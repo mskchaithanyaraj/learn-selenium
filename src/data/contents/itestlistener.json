@@ -1,0 +1,38 @@
+{
+  "id": "itestlistener",
+  "moduleId": "selenium-webdriver",
+  "title": "ITestListener Deep Dive",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "A closer look at implementing ITestListener for advanced failure reporting and CI/CD integration.",
+  "whyItMatters": "Basic tests just pass or fail. Enterprise tests need to attach screenshots, video recordings, and detailed logs to the failed test result. ITestListener is the hook that makes this possible.",
+  "explanation": "To create a listener, you create a class that implements `org.testng.ITestListener`. You don't need to override every method, only the ones you care about (usually `onTestFailure`, `onTestStart`, and `onTestSuccess`).\n\nThe most important object passed into these methods is `ITestResult result`. This object contains:\n- `result.getName()`: The name of the test method.\n- `result.getThrowable()`: The exception that caused the failure.\n- `result.getInstance()`: The actual instance of the test class that was running. This is critical because you need to access the `WebDriver` instance from that class to take a screenshot.",
+  "keyPoints": [
+    "`ITestResult` provides metadata about the test execution.",
+    "Use `result.getInstance()` to fetch the WebDriver instance for screenshots.",
+    "Listeners can also be used to automatically log defects to Jira via REST API upon failure."
+  ],
+  "codeExample": "public class ScreenShotListener implements ITestListener {\n    @Override\n    public void onTestFailure(ITestResult result) {\n        // 1. Get the name of the failed test\n        String testName = result.getName();\n        \n        // 2. Fetch the driver from the test class\n        Object testClass = result.getInstance();\n        WebDriver driver = ((BaseTest) testClass).getDriver();\n        \n        // 3. Take screenshot logic\n        if (driver != null) {\n            File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);\n            // copy file to destination...\n        }\n    }\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "You run a suite of 200 tests overnight. 3 fail. Because you implemented ITestListener, you wake up to an email containing the names of the 3 failed tests, the exact Exception thrown, and a screenshot of the browser at the exact moment it failed.",
+  "commonMistakes": [
+    "Not making the WebDriver accessible to the listener (e.g., leaving it `private` without a getter in the Base class).",
+    "Failing to handle ThreadLocal driver instances correctly inside the listener, resulting in screenshots being taken of the wrong browser window."
+  ],
+  "bestPractices": [
+    "Design a strong `BaseTest` class that manages the WebDriver and exposes it via a `getDriver()` method so listeners can access it.",
+    "Append a timestamp to screenshot filenames to prevent overriding previous failures."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Inside an ITestListener's onTestFailure method, how do you get the instance of the WebDriver to take a screenshot?",
+      "a": "You call `result.getInstance()` to get the test class object, cast it to your base test class, and call a public getter method like `getDriver()`."
+    },
+    {
+      "q": "What is the difference between ITestListener and ISuiteListener?",
+      "a": "ITestListener triggers before and after individual test methods. ISuiteListener triggers only twice: once before the entire testng.xml suite starts, and once after it finishes completely."
+    }
+  ],
+  "revisionSummary": "ITestListener gives you hooks into individual test execution. Mastering the ITestResult object is essential for extracting the WebDriver instance and building automated screenshot/reporting utilities.",
+  "tags": ["testng", "listeners", "reporting", "screenshots"]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "nested-json-assertion",
+  "moduleId": "rest-assured",
+  "title": "Nested JSON Assertions",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "Assert deeply nested JSON structures, arrays, and apply filters using GPath.",
+  "whyItMatters": "Enterprise API responses are rarely flat. They contain complex hierarchies of objects and arrays. Extracting and validating data deeply nested in these hierarchies is a critical skill.",
+  "explanation": "REST Assured uses Groovy's GPath syntax to navigate JSON. You can traverse objects using dot notation (`parent.child`). You can access array elements by index (`items[0]`). If an array contains objects, specifying a property name returns a list of all those properties (`users.name` returns a list of names). You can also filter arrays using the `findAll` method directly in the path string.",
+  "keyPoints": [
+    "Traverse objects with dot notation: `data.user.address.city`.",
+    "Access arrays by index: `data.items[0].price`.",
+    "Extract lists across an array: `items.id` (returns all IDs).",
+    "Filter collections: `items.findAll { it.price > 50 }.name`."
+  ],
+  "codeExample": "given().\nwhen().\n    get(\"/store\").\nthen().\n    // Flat assertion\n    body(\"store.name\", equalTo(\"Tech Hub\")).\n    // Deep nested object\n    body(\"store.location.address.city\", equalTo(\"London\")).\n    // Array element assertion\n    body(\"store.employees[0].role\", equalTo(\"Manager\")).\n    // Collection assertion (all employee names)\n    body(\"store.employees.name\", hasItems(\"Alice\", \"Bob\")).\n    // GPath filtering: count employees older than 30\n    body(\"store.employees.findAll { it.age > 30 }.size()\", equalTo(1));",
+  "codeLanguage": "java",
+  "realWorldExample": "When testing a GraphQL or complex REST endpoint returning a list of orders, you use GPath to filter only the 'delivered' orders and assert that their delivery dates are not null.",
+  "commonMistakes": [
+    "Misunderstanding that `array.propertyName` returns a List, not a single value. Therefore, you must use matchers like `hasItem()` or `hasItems()`, not `equalTo()`.",
+    "Syntax errors in the `findAll` closure, which throw runtime Groovy exceptions.",
+    "Assuming array indexes are stable. If the API order changes, `items[0]` assertions will become flaky."
+  ],
+  "bestPractices": [
+    "Use GPath filtering (`findAll`, `find`) to locate specific items dynamically rather than relying on hardcoded array indexes.",
+    "Familiarize yourself with Groovy closures, as they unlock powerful inline JSON querying.",
+    "If the path becomes too complex, extract the JSON into a String/Object and parse it using a dedicated library (like Jayway JsonPath) for easier debugging."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "If a JSON response contains an array of 'users' and each user has a 'name', what does the path \"users.name\" return?",
+      "a": "It returns a List containing the 'name' of every user in the array."
+    },
+    {
+      "q": "How can you dynamically find an item in a JSON array using REST Assured?",
+      "a": "By using GPath's `find` or `findAll` methods within the string path, e.g., `body(\"users.find { it.id == 5 }.name\", equalTo(\"Alice\"))`."
+    }
+  ],
+  "revisionSummary": "Use GPath (dot notation, indexes, findAll) to assert data deep within JSON hierarchies.",
+  "tags": ["REST Assured", "JSON", "GPath", "Nested Data"]
+}

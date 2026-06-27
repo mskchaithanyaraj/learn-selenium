@@ -1,0 +1,39 @@
+{
+  "id": "element-click-intercepted",
+  "moduleId": "selenium-webdriver",
+  "title": "ElementClickInterceptedException",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Occurs when you attempt to click an element, but another element (like a modal, loader, or floating header) receives the click instead.",
+  "whyItMatters": "Modern web applications heavily use overlays (spinners, GDPR cookie banners, sticky headers). This exception is extremely common when dealing with these elements.",
+  "explanation": "Selenium attempts to click the exact center of the target element. If the browser calculates that another element is covering that center point, the click is intercepted. The exception message usually tells you exactly which element blocked the click.\n\nSolutions:\n1. **Wait for overlay to disappear**: Wait for the loading spinner or modal to become invisible using `invisibilityOfElementLocated`.\n2. **Dismiss the overlay**: Explicitly click 'Accept' on the cookie banner before proceeding.\n3. **Scroll into view**: The element might be partially under a sticky header. Scroll it to the center of the screen.\n4. **JavaScript Click**: Bypasses the UI layer entirely.",
+  "keyPoints": [
+    "Target element is visible and enabled, but covered by something else.",
+    "Exception message identifies the blocking element.",
+    "Most common culprits: loading spinners, cookie banners, sticky navbars."
+  ],
+  "codeExample": "// ✅ Solution 1: Wait for the loading spinner to disappear\nWebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));\nwait.until(ExpectedConditions.invisibilityOfElementLocated(By.id(\"loading-spinner\")));\ndriver.findElement(By.id(\"submit\")).click();\n\n// ✅ Solution 2: Scroll element slightly to avoid sticky header\nWebElement btn = driver.findElement(By.id(\"submit\"));\nnew Actions(driver).moveToElement(btn).click().perform();\n\n// ⚠️ Solution 3: Force click via JS\nJavascriptExecutor js = (JavascriptExecutor) driver;\njs.executeScript(\"arguments[0].click();\", btn);",
+  "codeLanguage": "java",
+  "realWorldExample": "You submit a form, and a full-screen semi-transparent 'Loading...' spinner appears. Your script immediately tries to click the 'Next' button. The spinner intercepts the click, throwing the exception.",
+  "commonMistakes": [
+    "Ignoring the exception message, which explicitly names the blocking element.",
+    "Over-relying on JS click, which means your test isn't accurately simulating a real user (a real user couldn't click it either!)."
+  ],
+  "bestPractices": [
+    "Create helper methods to wait for global loading spinners to disappear before taking action.",
+    "Handle cookie consent banners in an `@BeforeMethod` or base test setup.",
+    "Read the exception stack trace carefully—it tells you what to wait for."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you handle a generic loading spinner that appears unpredictably?",
+      "a": "Implement a custom wait helper that checks for the invisibility of the spinner before interacting with core elements, or integrate it into a custom wrapper for the `click()` method."
+    },
+    {
+      "q": "Why is it generally bad practice to resolve click interceptions with JavascriptExecutor?",
+      "a": "Because JavaScript clicks bypass the UI layer. If a bug causes an invisible overlay to permanently block a button, a real user cannot click it. A JS click will succeed, giving a false positive test result."
+    }
+  ],
+  "revisionSummary": "ElementClickInterceptedException happens when an overlay blocks the target element. Resolve it by waiting for the overlay to vanish, dismissing it, or scrolling.",
+  "tags": ["selenium", "exceptions", "debugging"]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "timers-think-time",
+  "moduleId": "performance-testing",
+  "title": "Timers & Think Time",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Timers in JMeter are used to pause threads for a certain amount of time between requests. This simulates 'Think Time', the natural delay as real users read a page or fill out a form.",
+  "whyItMatters": "Without timers, JMeter fires requests as fast as possible, which acts like a Denial of Service (DoS) attack rather than a realistic load test. Proper think time modelling is crucial for accurate capacity planning.",
+  "explanation": "### What is Think Time?\n\nReal users don't instantly click the next link after a page loads. They pause to comprehend content. Simulating this delay is necessary to generate realistic server load profiles.\n\n### Common JMeter Timers\n\n- **Constant Timer:** Pauses each thread for the exact same amount of time (e.g., 3000 ms).\n- **Uniform Random Timer:** Delays threads by a random amount of time within a specified range (e.g., a base delay of 1000ms plus a random delay between 0 and 2000ms).\n- **Gaussian Random Timer:** Calculates a random delay based on a normal distribution curve (mean and standard deviation). Highly realistic for simulating user behavior.\n- **Throughput Shaping Timer:** Used to pace the test to hit a target Requests Per Second (RPS) profile, regardless of the number of active threads.\n\n### Scoping\n\nTimers execute *before* the samplers in their scope. If a timer is placed under a Transaction Controller, it applies to every sampler inside it.",
+  "keyPoints": [
+    "Timers pause the thread, simulating user think time.",
+    "They execute *before* the samplers in their scope.",
+    "Zero think time results in unrealistic stress testing."
+  ],
+  "codeExample": "<!-- Uniform Random Timer Example in JMX -->\n<UniformRandomTimer guiclass=\"UniformRandomTimerGui\" testclass=\"UniformRandomTimer\" testname=\"Uniform Random Timer\" enabled=\"true\">\n  <!-- Base delay (in milliseconds) -->\n  <stringProp name=\"ConstantTimer.delay\">2000</stringProp>\n  <!-- Maximum random delay added to base -->\n  <stringProp name=\"RandomTimer.range\">3000</stringProp>\n</UniformRandomTimer>\n<!-- Result: Delay will be anywhere between 2000ms and 5000ms -->",
+  "codeLanguage": "xml",
+  "realWorldExample": "An SDET scripting a multi-page checkout flow adds a Gaussian Random Timer with a mean of 5000ms and deviation of 2000ms before the 'Submit Payment' sampler, accurately simulating the time it takes users to review their cart and type in credit card details.",
+  "commonMistakes": [
+    "Putting a Timer at the Thread Group level, inadvertently slowing down API teardown or setup requests.",
+    "Testing without any think time, resulting in immediate CPU spikes on the server that don't reflect production usage.",
+    "Miscalculating concurrency limits by ignoring think time (e.g., Little's Law)."
+  ],
+  "bestPractices": [
+    "Use Uniform or Gaussian Random Timers instead of Constant Timers to avoid 'synchronized' request spikes.",
+    "Scope timers tightly by placing them as children of specific samplers, or use a Test Action/Flow Control Action sampler for explicit pauses.",
+    "Parameterize timer values so they can be easily scaled up or down via command-line arguments."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "If you have 10 threads hitting a server with 0 think time vs 10 threads hitting with 5 seconds think time, how does it affect throughput?",
+      "a": "Zero think time creates massive throughput (RPS), acting like a stress test. 5 seconds of think time drastically lowers the RPS, accurately reflecting 10 concurrent real-world users."
+    },
+    {
+      "q": "When does a timer execute in JMeter's lifecycle?",
+      "a": "It executes *before* the sampler it is scoped to."
+    }
+  ],
+  "revisionSummary": "Timers simulate human pauses (think time). Without them, tests are unrealistic. Timers execute before samplers, so scope them carefully. Prefer random distribution timers for realistic load.",
+  "tags": ["JMeter", "Timers", "Think Time", "Load Profile"]
+}

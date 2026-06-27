@@ -1,0 +1,39 @@
+{
+  "id": "hssf-vs-xssf",
+  "moduleId": "selenium-webdriver",
+  "title": "HSSF vs XSSF vs SXSSF",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Apache POI provides different implementations depending on the Excel file format and the performance requirements.",
+  "whyItMatters": "Using the wrong implementation will cause exceptions (if file formats mismatch) or OutOfMemoryErrors (if trying to write massive files).",
+  "explanation": "1. **HSSF (Horrible Spreadsheet Format)**: Used for legacy Excel 97-2003 files (`.xls`). Limited to 65,536 rows. Classes: `HSSFWorkbook`, `HSSFSheet`.\n2. **XSSF (XML Spreadsheet Format)**: Used for modern Excel 2007+ files (`.xlsx`). Supports over 1 million rows. Classes: `XSSFWorkbook`, `XSSFSheet`.\n3. **SXSSF (Streaming Usermodel API)**: An extension of XSSF for writing very large files. It flushes rows to the disk rather than keeping everything in RAM, preventing `OutOfMemoryError`.\n\nTo avoid hardcoding formats, use `WorkbookFactory.create(fileInputStream)`, which automatically detects if it's an XLS or XLSX and returns the correct polymorphic `Workbook` object.",
+  "keyPoints": [
+    "HSSF is for `.xls`.",
+    "XSSF is for `.xlsx`.",
+    "SXSSF is for writing massive `.xlsx` files without running out of RAM.",
+    "`WorkbookFactory` abstract this away for reading files."
+  ],
+  "codeExample": "// Instead of hardcoding XSSFWorkbook or HSSFWorkbook:\nFileInputStream fis = new FileInputStream(\"data.xlsx\");\n\n// WorkbookFactory automatically returns the correct implementation\nWorkbook wb = WorkbookFactory.create(fis);\nSheet sheet = wb.getSheetAt(0);\nSystem.out.println(sheet.getRow(0).getCell(0));\nwb.close();",
+  "codeLanguage": "java",
+  "realWorldExample": "Your automation suite downloads a generated report and needs to parse it. Yesterday it was an `.xls` file, today the developers updated the system to export `.xlsx`. If you used `WorkbookFactory`, your test won't break.",
+  "commonMistakes": [
+    "Hardcoding `new XSSFWorkbook()` and then feeding it an older `.xls` file, throwing an exception.",
+    "Trying to write 500,000 rows using `XSSFWorkbook` and crashing the JVM. (Use `SXSSFWorkbook` instead)."
+  ],
+  "bestPractices": [
+    "Always use `WorkbookFactory.create()` for reading data, making your framework format-agnostic.",
+    "Use `SXSSFWorkbook` if you are generating massive data export files programmatically."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between HSSF and XSSF in Apache POI?",
+      "a": "HSSF is used to interact with legacy `.xls` files, while XSSF is used for modern `.xlsx` files."
+    },
+    {
+      "q": "How can you prevent an OutOfMemoryError when writing a huge Excel file?",
+      "a": "By using `SXSSFWorkbook`, which is a streaming version of XSSF. It keeps a limited number of rows in memory (e.g., 100) and writes the rest to a temporary file on disk."
+    }
+  ],
+  "revisionSummary": "Apache POI uses HSSF for older XLS files and XSSF for modern XLSX files. Use WorkbookFactory to seamlessly handle both when reading. Use SXSSF when writing massive files to manage memory.",
+  "tags": ["apache-poi", "excel"]
+}

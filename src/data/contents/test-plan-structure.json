@@ -1,0 +1,40 @@
+{
+  "id": "test-plan-structure",
+  "moduleId": "performance-testing",
+  "title": "Test Plan Structure",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "A JMeter Test Plan is a hierarchical tree of elements that dictates exactly how the load test will execute, including configuration, flow control, data extraction, and assertions.",
+  "whyItMatters": "A well-structured test plan ensures maintainability, reusability, and accurate simulation of complex user workflows, as the execution order and scoping rules heavily influence the test outcome.",
+  "explanation": "### Scoping Rules and Execution Order\n\nJMeter executes elements based on their hierarchical placement (scope) and type, not just top-to-bottom order. \n\n**Order of Execution:**\n1. Configuration Elements (e.g., HTTP Header Manager)\n2. Pre-Processors (e.g., JSR223 PreProcessor)\n3. Timers\n4. Sampler\n5. Post-Processors (e.g., JSON Extractor) (runs only if Sampler has results)\n6. Assertions (runs only if Sampler has results)\n7. Listeners\n\n### Core Components\n\n- **Config Elements:** Used to set up defaults and variables (e.g., HTTP Cookie Manager for session handling, CSV Data Set Config for parameterization).\n- **Logic Controllers:** Determine the processing order of Samplers. E.g., Loop Controller, If Controller, Transaction Controller (groups samplers to measure overall time).\n- **Pre/Post-Processors:** Used to modify requests before they go out (Pre) or extract data from responses (Post), commonly used for correlation (extracting dynamic tokens).\n- **Assertions:** Validate that the responses contain expected data or HTTP codes.",
+  "keyPoints": [
+    "Test plans are executed in a specific lifecycle order, regardless of visual placement in the tree.",
+    "Hierarchical scoping means an element affects its parent, siblings, and their children.",
+    "Transaction Controllers are vital for measuring the time taken for a logical step consisting of multiple HTTP requests."
+  ],
+  "codeExample": "Test Plan\n└── Thread Group (10 Users)\n    ├── HTTP Cookie Manager (Applies to all requests)\n    ├── HTTP Header Manager (Applies to all requests)\n    ├── Transaction Controller (Login Flow)\n    │   ├── HTTP Request (GET Login Page)\n    │   │   └── Regular Expression Extractor (Extract CSRF Token)\n    │   └── HTTP Request (POST Login Data)\n    │       └── HTTP Header Manager (Overrides Headers for this request)\n    └── Response Assertion (Applies to all requests in Thread Group)",
+  "codeLanguage": "text",
+  "realWorldExample": "When testing an e-commerce checkout, an SDET uses a Transaction Controller named 'Checkout Flow' to group the Cart, Shipping, and Payment HTTP requests. A JSON Extractor is attached as a child to the Cart request to capture the 'cartId', which is then passed to the subsequent requests.",
+  "commonMistakes": [
+    "Placing Timers at the Thread Group level when they are meant for a specific sampler, causing delays on *every* sampler.",
+    "Failing to use a Cookie Manager, meaning each HTTP request acts as a brand new, unauthenticated session.",
+    "Overusing assertions on large response bodies, which degrades JMeter client performance."
+  ],
+  "bestPractices": [
+    "Use a Transaction Controller with 'Generate parent sample' checked to keep reports clean.",
+    "Place Configuration elements like Header Managers at the highest applicable level to reduce duplication.",
+    "Use JSR223 elements with Groovy (not BeanShell) for complex scripting needs, as Groovy is heavily optimized."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the execution order of elements in JMeter?",
+      "a": "Config Elements -> Pre-Processors -> Timers -> Sampler -> Post-Processors -> Assertions -> Listeners."
+    },
+    {
+      "q": "If a Timer is placed as a child of a Thread Group alongside 3 HTTP Requests, when does it execute?",
+      "a": "It executes before *every* HTTP Request in that Thread Group."
+    }
+  ],
+  "revisionSummary": "Mastering scoping and execution order is critical. Use Logic Controllers to manage flow, Pre/Post-processors for correlation, and Config Elements for global settings.",
+  "tags": ["JMeter", "Test Plan", "Logic Controllers", "Scope", "Execution Order"]
+}

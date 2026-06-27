@@ -1,0 +1,46 @@
+{
+  "id": "git-version-control",
+  "moduleId": "general-sdet",
+  "title": "Git Version Control",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Essential Git concepts and commands required for SDETs to manage test automation codebases collaboratively.",
+  "whyItMatters": "Version control is critical for team collaboration, tracking changes, and maintaining code history. A strong grasp of Git enables seamless CI/CD integration and code reviews.",
+  "explanation": "Git is a distributed version control system. A typical workflow involves cloning a repository, creating a feature branch, making commits, pulling the latest remote changes to resolve conflicts, and pushing the branch to a remote server (like GitHub or Bitbucket) to open a Pull Request. Important concepts include branching strategies (e.g., GitFlow) and understanding the working directory, staging area, and local repository.",
+  "keyPoints": [
+    "Commit often with meaningful commit messages.",
+    "Always pull/rebase before pushing to avoid merge conflicts.",
+    ".gitignore is essential to prevent committing binaries, logs, and sensitive data.",
+    "Feature branches isolate work without disrupting the main codebase."
+  ],
+  "codeExample": "# Typical SDET daily workflow\ngit checkout main\ngit pull origin main\ngit checkout -b feature/login-tests\n# ... make code changes ...\ngit add .\ngit commit -m \"Add automated tests for login flow\"\ngit push origin feature/login-tests",
+  "codeLanguage": "bash",
+  "realWorldExample": "An SDET creates a branch `fix/stale-element` to update flaky locators. After committing and pushing, they open a Pull Request. Another SDET reviews the code, approves it, and it merges into `main`.",
+  "commonMistakes": [
+    "Committing hardcoded passwords or API keys to the repository.",
+    "Committing compiled files (`.class`) or report folders (`test-output/`) because of a missing `.gitignore`.",
+    "Working directly on the `main` branch instead of using feature branches."
+  ],
+  "bestPractices": [
+    "Keep commits small and focused on a single logical change.",
+    "Write descriptive commit messages (e.g., 'Fix login timeout issue' instead of 'updates').",
+    "Perform code reviews on Pull Requests to maintain test framework quality."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between `git pull` and `git fetch`?",
+      "a": "`git fetch` downloads new data from a remote repository but doesn't integrate it into your working files. `git pull` is essentially `git fetch` followed by `git merge`, directly updating your current branch."
+    },
+    {
+      "q": "How do you resolve a merge conflict?",
+      "a": "Open the conflicting files, look for the conflict markers (`<<<<`, `====`, `>>>>`), manually edit the file to keep the desired changes, save, `git add` the resolved files, and `git commit`."
+    }
+  ],
+  "revisionSummary": "Git lifecycle: Working Directory -> (add) -> Staging -> (commit) -> Local Repo -> (push) -> Remote Repo. Always branch, commit small, and use .gitignore.",
+  "tags": [
+    "Git",
+    "Version Control",
+    "VCS",
+    "Collaboration"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "parallel-execution",
+  "moduleId": "selenium-webdriver",
+  "title": "Parallel Execution",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Running tests concurrently rather than sequentially. TestNG natively supports multithreading to dramatically reduce test suite execution time.",
+  "whyItMatters": "A suite of 500 UI tests taking 1 minute each takes over 8 hours sequentially. Running them 10 at a time brings it under an hour. Parallel execution is mandatory for CI/CD.",
+  "explanation": "TestNG can parallelize at different levels via `testng.xml`: methods, classes, or tests.\n- `parallel=\"methods\"`: Runs every @Test method in a separate thread.\n- `parallel=\"classes\"`: Runs all methods in a class in the same thread, but runs multiple classes concurrently.\n- `thread-count=\"5\"`: Specifies the maximum number of threads.\n\n**The ThreadLocal Challenge**: Selenium `WebDriver` is not thread-safe. If multiple parallel tests share a single `static WebDriver driver`, their commands will collide, causing chaotic failures. You MUST isolate the WebDriver instance for each thread using Java's `ThreadLocal<WebDriver>`.",
+  "keyPoints": [
+    "Configured via the `parallel` and `thread-count` attributes in testng.xml.",
+    "Drastically reduces execution time.",
+    "Requires strict thread-safety in the framework architecture.",
+    "ThreadLocal is the standard solution for managing WebDriver instances in parallel."
+  ],
+  "codeExample": "public class DriverFactory {\n    // Isolate driver instances per thread\n    private static ThreadLocal<WebDriver> driver = new ThreadLocal<>();\n\n    public static void setDriver(WebDriver d) {\n        driver.set(d);\n    }\n\n    public static WebDriver getDriver() {\n        return driver.get();\n    }\n\n    public static void removeDriver() {\n        driver.remove();\n    }\n}\n\n/* testng.xml\n<suite name=\"Suite\" parallel=\"methods\" thread-count=\"4\">\n    ...\n</suite>\n*/",
+  "codeLanguage": "java",
+  "realWorldExample": "Your team wants fast feedback on pull requests. By utilizing a Selenium Grid with 20 nodes and setting TestNG to `parallel=\"classes\"` with a `thread-count=\"20\"`, the UI regression suite finishes in 15 minutes instead of 5 hours.",
+  "commonMistakes": [
+    "Using a `public static WebDriver driver;` variable, which causes threads to overwrite each other's sessions.",
+    "Running data-dependent tests in parallel (e.g., Test A creates a user, Test B immediately tries to delete it while Test A is still running)."
+  ],
+  "bestPractices": [
+    "Use `parallel=\"classes\"` as a safe default, ensuring methods within the same class execute predictably in sequence.",
+    "Ensure all utility classes, reporting tools (like ExtentReports), and test data generators are also thread-safe.",
+    "Always call `ThreadLocal.remove()` in your teardown to prevent memory leaks."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is ThreadLocal and why is it used in Selenium frameworks?",
+      "a": "ThreadLocal provides thread-local variables. Each thread that accesses one has its own, independently initialized copy of the variable. We use it to store the WebDriver instance so parallel tests don't interfere with each other."
+    },
+    {
+      "q": "How can you run data provider iterations in parallel?",
+      "a": "By adding `parallel = true` to the `@DataProvider` annotation. TestNG will execute the iterations concurrently."
+    }
+  ],
+  "revisionSummary": "TestNG parallel execution speeds up test suites. It requires configuring testng.xml and architecting the framework for thread safety, most commonly by wrapping the WebDriver in a ThreadLocal object.",
+  "tags": ["testng", "parallel", "multithreading", "threadlocal"]
+}

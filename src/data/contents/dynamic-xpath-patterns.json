@@ -1,0 +1,57 @@
+{
+  "id": "dynamic-xpath-patterns",
+  "moduleId": "selenium-webdriver",
+  "title": "Dynamic XPath Patterns",
+  "priority": "hot",
+  "estimatedMinutes": 55,
+  "overview": "Dynamic XPath expressions use functions and axes to locate elements whose attributes change at runtime, unlike static XPath that relies on fixed attribute values.",
+  "whyItMatters": "Modern web applications use dynamic IDs and class names that change on every page load. Dynamic XPath is the primary way to locate such elements reliably.",
+  "explanation": "**What is Dynamic XPath?**\nWhen element attributes like id=\"user_12345\" change dynamically (12345 being a session-specific number), static XPath fails. Dynamic XPath uses partial matching functions and relationship axes.\n\n**XPath Functions:**\n- `contains(@attr, 'value')` — partial match on attribute value\n- `starts-with(@attr, 'value')` — element whose attribute starts with value\n- `text()='value'` — match by exact text content\n- `contains(text(), 'value')` — partial text match\n- `normalize-space(text())='value'` — trim whitespace then match\n\n**XPath Axes (navigating the DOM tree):**\n- `parent::` — direct parent\n- `ancestor::` — any ancestor\n- `child::` — direct children\n- `following-sibling::` — siblings after current node\n- `preceding-sibling::` — siblings before current node\n- `following::` — all nodes after current (in document order)\n- `preceding::` — all nodes before current\n- `descendant::` — all descendants\n\n**Absolute vs Relative XPath:**\n- Absolute: `/html/body/div[2]/form/input[1]` — starts from root, brittle\n- Relative: `//input[@id='username']` — starts from anywhere, preferred",
+  "keyPoints": [
+    "contains() for partial attribute matching — most commonly used",
+    "starts-with() for elements with ID prefixes that are consistent",
+    "text() for matching visible text content",
+    "XPath axes (following-sibling, ancestor, parent) for navigating DOM relationships",
+    "Relative XPath (//) is always preferred over absolute XPath (/html/body/...)",
+    "Combine multiple conditions with and/or operators"
+  ],
+  "codeExample": "// ── XPATH FUNCTIONS ──────────────────────────────────────────────\n\n// contains() — partial attribute match\ndriver.findElement(By.xpath(\"//input[contains(@id, 'user')]\"));\ndriver.findElement(By.xpath(\"//div[contains(@class, 'error')]\"));\n\n// starts-with()\ndriver.findElement(By.xpath(\"//input[starts-with(@name, 'login')]\"));\n\n// text() — exact text\ndriver.findElement(By.xpath(\"//button[text()='Submit']\"));\ndriver.findElement(By.xpath(\"//span[contains(text(), 'Hello')]\"));\n\n// AND / OR conditions\ndriver.findElement(By.xpath(\n    \"//input[@type='text' and @placeholder='Enter email']\"\n));\ndriver.findElement(By.xpath(\n    \"//button[@id='btn1' or @id='btn2']\"\n));\n\n// ── XPATH AXES ────────────────────────────────────────────────────\n\n// following-sibling — find element after a known element\n// HTML: <label>Username</label><input id=\"user_xyz\"/>\ndriver.findElement(By.xpath(\n    \"//label[text()='Username']/following-sibling::input\"\n));\n\n// ancestor — go up the tree\n// Find the parent table row of a specific cell\ndriver.findElement(By.xpath(\n    \"//td[text()='John Doe']/ancestor::tr\"\n));\n\n// parent — direct parent\ndriver.findElement(By.xpath(\"//input[@id='email']/parent::div\"));\n\n// child — direct child\ndriver.findElement(By.xpath(\"//form[@id='loginForm']/child::input[1]\"));\n\n// preceding-sibling\ndriver.findElement(By.xpath(\n    \"//input[@id='password']/preceding-sibling::label\"\n));\n\n// ── REAL DYNAMIC SCENARIOS ────────────────────────────────────────\n\n// Dynamic ID: id=\"react-select-3-input\" — use contains\ndriver.findElement(By.xpath(\"//input[contains(@id, 'react-select')]\"));\n\n// Table row by cell value (find row where name is 'Alice')\ndriver.findElement(By.xpath(\n    \"//table//tr[td[text()='Alice']]/td[3]\" // Get 3rd cell from Alice's row\n));\n\n// Index-based when multiple matches\ndriver.findElement(By.xpath(\"(//button[@class='btn-primary'])[2]\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "An Angular application generates IDs like \"mat-input-0\", \"mat-input-1\" that change depending on component load order. Using contains(@id, \"mat-input\") finds these reliably. Or using the label text as an anchor and following-sibling::input to find the associated input.",
+  "commonMistakes": [
+    "Using absolute XPath (/html/body/div[1]/...) — breaks with any UI change",
+    "Not using contains() for dynamic IDs — causes NoSuchElementException",
+    "XPath with index [1] without understanding — may grab wrong element",
+    "Overly complex XPath with 5+ axes — use CSS selector instead",
+    "Not testing XPath in browser DevTools before using in code"
+  ],
+  "bestPractices": [
+    "Always prefer relative XPath (starts with //) over absolute",
+    "Test XPath in Chrome DevTools console: $x(\"//your/xpath\")",
+    "Use CSS selectors when possible — they are faster than XPath",
+    "Prefer stable attributes (data-testid, aria-label) over dynamic ones",
+    "Use meaningful anchors (visible text, labels) rather than brittle indices"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between absolute and relative XPath?",
+      "a": "Absolute XPath starts from the root element (/html/body/...) and is brittle — any UI change breaks it. Relative XPath starts with // and searches from anywhere in the DOM, making it more resilient to UI changes."
+    },
+    {
+      "q": "How do you handle elements with dynamic IDs in Selenium?",
+      "a": "Use XPath functions like contains(@id, \"static-prefix\") or starts-with(@id, \"prefix\"). Alternatively, use following-sibling, preceding-sibling axes to navigate from a known stable element, or use data-testid attributes if developers provide them."
+    },
+    {
+      "q": "What are XPath axes?",
+      "a": "XPath axes define the relationship between the current node and the nodes to select. Common axes: parent (direct parent), ancestor (all ancestors), following-sibling (siblings after current node), preceding-sibling (siblings before), child (direct children), descendant (all descendants)."
+    }
+  ],
+  "revisionSummary": "Dynamic XPath uses contains(), starts-with(), text(). Axes: following-sibling, preceding-sibling, ancestor, parent, child. Always use relative XPath (//). Test XPath in DevTools with $x().",
+  "tags": [
+    "xpath",
+    "dynamic-xpath",
+    "xpath-axes",
+    "css-selectors",
+    "selenium"
+  ]
+}

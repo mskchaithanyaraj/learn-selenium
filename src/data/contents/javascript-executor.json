@@ -1,0 +1,39 @@
+{
+  "id": "javascript-executor",
+  "moduleId": "selenium-webdriver",
+  "title": "JavascriptExecutor",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "An interface that allows Selenium to execute custom JavaScript directly within the context of the browser window.",
+  "whyItMatters": "Sometimes standard WebDriver methods fail due to complex UI overlays, animations, or unsupported native events. JavascriptExecutor provides a 'backdoor' to interact with the DOM directly.",
+  "explanation": "You cast the driver to `JavascriptExecutor`: `JavascriptExecutor js = (JavascriptExecutor) driver;`\n\nKey Use Cases:\n- **Forced Clicking**: Bypasses `ElementClickInterceptedException` by triggering the click event via JS.\n- **Scrolling**: Selenium tries to auto-scroll, but sometimes fails. Use JS to `scrollIntoView()`.\n- **Setting Values**: Entering text into hidden fields or bypassing buggy `sendKeys()` behavior.\n- **Fetching Properties**: Retrieving computed CSS styles or DOM properties that aren't exposed via standard Selenium APIs.\n- **Waiting for Page Load**: Checking `return document.readyState;` to ensure the DOM is fully loaded.",
+  "keyPoints": [
+    "Executes synchronous or asynchronous JavaScript.",
+    "Passes WebElements as arguments using the `arguments[0]` syntax.",
+    "Can return values back to Java (Strings, Longs, Booleans, WebElements).",
+    "Should be used as a fallback, not a primary strategy."
+  ],
+  "codeExample": "JavascriptExecutor js = (JavascriptExecutor) driver;\nWebElement element = driver.findElement(By.id(\"hidden-btn\"));\n\n// 1. Click element (bypasses UI visibility checks)\njs.executeScript(\"arguments[0].click();\", element);\n\n// 2. Scroll element into view\njs.executeScript(\"arguments[0].scrollIntoView(true);\", element);\n\n// 3. Return a value to Java\nString title = (String) js.executeScript(\"return document.title;\");\n\n// 4. Set a value directly\njs.executeScript(\"arguments[0].value='test user';\", driver.findElement(By.id(\"username\")));",
+  "codeLanguage": "java",
+  "realWorldExample": "A GDPR cookie banner covers the bottom 20% of the screen. Selenium's standard `click()` fails because it tries to click a button hidden under the banner. You use `js.executeScript(\"arguments[0].scrollIntoView({block: 'center'});\", button)` to scroll the button to the middle of the screen, escaping the banner.",
+  "commonMistakes": [
+    "Using JS Click for everything. This is an anti-pattern. If a button is permanently blocked by an invisible div, a real user cannot click it. JS Click will succeed, giving you a false positive (test passes, but the app is broken).",
+    "Forgetting the `return` keyword in the script when trying to fetch data back to Java."
+  ],
+  "bestPractices": [
+    "Prioritize standard Actions and standard clicks. Only use JavascriptExecutor when standard methods reliably fail due to known UI quirks.",
+    "Use it to manipulate the DOM for test setup (e.g., revealing hidden form fields to bypass a multi-step wizard)."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why is it generally bad practice to resolve click interceptions with JavascriptExecutor?",
+      "a": "Because JavascriptExecutor bypasses the UI layer entirely. If a UI bug prevents a human from clicking the button, a JS click will still work, leading to a false positive test."
+    },
+    {
+      "q": "How do you scroll to an element using Selenium?",
+      "a": "You cast the driver to JavascriptExecutor and execute `arguments[0].scrollIntoView(true);`, passing the WebElement as the argument."
+    }
+  ],
+  "revisionSummary": "JavascriptExecutor executes raw JS in the browser. It is incredibly powerful for scrolling, forced clicking, and reading DOM properties, but should be used sparingly to ensure tests remain realistic.",
+  "tags": ["selenium", "javascript", "dom", "workarounds"]
+}

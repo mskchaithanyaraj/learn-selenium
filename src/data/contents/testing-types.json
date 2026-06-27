@@ -1,0 +1,49 @@
+{
+  "id": "testing-types",
+  "moduleId": "general-sdet",
+  "title": "Testing Types",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "A comprehensive guide to the various levels and types of software testing, including functional, non-functional, and maintenance testing.",
+  "whyItMatters": "Understanding different testing types allows SDETs to formulate a balanced and thorough test strategy, ensuring both application functionality and performance.",
+  "explanation": "Software testing is broadly categorized into Functional and Non-Functional testing. Functional testing verifies what the system does (Unit, Integration, System, UAT). Non-Functional testing validates how well the system performs its functions (Performance, Security, Usability). Finally, maintenance testing such as Regression, Smoke, and Sanity testing are conducted to ensure ongoing stability after changes.",
+  "keyPoints": [
+    "Functional testing covers Unit, Integration, System, and Acceptance testing.",
+    "Non-functional testing evaluates performance, load, security, and usability.",
+    "Smoke testing is a build verification test, while Sanity testing focuses on specific functionality post-bug fix.",
+    "Regression testing ensures new code does not break existing features.",
+    "Black-box testing focuses on inputs/outputs without knowing internal code; White-box involves internal logic testing."
+  ],
+  "codeExample": "// Example of Unit Test in Java (White-box testing)\n@Test\npublic void testAddition() {\n    Calculator calc = new Calculator();\n    assertEquals(5, calc.add(2, 3), \"Addition should work correctly\");\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "An e-commerce site undergoes functional testing to ensure 'Add to Cart' works. It undergoes non-functional load testing to ensure it can handle Black Friday traffic.",
+  "commonMistakes": [
+    "Confusing smoke testing with sanity testing.",
+    "Neglecting non-functional testing until the end of the SDLC.",
+    "Over-relying on end-to-end (UI) tests instead of unit tests (the testing pyramid)."
+  ],
+  "bestPractices": [
+    "Follow the Testing Pyramid: many unit tests, some integration tests, and few UI tests.",
+    "Automate regression and smoke tests to save time.",
+    "Integrate testing early in the lifecycle (Shift-Left)."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between Smoke Testing and Sanity Testing?",
+      "a": "Smoke testing verifies critical functionalities to ensure the build is stable enough for further testing. Sanity testing is a subset of regression testing, checking specific functionalities after minor code changes to verify bugs are fixed."
+    },
+    {
+      "q": "Explain Black-box vs White-box testing.",
+      "a": "Black-box testing focuses solely on inputs and outputs without knowing the internal code structure. White-box testing requires knowledge of the internal code and structure to test all logical paths."
+    }
+  ],
+  "revisionSummary": "Functional testing (what it does) vs Non-functional (how it behaves). Smoke (broad/shallow) vs Sanity (narrow/deep). Shift-left for early testing.",
+  "tags": [
+    "Functional",
+    "Non-Functional",
+    "Smoke Testing",
+    "Sanity Testing",
+    "Black-box",
+    "White-box"
+  ]
+}

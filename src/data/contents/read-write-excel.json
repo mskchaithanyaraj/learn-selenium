@@ -1,0 +1,40 @@
+{
+  "id": "read-write-excel",
+  "moduleId": "selenium-webdriver",
+  "title": "Read & Write Excel with Apache POI",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Apache POI is the standard Java API for reading and writing Microsoft Office formats, primarily used for Excel (.xls, .xlsx) in test automation.",
+  "whyItMatters": "Business analysts and manual testers often define test scenarios in Excel. POI allows your Java automation framework to read these files directly, turning spreadsheets into executable test data.",
+  "explanation": "The POI architecture maps directly to Excel's structure:\n1. **Workbook** (`XSSFWorkbook`): Represents the entire Excel file.\n2. **Sheet** (`XSSFSheet`): Represents a specific tab in the workbook.\n3. **Row** (`XSSFRow`): A row within a sheet.\n4. **Cell** (`XSSFCell`): A specific cell within a row.\n\nTo read:\nOpen a `FileInputStream`, pass it to `WorkbookFactory.create()`, get the sheet, iterate through rows, and iterate through cells. You must check the CellType (STRING, NUMERIC, BOOLEAN) before retrieving the value to avoid Exceptions.\n\nTo write:\nOpen a `FileOutputStream`, use `cell.setCellValue(\"Pass\")`, and then `workbook.write(out)`. Always close streams to avoid file corruption.",
+  "keyPoints": [
+    "Requires `poi` and `poi-ooxml` Maven dependencies.",
+    "File streams (`FileInputStream` / `FileOutputStream`) are required.",
+    "Cell types must be evaluated before extraction (e.g., Excel stores dates and numbers as NUMERIC).",
+    "Always close the Workbook and streams in a `finally` block or try-with-resources."
+  ],
+  "codeExample": "FileInputStream fis = new FileInputStream(new File(\"data.xlsx\"));\nWorkbook workbook = new XSSFWorkbook(fis);\nSheet sheet = workbook.getSheet(\"Users\");\n\n// Read cell (Row 1, Column 0)\nRow row = sheet.getRow(1);\nCell cell = row.getCell(0);\nSystem.out.println(\"User: \" + cell.getStringCellValue());\n\n// Write to cell\nCell statusCell = row.createCell(2);\nstatusCell.setCellValue(\"PASS\");\n\nFileOutputStream fos = new FileOutputStream(\"data.xlsx\");\nworkbook.write(fos);\n\nworkbook.close();\nfis.close();\nfos.close();",
+  "codeLanguage": "java",
+  "realWorldExample": "An Excel sheet contains 100 rows of user registration data. The script reads the sheet row by row, creates users in the UI, and writes 'PASS' or 'FAIL' back into the last column of the Excel file.",
+  "commonMistakes": [
+    "Trying to read a numeric cell (like a phone number) using `getStringCellValue()`, causing an `IllegalStateException`.",
+    "Forgetting to call `workbook.write()` after making changes, resulting in the file not updating.",
+    "Leaving the Excel file open in the Microsoft Excel application while the Java script tries to write to it (throws a file locked exception)."
+  ],
+  "bestPractices": [
+    "Create a reusable `ExcelUtils` class to hide the boilerplate code of POI.",
+    "Use a DataFormatter (`new DataFormatter().formatCellValue(cell)`) to safely extract any cell type as a String."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you handle different cell types (string, numeric, boolean) in Apache POI?",
+      "a": "You check `cell.getCellType()` and use a switch statement to call the appropriate method (`getStringCellValue`, `getNumericCellValue`), or simply use Apache POI's `DataFormatter` to handle the conversion to string automatically."
+    },
+    {
+      "q": "What exception do you get if the Excel file is open while your script tries to write to it?",
+      "a": "You will typically get a `FileNotFoundException` stating that the process cannot access the file because it is being used by another process."
+    }
+  ],
+  "revisionSummary": "Apache POI enables reading and writing Excel files in Java. It models files hierarchically: Workbook -> Sheet -> Row -> Cell. Handling file streams correctly and parsing cell types are the main challenges.",
+  "tags": ["apache-poi", "excel", "data-driven", "java"]
+}

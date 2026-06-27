@@ -1,0 +1,40 @@
+{
+  "id": "wsdl-structure",
+  "moduleId": "rest-soap-wsdl",
+  "title": "WSDL Structure",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "A detailed breakdown of the Web Services Description Language (WSDL) document structure, essential for testing SOAP APIs.",
+  "whyItMatters": "WSDL is the contract for a SOAP service. SDETs must know how to read a WSDL to understand the available operations, expected request formats, and data types when configuring tests in tools like SoapUI or writing Java test clients.",
+  "explanation": "WSDL (Web Services Description Language) is an XML-based language used to describe the functionality offered by a SOAP web service. It acts as a strict contract between the client and the server.\n\nThink of WSDL like an OpenAPI/Swagger specification for REST, but strictly formatted in XML.\n\n### Key Elements of a WSDL 1.1 Document\nA standard WSDL document contains the following core elements, usually read from bottom to top conceptually:\n\n1. `<types>`: Defines the XML Schema (XSD) data types used by the web service. This dictates the structure of the data you can send and receive (e.g., defining what an `Employee` object looks like).\n2. `<message>`: Defines the data elements for an operation. Usually, there is one message for the request and one for the response. They refer to the data types defined in `<types>`.\n3. `<portType>`: Describes the operations (functions) that can be performed and the messages involved (analogous to a Java Interface).\n4. `<binding>`: Specifies the communication protocol (usually SOAP over HTTP) and data format specifications for the operations defined by the `<portType>`.\n5. `<service>`: Specifies the actual endpoint URL (network address) where the service can be invoked.\n\n### WSDL 1.1 vs WSDL 2.0\nWSDL 2.0 changed some terminology (e.g., `<portType>` became `<interface>`, `<port>` became `<endpoint>`), but WSDL 1.1 remains vastly more common in legacy enterprise systems.",
+  "keyPoints": [
+    "WSDL is an XML document describing a SOAP web service.",
+    "It serves as a strict, machine-readable contract between client and server.",
+    "The <types> element defines data structures using XML Schema (XSD).",
+    "The <portType> defines the abstract operations available.",
+    "The <binding> ties the operations to a concrete protocol like SOAP/HTTP."
+  ],
+  "codeExample": "<definitions name=\"StockQuote\" targetNamespace=\"http://example.com/stockquote.wsdl\" ...>\n  <!-- 1. Data Types -->\n  <types>\n    <schema targetNamespace=\"http://example.com/stockquote.xsd\">\n      <element name=\"TradePriceRequest\">\n        <complexType><all><element name=\"tickerSymbol\" type=\"string\"/></all></complexType>\n      </element>\n      <element name=\"TradePrice\">\n        <complexType><all><element name=\"price\" type=\"float\"/></all></complexType>\n      </element>\n    </schema>\n  </types>\n\n  <!-- 2. Messages -->\n  <message name=\"GetLastTradePriceInput\">\n    <part name=\"body\" element=\"xsd1:TradePriceRequest\"/>\n  </message>\n  <message name=\"GetLastTradePriceOutput\">\n    <part name=\"body\" element=\"xsd1:TradePrice\"/>\n  </message>\n\n  <!-- 3. PortType (Operations) -->\n  <portType name=\"StockQuotePortType\">\n    <operation name=\"GetLastTradePrice\">\n      <input message=\"tns:GetLastTradePriceInput\"/>\n      <output message=\"tns:GetLastTradePriceOutput\"/>\n    </operation>\n  </portType>\n\n  <!-- 4. Binding (Protocol) -->\n  <binding name=\"StockQuoteSoapBinding\" type=\"tns:StockQuotePortType\">\n    <soap:binding style=\"document\" transport=\"http://schemas.xmlsoap.org/soap/http\"/>\n    <operation name=\"GetLastTradePrice\">\n       <!-- specific binding details here -->\n    </operation>\n  </binding>\n\n  <!-- 5. Service (Endpoint) -->\n  <service name=\"StockQuoteService\">\n    <port name=\"StockQuotePort\" binding=\"tns:StockQuoteSoapBinding\">\n      <soap:address location=\"http://example.com/stockquote\"/>\n    </port>\n  </service>\n</definitions>",
+  "codeLanguage": "xml",
+  "realWorldExample": "When a bank exposes a service to check account balances, they publish a WSDL URL. An SDET pastes this URL into SoapUI. SoapUI parses the `<types>`, `<message>`, and `<portType>` tags to automatically generate a sample XML request payload for the `GetBalance` operation, pointing it to the URL found in the `<service>` tag.",
+  "commonMistakes": [
+    "Confusing `<portType>` (the abstract operations) with `<port>` (the physical endpoint address under `<service>`).",
+    "Ignoring the XML namespaces (`xmlns`), which often leads to invalid request payloads when manually crafting XML in REST Assured."
+  ],
+  "bestPractices": [
+    "Always use tools like SoapUI, Postman, or `wsimport` (Java) to parse WSDL files and generate client code or stubs, rather than writing SOAP XML by hand.",
+    "Validate XML requests against the XSD defined in the `<types>` section before sending them."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the purpose of the <binding> element in a WSDL file?",
+      "a": "The <binding> element connects the abstract operations defined in the <portType> to a concrete network protocol and data format, typically specifying that the service uses SOAP over HTTP."
+    },
+    {
+      "q": "Where in a WSDL file would you look to find the actual URL to send requests to?",
+      "a": "The endpoint URL is located in the <soap:address> element, which is nested inside the <port> element within the <service> section at the bottom of the WSDL."
+    }
+  ],
+  "revisionSummary": "WSDL is an XML contract for SOAP services. Key elements include <types> (data schema), <message> (payloads), <portType> (operations), <binding> (protocol), and <service> (endpoint URL).",
+  "tags": ["SOAP", "WSDL", "XML", "Web Services"]
+}

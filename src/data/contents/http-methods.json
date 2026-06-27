@@ -1,0 +1,59 @@
+{
+  "id": "http-methods",
+  "moduleId": "rest-assured",
+  "title": "HTTP Methods (GET, POST, PUT, PATCH, DELETE)",
+  "priority": "hot",
+  "estimatedMinutes": 40,
+  "overview": "HTTP methods define the intent of an API request — whether you are retrieving, creating, updating, or deleting a resource.",
+  "whyItMatters": "Understanding HTTP methods and their properties (idempotency, safety) is foundational for API testing. These are asked in every SDET and backend testing interview.",
+  "explanation": "**HTTP Methods Overview:**\n\n| Method | Purpose | Has Body? | Idempotent | Safe |\n|---|---|---|---|---|\n| GET | Retrieve resource | No | Yes | Yes |\n| POST | Create resource | Yes | No | No |\n| PUT | Replace entire resource | Yes | Yes | No |\n| PATCH | Partially update resource | Yes | No | No |\n| DELETE | Remove resource | Optional | Yes | No |\n| HEAD | Like GET but no body | No | Yes | Yes |\n| OPTIONS | Get allowed methods | No | Yes | Yes |\n\n**Idempotent:** Calling the same request multiple times produces the same result.\n- GET /users/1 called 5 times → always returns the same user → Idempotent\n- POST /users called 5 times → creates 5 users → NOT idempotent\n- DELETE /users/1 called 5 times → after first call, user is gone → subsequent calls return 404 but the end state is the same → Idempotent\n\n**Safe Methods:** Do not modify server state (GET, HEAD, OPTIONS).\n\n**REST CRUD Mapping:**\n- GET /users → List all users\n- POST /users → Create a user\n- GET /users/{id} → Get specific user\n- PUT /users/{id} → Replace user completely\n- PATCH /users/{id} → Update specific fields\n- DELETE /users/{id} → Delete user",
+  "keyPoints": [
+    "GET = retrieve, POST = create, PUT = full replace, PATCH = partial update, DELETE = remove",
+    "Idempotent methods: GET, PUT, DELETE, HEAD, OPTIONS (not POST, not PATCH)",
+    "Safe methods do not modify server state: GET, HEAD, OPTIONS",
+    "POST is not idempotent — multiple calls create multiple resources",
+    "PUT requires sending the complete resource in the body",
+    "PATCH only sends the fields that need to be changed"
+  ],
+  "codeExample": "// ── GET — Retrieve ────────────────────────────────────────────────\ngiven()\n    .header(\"Authorization\", \"Bearer \" + token)\n    .queryParam(\"page\", 1)\n    .queryParam(\"size\", 10)\n.when()\n    .get(\"/api/users\")\n.then()\n    .statusCode(200)\n    .body(\"users\", hasSize(greaterThan(0)));\n\n// ── POST — Create ──────────────────────────────────────────────────\nString newUser = \"\"\"\n    {\n        \"firstName\": \"Alice\",\n        \"lastName\": \"Smith\",\n        \"email\": \"alice@test.com\",\n        \"role\": \"TESTER\"\n    }\n    \"\"\";\n    \nResponse createResponse =\n    given()\n        .contentType(\"application/json\")\n        .body(newUser)\n    .when()\n        .post(\"/api/users\")\n    .then()\n        .statusCode(201)\n        .body(\"id\", notNullValue())\n        .extract().response();\n        \nString newUserId = createResponse.jsonPath().getString(\"id\");\n\n// ── PUT — Full Replace ─────────────────────────────────────────────\nString updatedUser = \"\"\"\n    {\n        \"firstName\": \"Alice\",\n        \"lastName\": \"Johnson\",  \n        \"email\": \"alice.j@test.com\",\n        \"role\": \"SENIOR_TESTER\"\n    }\n    \"\"\"; // Must send ALL fields\n\ngiven()\n    .contentType(\"application/json\")\n    .pathParam(\"id\", newUserId)\n    .body(updatedUser)\n.when()\n    .put(\"/api/users/{id}\")\n.then()\n    .statusCode(200)\n    .body(\"lastName\", equalTo(\"Johnson\"));\n\n// ── PATCH — Partial Update ─────────────────────────────────────────\nString partialUpdate = \"\"\"\n    {\n        \"role\": \"LEAD_SDET\"\n    }\n    \"\"\"; // Only the field(s) to update\n\ngiven()\n    .contentType(\"application/json\")\n    .pathParam(\"id\", newUserId)\n    .body(partialUpdate)\n.when()\n    .patch(\"/api/users/{id}\")\n.then()\n    .statusCode(200)\n    .body(\"role\", equalTo(\"LEAD_SDET\"))\n    .body(\"email\", equalTo(\"alice.j@test.com\")); // Other fields unchanged\n\n// ── DELETE — Remove ────────────────────────────────────────────────\ngiven()\n    .pathParam(\"id\", newUserId)\n.when()\n    .delete(\"/api/users/{id}\")\n.then()\n    .statusCode(204); // No content\n\n// Verify deletion\ngiven()\n    .pathParam(\"id\", newUserId)\n.when()\n    .get(\"/api/users/{id}\")\n.then()\n    .statusCode(404);",
+  "codeLanguage": "java",
+  "realWorldExample": "In a hotel booking API: GET /bookings lists all bookings. POST /bookings creates a new booking. PUT /bookings/{id} updates all booking details (dates, room, guest). PATCH /bookings/{id} only updates the check-in date. DELETE /bookings/{id} cancels the booking.",
+  "commonMistakes": [
+    "Using POST instead of PUT for updates — POST creates new resources",
+    "Confusing PUT (full replace) with PATCH (partial update)",
+    "Assuming DELETE always returns 200 — it often returns 204 (No Content)",
+    "Not sending Content-Type header for POST/PUT/PATCH requests",
+    "Thinking PATCH is idempotent — it is generally not"
+  ],
+  "bestPractices": [
+    "Always verify response status codes match HTTP semantics (201 for creation, 204 for delete)",
+    "Test idempotency of PUT: call twice with same data, verify same result",
+    "Test POST idempotency violation: call twice, verify two resources are created",
+    "Validate response headers, not just body (Content-Type, Location header on POST)"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between PUT and PATCH?",
+      "a": "PUT replaces the entire resource — you must send all fields in the request body. PATCH partially updates a resource — you only send the fields you want to change. PUT is idempotent; PATCH is generally not."
+    },
+    {
+      "q": "What are idempotent HTTP methods?",
+      "a": "Idempotent methods produce the same result no matter how many times they are called. GET, HEAD, PUT, DELETE, OPTIONS are idempotent. POST and PATCH are not idempotent — calling POST multiple times creates multiple resources."
+    },
+    {
+      "q": "What HTTP status code should a POST return on successful creation?",
+      "a": "201 Created, and ideally includes a Location header pointing to the new resource URL (e.g., Location: /api/users/123). Some APIs return 200 OK but 201 is more semantically correct per REST standards."
+    }
+  ],
+  "revisionSummary": "GET=read, POST=create(201), PUT=full replace, PATCH=partial update, DELETE=remove(204). Idempotent: GET/PUT/DELETE. Not idempotent: POST/PATCH. Safe: GET/HEAD/OPTIONS.",
+  "tags": [
+    "http-methods",
+    "get",
+    "post",
+    "put",
+    "patch",
+    "delete",
+    "idempotent",
+    "rest"
+  ]
+}

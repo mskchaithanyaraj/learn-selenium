@@ -1,0 +1,47 @@
+{
+  "id": "jenkins-selenium",
+  "moduleId": "general-sdet",
+  "title": "Jenkins & Selenium Integration",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "How to integrate Selenium automated tests into a Jenkins CI/CD pipeline for continuous testing.",
+  "whyItMatters": "Running Selenium tests locally doesn't scale. Integrating them into Jenkins ensures tests run automatically on every code commit, providing immediate feedback on build health.",
+  "explanation": "Jenkins can checkout code from Git, build it using Maven, and execute Selenium tests. You configure a Jenkins job (Freestyle or Pipeline) to run `mvn test`. Jenkins can also archive test reports (like TestNG or Surefire XML), publish HTML reports, and send email notifications based on the build outcome. Running tests on a headless browser or Selenium Grid is common in Jenkins environments.",
+  "keyPoints": [
+    "Jenkins runs automated tests on triggers (e.g., code push, schedule).",
+    "Uses Maven or Gradle to execute tests via command line (`mvn test`).",
+    "Test reports are parsed using Jenkins plugins (JUnit, TestNG Results).",
+    "Pipeline as Code (Jenkinsfile) is the modern way to define CI/CD jobs."
+  ],
+  "codeExample": "pipeline {\n    agent any\n    tools {\n        maven 'Maven 3.8'\n        jdk 'Java 11'\n    }\n    stages {\n        stage('Checkout') {\n            steps { git 'https://github.com/org/repo.git' }\n        }\n        stage('Test') {\n            steps { sh 'mvn clean test -Dsuite=regression.xml' }\n        }\n    }\n    post {\n        always {\n            junit 'target/surefire-reports/*.xml'\n        }\n    }\n}",
+  "codeLanguage": "groovy",
+  "realWorldExample": "When a developer merges a PR, Jenkins triggers a build, deploys to a staging server, and runs the Selenium smoke test suite. If tests pass, the team is notified via Slack; if they fail, the build is marked unstable.",
+  "commonMistakes": [
+    "Running UI tests on a Jenkins server without a display (needs Headless mode or Xvfb).",
+    "Failing to clean up browser processes, leading to memory exhaustion on the Jenkins node.",
+    "Hardcoding environment URLs in tests instead of passing them via Jenkins parameters."
+  ],
+  "bestPractices": [
+    "Run tests in headless mode (e.g., ChromeOptions.addArguments(\"--headless\")) when executing on Jenkins.",
+    "Use Jenkins parameters to pass environment variables (e.g., browser type, target URL) to Maven.",
+    "Archive ExtentReports or Allure reports as Jenkins artifacts for easy debugging."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you run Selenium tests in Jenkins if the Jenkins server has no GUI?",
+      "a": "By configuring the WebDriver to run in Headless mode (e.g., Chrome Headless), or by configuring Xvfb (X virtual framebuffer) on a Linux server to simulate a display."
+    },
+    {
+      "q": "How do you pass a browser parameter from Jenkins to your Selenium framework?",
+      "a": "Define a string parameter in the Jenkins job (e.g., BROWSER). In the build step, use `mvn test -Dbrowser=$BROWSER`. In the Java code, retrieve it using `System.getProperty(\"browser\")`."
+    }
+  ],
+  "revisionSummary": "Integrate via Jenkinsfile -> Git checkout -> Maven test -> JUnit/TestNG report parsing -> Notifications. Run headless and parameterize variables.",
+  "tags": [
+    "Jenkins",
+    "CI/CD",
+    "Selenium",
+    "Pipeline",
+    "Maven"
+  ]
+}

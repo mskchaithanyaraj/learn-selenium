@@ -1,0 +1,41 @@
+{
+  "id": "resource-based-urls",
+  "moduleId": "rest-soap-wsdl",
+  "title": "Resource-Based URL Design",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Guidelines and best practices for designing RESTful URLs that are intuitive, hierarchical, and compliant with the Uniform Interface constraint.",
+  "whyItMatters": "Proper URL design distinguishes a true REST API from a simple RPC (Remote Procedure Call) API over HTTP. Testing APIs effectively requires understanding these naming conventions to predict endpoints and validate routing.",
+  "explanation": "A key aspect of REST is that URIs (Uniform Resource Identifiers) represent **resources**, not actions. The action being performed is defined by the HTTP method (GET, POST, PUT, DELETE).\n\n### Best Practices for URL Design\n1. **Use Nouns, Not Verbs**: \n   - Bad: `POST /createUser` or `GET /getAllUsers`\n   - Good: `POST /users` or `GET /users`\n2. **Use Plural Nouns**: Resource collections should be plural to maintain consistency.\n   - `/users` instead of `/user`\n   - `/orders/123` instead of `/order/123`\n3. **Use Hierarchical Structure**: Represent relationships logically by nesting URIs.\n   - `GET /users/42/orders` (Get all orders belonging to user 42)\n   - `GET /users/42/orders/99` (Get order 99 for user 42)\n4. **Keep Nesting Shallow**: Avoid going deeper than 2-3 levels. If it gets too deep, link directly to the sub-resource.\n   - Instead of `/users/42/orders/99/items/5`, use `/orders/99/items/5` or just `/items/5`.\n5. **Use Query Parameters for Filtering/Sorting/Pagination**: Don't create new endpoints for different views of the same data.\n   - Bad: `GET /activeUsers`\n   - Good: `GET /users?status=active&sort=createdAt&page=2`\n\n### Versioning\nAPIs must evolve without breaking existing clients. Common strategies include:\n- **URI Versioning**: `/v1/users` (Most common, easy to cache)\n- **Header Versioning**: `Accept: application/vnd.company.v1+json` (More RESTful, harder to test manually)\n- **Query Parameter**: `/users?version=1`",
+  "keyPoints": [
+    "URLs should contain plural nouns, not verbs.",
+    "HTTP verbs dictate the action; the URL dictates the target resource.",
+    "Hierarchical URLs should express relationships between resources.",
+    "Complex filtering, sorting, and pagination belong in query parameters, not the URI path."
+  ],
+  "codeExample": "// BAD - RPC Style\nPOST /api/v1/updateOrderStatus?id=123&status=shipped\n\n// GOOD - RESTful Style\nPATCH /api/v1/orders/123\nHost: api.example.com\nContent-Type: application/json\n\n{\n  \"status\": \"shipped\"\n}",
+  "codeLanguage": "http",
+  "realWorldExample": "In a blog application, the URL `/articles/10/comments` clearly indicates the collection of comments belonging to article #10. Sending a POST request to this URL intuitively means 'create a new comment on article #10', while sending a GET request means 'retrieve all comments for article #10'.",
+  "commonMistakes": [
+    "Using verbs in URLs (e.g., `/deleteUser`). This is RPC (Remote Procedure Call) style, not REST.",
+    "Mixing singular and plural nouns inconsistently across the API.",
+    "Deeply nested URLs that become unreadable and tightly couple resources."
+  ],
+  "bestPractices": [
+    "Standardize on lowercase URLs with hyphens (kebab-case) for readability.",
+    "Use plural nouns for all resources.",
+    "Keep endpoints flat where possible and rely on query parameters for complex lookups."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why shouldn't we use verbs in REST API URLs?",
+      "a": "Because REST URLs should identify resources (nouns), while the HTTP method (GET, POST, PUT, DELETE) provides the action (verb). Using verbs in the URL leads to a proliferation of endpoints and violates the Uniform Interface constraint."
+    },
+    {
+      "q": "How would you design an endpoint to find all active users sorted by creation date?",
+      "a": "I would use a query string on the base users resource: GET /users?status=active&sort=createdAt_desc. This keeps the URL focused on the resource while allowing flexible filtering and sorting."
+    }
+  ],
+  "revisionSummary": "REST URLs should use plural nouns, denote relationships hierarchically, avoid verbs, and use query parameters for filtering, sorting, and pagination.",
+  "tags": ["REST", "API Design", "URI", "Best Practices"]
+}

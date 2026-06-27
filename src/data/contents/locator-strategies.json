@@ -1,0 +1,44 @@
+{
+  "id": "locator-strategies",
+  "moduleId": "selenium-webdriver",
+  "title": "Locator Strategies",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Locator strategies are the mechanisms Selenium uses to find web elements on a page. Choosing the right strategy is critical for test stability and maintenance.",
+  "whyItMatters": "Flaky locators are the #1 cause of test failures in UI automation. Mastering locator strategies ensures your tests are robust, resilient to minor UI changes, and execute efficiently.",
+  "explanation": "Selenium provides various locator strategies through the `By` class:\n- **ID**: The fastest and most reliable locator, assuming it is unique and non-dynamic.\n- **Name**: Good for form inputs if ID is absent.\n- **ClassName**: Finds elements by a specific CSS class. Useful for lists or styling hooks.\n- **TagName**: Locates elements by HTML tag (e.g., `a`, `div`). Usually returns multiple elements.\n- **LinkText / PartialLinkText**: Useful for anchor (`<a>`) tags based on their visible text.\n- **CSS Selector**: Fast, powerful, and highly recommended. It can match attributes, classes, IDs, and hierarchical relationships.\n- **XPath**: The most flexible locator. Can traverse DOM up and down, match text, and handle complex logic, but can be slower and more brittle if used as an absolute path.\n\nSelenium 4 also introduced **Relative Locators** (above, below, toLeftOf, toRightOf, near), which are useful for finding elements based on their visual placement.",
+  "keyPoints": [
+    "ID is the preferred locator strategy when available and static.",
+    "CSS Selectors are generally faster than XPath.",
+    "XPath can traverse backwards (up the DOM tree); CSS cannot.",
+    "Avoid absolute XPath (e.g., `/html/body/div[1]/...`).",
+    "Relative locators in Selenium 4 help find elements based on spatial relationships."
+  ],
+  "codeExample": "// Standard locators\nWebElement byId = driver.findElement(By.id(\"submit-btn\"));\nWebElement byCss = driver.findElement(By.cssSelector(\"input.user-field[type='text']\"));\nWebElement byXpath = driver.findElement(By.xpath(\"//button[text()='Login']\"));\n\n// Selenium 4 Relative Locator\nWebElement passwordField = driver.findElement(with(By.tagName(\"input\")).below(byId));",
+  "codeLanguage": "java",
+  "realWorldExample": "Locating a dynamically generated 'Checkout' button where the ID changes every session (`id=\"btn-12345\"`). You use CSS Selector `[id^='btn-']` or XPath `//button[contains(@id, 'btn-')]` to reliably find it.",
+  "commonMistakes": [
+    "Using absolute XPath which breaks on any DOM change.",
+    "Relying on dynamic IDs or classes (e.g., React/Angular generated classes).",
+    "Overusing XPath when a simple ID or CSS selector would suffice.",
+    "Using LinkText on non-anchor elements."
+  ],
+  "bestPractices": [
+    "Prioritize locators: ID > Name > CSS Selector > XPath.",
+    "Work with developers to add custom data attributes (e.g., `data-testid=\"login-btn\"`) for stable locators.",
+    "Keep locators as short and descriptive as possible.",
+    "Use Relative Locators only when standard locators are impractical."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between findElement and findElements?",
+      "a": "`findElement` returns a single WebElement and throws NoSuchElementException if not found. `findElements` returns a List of WebElements and returns an empty list if nothing matches."
+    },
+    {
+      "q": "Why is CSS Selector generally preferred over XPath?",
+      "a": "CSS Selectors are natively supported by the browser's CSS engine, making them faster to evaluate. They are also usually shorter and more readable."
+    }
+  ],
+  "revisionSummary": "Locator strategies dictate how Selenium finds elements. Prioritize robust, static locators like IDs or data attributes. Use CSS Selectors for performance and XPath for complex traversals.",
+  "tags": ["selenium", "locators", "css", "xpath", "best-practices"]
+}

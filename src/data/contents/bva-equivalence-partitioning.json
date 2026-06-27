@@ -1,0 +1,46 @@
+{
+  "id": "bva-equivalence-partitioning",
+  "moduleId": "general-sdet",
+  "title": "BVA & Equivalence Partitioning",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Essential test design techniques used to systematically derive test cases while reducing the total number of required tests.",
+  "whyItMatters": "Exhaustive testing is impossible. These techniques help SDETs maximize test coverage with the minimum number of test cases by targeting the most error-prone areas (boundaries).",
+  "explanation": "Equivalence Partitioning (EP) divides input data into valid and invalid partitions, assuming that the program behaves similarly for all inputs in a partition. Boundary Value Analysis (BVA) is an extension of EP that focuses on testing the boundaries between partitions, as errors are most commonly found at the edges of equivalence classes.",
+  "keyPoints": [
+    "Equivalence Partitioning reduces test cases by selecting one representative value per class.",
+    "BVA tests values at the exact boundary, just below, and just above it.",
+    "These are black-box test design techniques.",
+    "They are most effective when applied to variables with logical or physical ranges."
+  ],
+  "codeExample": "// No specific code for this conceptual topic, but applied in assertions:\n@Test\npublic void testAgeValidation() {\n    // BVA for age range 18-60\n    assertFalse(validator.isValidAge(17)); // Below min\n    assertTrue(validator.isValidAge(18));  // Min boundary\n    assertTrue(validator.isValidAge(60));  // Max boundary\n    assertFalse(validator.isValidAge(61)); // Above max\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "For a password length requirement of 8-15 characters, BVA test inputs would be 7, 8, 9 and 14, 15, 16 characters.",
+  "commonMistakes": [
+    "Testing only the exact boundary and forgetting the +/- 1 values.",
+    "Creating overlapping equivalence partitions.",
+    "Using BVA on boolean values where it doesn't apply."
+  ],
+  "bestPractices": [
+    "Always combine EP and BVA for comprehensive input validation.",
+    "Apply BVA to output domains as well as input domains.",
+    "Document the derived partitions and boundaries clearly in test plans."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "If a text box accepts values from 1 to 100, what are the BVA test values?",
+      "a": "The typical BVA values would be 0 (min-1), 1 (min), 2 (min+1), 99 (max-1), 100 (max), and 101 (max+1)."
+    },
+    {
+      "q": "Why do we test boundary values?",
+      "a": "Because developers often make off-by-one errors (using < instead of <=) at boundaries, making them the most defect-dense areas in software."
+    }
+  ],
+  "revisionSummary": "EP reduces test cases by testing partitions; BVA catches edge-case bugs by testing boundaries (min-1, min, min+1, max-1, max, max+1).",
+  "tags": [
+    "Test Design",
+    "BVA",
+    "Equivalence Partitioning",
+    "Black-box"
+  ]
+}

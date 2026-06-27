@@ -1,0 +1,39 @@
+{
+  "id": "testng-listeners-reports",
+  "moduleId": "selenium-webdriver",
+  "title": "TestNG Listeners & Reports",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Listeners 'listen' to the events in a TestNG execution lifecycle (start, pass, fail, skip) and allow you to execute custom code. They are heavily used for custom reporting.",
+  "whyItMatters": "Default TestNG reports are basic. To build enterprise-grade frameworks that automatically take screenshots on failure, log to Jira, or generate beautiful HTML dashboards, you must master Listeners.",
+  "explanation": "TestNG provides several listener interfaces. The most common is `ITestListener`.\n\nKey methods in `ITestListener`:\n- `onTestStart`: Triggered before a @Test method begins.\n- `onTestSuccess`: Triggered when a test passes.\n- `onTestFailure`: Triggered when an assertion fails or an exception is thrown. *This is where you write the code to capture a screenshot.*\n- `onTestSkipped`: Triggered when a test is skipped (e.g., due to a failed dependency).\n\nYou register listeners either in `testng.xml` using the `<listeners>` tag, or above a test class using the `@Listeners(MyListener.class)` annotation.",
+  "keyPoints": [
+    "Listeners intercept the test execution flow.",
+    "`ITestListener` is the primary interface used for reporting and failure handling.",
+    "Listeners are essential for integrating third-party reporting tools like ExtentReports or Allure.",
+    "Another useful listener is `IRetryAnalyzer`, which automatically reruns flaky, failed tests."
+  ],
+  "codeExample": "public class CustomListener implements ITestListener {\n    @Override\n    public void onTestFailure(ITestResult result) {\n        System.out.println(\"Test Failed: \" + result.getName());\n        // Get driver from test class to take screenshot\n        // WebDriver driver = ((BaseTest)result.getInstance()).getDriver();\n        // takeScreenshot(driver, result.getName());\n    }\n}\n\n/* testng.xml\n<listeners>\n    <listener class-name=\"com.utils.CustomListener\" />\n</listeners>\n*/",
+  "codeLanguage": "java",
+  "realWorldExample": "In an automated nightly run, you don't want to manually figure out why a test failed. By implementing an ITestListener, the framework automatically captures a screenshot of the browser at the exact moment of failure and embeds it into an Extent HTML report.",
+  "commonMistakes": [
+    "Forgetting to register the listener in testng.xml, meaning the custom code never executes.",
+    "Failing to handle ThreadLocal properly inside the listener when taking screenshots in a parallel execution environment."
+  ],
+  "bestPractices": [
+    "Register listeners globally in `testng.xml` rather than using the `@Listeners` annotation on every class.",
+    "Use `ITestResult.getInstance()` inside the listener to access the driver instance from the specific test class that failed."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you automatically take a screenshot only when a test fails?",
+      "a": "Create a class implementing ITestListener. Override the `onTestFailure` method. Inside that method, write the WebDriver code to cast the driver to TakesScreenshot and save the file."
+    },
+    {
+      "q": "What is IRetryAnalyzer used for?",
+      "a": "It is a TestNG listener interface that allows you to define logic to automatically retry a failed test a specific number of times before finally marking it as failed. This helps mitigate environmental flakiness."
+    }
+  ],
+  "revisionSummary": "TestNG Listeners hook into the test lifecycle. ITestListener is the industry standard approach for catching test failures dynamically to trigger screenshot capture and update custom reporting dashboards.",
+  "tags": ["testng", "listeners", "reporting"]
+}

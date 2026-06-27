@@ -1,0 +1,42 @@
+{
+  "id": "hamcrest-matchers",
+  "moduleId": "rest-assured",
+  "title": "Hamcrest Matchers",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Use Hamcrest matchers for expressive, readable assertions in REST Assured.",
+  "whyItMatters": "REST Assured relies on Hamcrest for assertions. Mastering Hamcrest allows you to write complex, English-like validation logic for API responses.",
+  "explanation": "Hamcrest provides a library of matcher objects. When you use `.body(\"path\", equalTo(\"value\"))` in REST Assured, `equalTo()` is a Hamcrest matcher. Other common matchers include `containsString`, `hasSize`, `hasItem`, `greaterThan`, and `notNullValue`. You can combine matchers logically using `allOf` (AND) or `anyOf` (OR).",
+  "keyPoints": [
+    "Core Matchers: `equalTo`, `not`, `is`.",
+    "String Matchers: `containsString`, `startsWith`, `endsWith`, `equalToIgnoringCase`.",
+    "Collection Matchers: `hasSize`, `hasItem` (contains one), `hasItems` (contains multiple).",
+    "Number Matchers: `greaterThan`, `lessThan`.",
+    "Logical Matchers: `allOf`, `anyOf`."
+  ],
+  "codeExample": "import static org.hamcrest.Matchers.*;\n\ngiven().\nwhen().\n    get(\"/products\").\nthen().\n    body(\"data\", hasSize(greaterThan(0))).\n    body(\"data[0].name\", equalTo(\"Laptop\")).\n    body(\"data.price\", hasItem(999.99)).\n    body(\"status\", allOf(notNullValue(), equalTo(\"SUCCESS\")));",
+  "codeLanguage": "java",
+  "realWorldExample": "When searching for products, you assert that the results list `hasSize(greaterThan(0))`, that every product's category `equalTo(\"Electronics\")`, and that the price field is `notNullValue()`.",
+  "commonMistakes": [
+    "Forgetting to statically import `org.hamcrest.Matchers.*`, leading to compilation errors.",
+    "Confusing `hasItem` (checks if a collection contains an element) with `equalTo` (checks if a single value is exact).",
+    "Using JUnit assertions instead of Hamcrest inside the `then().body()` block."
+  ],
+  "bestPractices": [
+    "Always use static imports for Hamcrest matchers to keep code readable.",
+    "Use `hasSize()` to validate array lengths before checking individual elements.",
+    "Use `everyItem()` to assert a condition across all elements in an array."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you assert that an array in a JSON response contains a specific value?",
+      "a": "Using the Hamcrest matcher `hasItem()`. For example: `body(\"data.roles\", hasItem(\"admin\"))`."
+    },
+    {
+      "q": "How can you combine multiple conditions on a single field?",
+      "a": "You can use the `allOf()` matcher, which acts as a logical AND. For example, `allOf(notNullValue(), containsString(\"error\"))`."
+    }
+  ],
+  "revisionSummary": "Use Hamcrest matchers (equalTo, hasSize, containsString) for expressive API assertions.",
+  "tags": ["REST Assured", "Hamcrest", "Assertions", "Validation"]
+}

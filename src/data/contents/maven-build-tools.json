@@ -1,0 +1,46 @@
+{
+  "id": "maven-build-tools",
+  "moduleId": "general-sdet",
+  "title": "Maven Build & Dependency Management",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Understanding Apache Maven, the standard project management and build automation tool used in Java testing frameworks.",
+  "whyItMatters": "Maven simplifies project setup by automatically managing dependencies (jars) and providing a standardized build lifecycle to compile, test, and package applications.",
+  "explanation": "Maven uses a `pom.xml` (Project Object Model) file to manage project dependencies, plugins, and configurations. It fetches dependencies from the central repository. The Maven build lifecycle includes phases like `clean`, `compile`, `test`, `package`, and `install`. SDETs primarily use the `maven-compiler-plugin` (to compile Java code) and `maven-surefire-plugin` (to execute TestNG/JUnit tests).",
+  "keyPoints": [
+    "POM.xml is the heart of a Maven project.",
+    "Dependencies are defined using GroupID, ArtifactID, and Version (GAV).",
+    "The default build lifecycle runs sequentially (running `mvn test` also runs validate and compile).",
+    "The Surefire plugin is responsible for running unit and integration tests."
+  ],
+  "codeExample": "<!-- pom.xml snippet for Selenium and TestNG -->\n<dependencies>\n    <dependency>\n        <groupId>org.seleniumhq.selenium</groupId>\n        <artifactId>selenium-java</artifactId>\n        <version>4.15.0</version>\n    </dependency>\n    <dependency>\n        <groupId>org.testng</groupId>\n        <artifactId>testng</artifactId>\n        <version>7.8.0</version>\n        <scope>test</scope>\n    </dependency>\n</dependencies>",
+  "codeLanguage": "xml",
+  "realWorldExample": "Instead of manually downloading Selenium and TestNG JAR files and adding them to the build path, an SDET simply adds them to the pom.xml, and Maven downloads them automatically.",
+  "commonMistakes": [
+    "Committing the `target/` directory to version control (it should be in `.gitignore`).",
+    "Having dependency conflicts (using mismatched versions of interconnected libraries).",
+    "Forgetting to specify the Surefire plugin, causing `mvn test` to not execute any tests."
+  ],
+  "bestPractices": [
+    "Use Maven profiles (`<profiles>`) to manage different environments (dev, qa, staging).",
+    "Define versions in the `<properties>` block to maintain consistency across dependencies.",
+    "Regularly run `mvn clean` before building to ensure a fresh state."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between `mvn clean` and `mvn test`?",
+      "a": "`mvn clean` deletes the `target` directory (compiled output). `mvn test` executes the validate, compile, and test phases of the build lifecycle using the Surefire plugin."
+    },
+    {
+      "q": "How do you run a specific TestNG suite xml file from the command line using Maven?",
+      "a": "Configure the maven-surefire-plugin in the pom.xml to accept a parameter, then run `mvn test -DsuiteXmlFile=testng.xml`."
+    }
+  ],
+  "revisionSummary": "Maven = Dependency management (pom.xml) + Build lifecycle (clean, compile, test). Surefire plugin executes tests.",
+  "tags": [
+    "Maven",
+    "POM",
+    "Dependencies",
+    "Build Tool"
+  ]
+}

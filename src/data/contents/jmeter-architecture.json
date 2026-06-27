@@ -1,0 +1,59 @@
+{
+  "id": "jmeter-architecture",
+  "moduleId": "performance-testing",
+  "title": "JMeter Architecture",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "Apache JMeter is a pure Java desktop application for load testing. It simulates multiple users sending requests to a server and measures performance.",
+  "whyItMatters": "JMeter is the most widely used open-source performance testing tool. Understanding its architecture and components is essential for SDET roles involving performance testing.",
+  "explanation": "**JMeter Components:**\n\n**1. Test Plan**\nThe root element — contains all other elements. One JMeter test = one Test Plan (.jmx file).\n\n**2. Thread Group**\nSimulates virtual users. Configures:\n- Number of threads (users)\n- Ramp-up period (time to start all threads)\n- Loop count or duration\n\n**3. Samplers**\nMake actual requests. Types:\n- HTTP Request Sampler (most common)\n- JDBC Request (database queries)\n- FTP Request\n- SMTP Sampler (email)\n- Java Sampler (custom)\n\n**4. Logic Controllers**\nControl execution flow:\n- Loop Controller — repeat requests\n- If Controller — conditional logic\n- Transaction Controller — group requests\n\n**5. Listeners**\nCollect and display results:\n- View Results Tree (debug — shows individual responses)\n- Summary Report (aggregate stats)\n- Aggregate Report (percentiles)\n- Response Time Graph (visual)\n- Dashboard Report (HTML report)\n\n**6. Configuration Elements**\n- HTTP Header Manager\n- HTTP Cookie Manager\n- CSV Data Set Config\n- User Defined Variables\n\n**7. Timers**\nAdd think time between requests:\n- Constant Timer (fixed delay)\n- Gaussian Random Timer\n- Uniform Random Timer\n\n**8. Assertions**\nValidate responses:\n- Response Assertion (check status, body)\n- JSON Assertion\n- Duration Assertion (response time limit)\n\n**9. Pre/Post Processors**\n- BeanShell/JSR223 (scripting)\n- Regular Expression Extractor\n- JSON Extractor",
+  "keyPoints": [
+    "Thread Group = virtual users configuration (count, ramp-up, duration)",
+    "Samplers = actual request makers (HTTP, JDBC, etc.)",
+    "Listeners = result collectors (Summary Report, Aggregate Report)",
+    "Configuration Elements = headers, cookies, variables, CSV data",
+    "Assertions = response validators (status code, body content, time)",
+    "Timers = think time simulation between requests",
+    "JMeter runs in GUI mode for test creation, NON-GUI mode for actual testing"
+  ],
+  "codeExample": "// ── JMETER KEY METRICS EXPLAINED ─────────────────────────────────\n\n/*\nAGGREGATE REPORT COLUMNS:\n- Label: Sampler name\n- # Samples: Total requests made\n- Average: Mean response time (ms)\n- Min: Minimum response time\n- Max: Maximum response time\n- Std. Dev.: Standard deviation (consistency indicator)\n- Error %: Percentage of failed requests\n- Throughput: Requests/second\n- Received KB/sec: Network received\n- Sent KB/sec: Network sent\n- Avg. Bytes: Average response size\n\n90th Percentile (90%): 90% of requests completed within this time\n95th Percentile (95%): Most critical SLA metric\n99th Percentile (99%): Worst-case performance\n\nEXAMPLE ACCEPTABLE THRESHOLDS:\n- Average response time: < 2000ms\n- 95th percentile: < 3000ms\n- Error rate: < 1%\n- Throughput: > 50 req/sec\n\n── JMETER NON-GUI MODE (for actual load tests) ────────────────────\njmeter -n -t TestPlan.jmx -l results.jtl -e -o ./DashboardReport\n\nParameters:\n  -n: non-GUI mode\n  -t: test plan file\n  -l: log/results file (.jtl)\n  -e: generate dashboard report\n  -o: output directory for report\n\n── CSV DATA SET CONFIG ───────────────────────────────────────────\n// userdata.csv:\n// username,password\n// user1,pass1\n// user2,pass2\n// user3,pass3\n\n// In JMeter, CSV Data Set Config reads this file\n// [username] and [password] variables are populated\n// Each thread (user) gets one row (or rows loop)\n\n// HTTP Request sampler uses:\n// Body: { \"username\": \"[username]\", \"password\": \"[password]\" }\n*/\n\n// ── JMETER + JAVA (running JMeter programmatically) ───────────────\n// Add jmeter dependencies and run tests from Java:\nStandardJMeterEngine jmeter = new StandardJMeterEngine();\nJMeterUtils.loadJMeterProperties(\"/path/to/jmeter.properties\");\nHashTree testPlanTree = new HashTree();\n\nTestPlan testPlan = new TestPlan(\"Load Test\");\nThreadGroup threadGroup = new ThreadGroup();\nthreadGroup.setNumThreads(100);\nthreadGroup.setRampUp(30);\nthreadGroup.setScheduler(true);\nthreadGroup.setDuration(300);\n\nHTTPSamplerProxy sampler = new HTTPSamplerProxy();\nsampler.setDomain(\"api.example.com\");\nsampler.setPath(\"/users\");\nsampler.setMethod(\"GET\");\nsampler.setPort(443);\nsampler.setProtocol(\"https\");",
+  "codeLanguage": "java",
+  "realWorldExample": "A payment gateway needs to handle 1000 transactions per second during peak hours. JMeter simulates 1000 virtual users making payment requests simultaneously. Listeners capture throughput (TPS), 95th percentile response time, and error rate. If error rate exceeds 0.1%, the test fails.",
+  "commonMistakes": [
+    "Running performance tests in GUI mode — uses extra memory, affects results",
+    "Not using timers — unrealistic because real users have think time between actions",
+    "Not clearing previous results before running a new test",
+    "Using \"View Results Tree\" listener in load tests — very resource intensive",
+    "Not using CSV Data Set Config — hardcoding one username for all threads"
+  ],
+  "bestPractices": [
+    "Always run actual load tests in non-GUI mode (jmeter -n)",
+    "Use CSV Data Set Config for parameterized test data",
+    "Add think time (Constant/Gaussian Timer) to simulate real user behavior",
+    "Monitor server resources (CPU, memory) during JMeter tests",
+    "Use Transaction Controllers to group related requests for business-level metrics"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What are Thread Groups in JMeter?",
+      "a": "Thread Groups represent virtual users. They configure the number of threads (users), ramp-up period (time to gradually start all threads), and test duration or loop count. Each thread simulates one user independently executing the sampler requests."
+    },
+    {
+      "q": "What is the difference between Throughput and Response Time?",
+      "a": "Throughput is the number of requests processed per second (req/sec or TPS) — measures server capacity. Response time is the time taken for the server to respond to a single request (ms) — measures user experience. High throughput with high response time indicates a system that processes many requests but slowly."
+    },
+    {
+      "q": "What is the difference between JMeter and LoadRunner?",
+      "a": "JMeter is open-source, free, Java-based, widely used for web and API testing. LoadRunner is commercial (HP/Micro Focus), supports more protocols (SAP, Citrix, legacy systems), has more detailed analysis tools, and is preferred in large enterprises for complex performance testing scenarios."
+    }
+  ],
+  "revisionSummary": "JMeter: Test Plan→Thread Group(virtual users)→Samplers(HTTP requests)→Assertions(validation)→Listeners(results). Timers add think time. Always run in non-GUI mode. Key metrics: throughput, 95th %ile response time, error rate.",
+  "tags": [
+    "jmeter",
+    "performance-testing",
+    "thread-group",
+    "sampler",
+    "listener",
+    "throughput"
+  ]
+}

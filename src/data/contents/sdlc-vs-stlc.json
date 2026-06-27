@@ -1,0 +1,48 @@
+{
+  "id": "sdlc-vs-stlc",
+  "moduleId": "general-sdet",
+  "title": "SDLC vs STLC",
+  "priority": "normal",
+  "estimatedMinutes": 30,
+  "overview": "SDLC (Software Development Life Cycle) defines the software development process, while STLC (Software Testing Life Cycle) defines the testing subprocess within SDLC.",
+  "whyItMatters": "These are foundational concepts asked in entry and mid-level SDET interviews to gauge understanding of the overall software engineering process.",
+  "explanation": "**SDLC (Software Development Life Cycle):**\nThe complete process of planning, creating, testing, and deploying a software product.\n\nPhases:\n1. **Requirement Analysis** — Gather business requirements\n2. **Planning** — Estimate costs, timelines, risks\n3. **System Design** — Architecture, database, UI design\n4. **Implementation (Coding)** — Developers write code\n5. **Testing** — QA/SDET validates the software\n6. **Deployment** — Release to production\n7. **Maintenance** — Bug fixes, updates\n\nSDLC Models: Waterfall, Agile (Scrum/Kanban), V-Model, Spiral, DevOps\n\n**STLC (Software Testing Life Cycle):**\nThe subset of SDLC focused specifically on testing activities.\n\nPhases:\n1. **Requirement Analysis** — Understand what to test\n2. **Test Planning** — Test strategy, resources, schedule\n3. **Test Case Design** — Write test cases and test data\n4. **Test Environment Setup** — Prepare test infrastructure\n5. **Test Execution** — Run tests, log defects\n6. **Test Closure** — Test summary report, lessons learned\n\n**Key Difference:**\nSDLC = full product lifecycle | STLC = testing subset of SDLC",
+  "keyPoints": [
+    "SDLC covers the entire software development process, STLC covers testing within it",
+    "STLC starts with Requirement Analysis and ends with Test Closure",
+    "In Agile, STLC happens within each sprint (2-week cycle)",
+    "SDET participates in both SDLC (design reviews) and STLC (test execution)",
+    "V-Model is SDLC model where each dev phase maps to a test phase"
+  ],
+  "codeExample": "/*\nSDLC → STLC PARALLEL PHASES (V-Model):\n\nDevelopment Phase          Testing Phase\n─────────────────────────────────────────\nRequirement Analysis   ←→  Acceptance Testing\nSystem Design          ←→  System Testing  \nArchitecture Design    ←→  Integration Testing\nModule Design          ←→  Unit Testing\nCoding                 ←→  Unit Testing (TDD)\n\nAGILE SPRINT CYCLE (2 weeks):\nDay 1: Sprint Planning → SDET: test planning\nDay 2-4: Development → SDET: write test cases\nDay 5-8: Dev continues → SDET: automate tests\nDay 9-10: Feature freeze → SDET: regression testing\nDay 11: Bug fixes → SDET: retest/regression\nDay 12: Sprint Review + Demo → SDET: sign-off\nDay 13-14: Sprint Retrospective → SDET: test report\n*/",
+  "codeLanguage": "java",
+  "realWorldExample": "In an Agile project, during Sprint 5, the SDLC includes design review (Monday), coding (Tuesday-Thursday), and deployment to staging (Friday). The STLC runs in parallel: test case design (Monday), test automation (Tuesday-Thursday), regression execution (Friday). STLC is the testing slice of the SDLC.",
+  "commonMistakes": [
+    "Thinking STLC is a completely separate process from SDLC",
+    "Forgetting that STLC has its own Requirement Analysis phase (understanding what to test)",
+    "Not knowing the phases — interviewers often ask to list all phases in order"
+  ],
+  "bestPractices": [
+    "In Agile, involve QA/SDET from Day 1 of sprint (shift-left testing)",
+    "Use BDD (Behavior Driven Development) to align SDLC and STLC requirements",
+    "Automate regression suite so STLC test execution is fast in every sprint"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between SDLC and STLC?",
+      "a": "SDLC (Software Development Life Cycle) covers the complete software creation process: requirements, design, coding, testing, deployment, maintenance. STLC (Software Testing Life Cycle) is a subset of SDLC focused on testing activities: test planning, test case design, environment setup, test execution, and test closure."
+    },
+    {
+      "q": "What are the phases of STLC?",
+      "a": "1. Requirement Analysis 2. Test Planning 3. Test Case Design/Development 4. Test Environment Setup 5. Test Execution 6. Test Closure"
+    }
+  ],
+  "revisionSummary": "SDLC = full dev lifecycle. STLC = testing subset of SDLC. STLC phases: Requirements→Planning→Test Design→Environment Setup→Execution→Closure. In Agile, both happen within each sprint.",
+  "tags": [
+    "sdlc",
+    "stlc",
+    "software-lifecycle",
+    "testing-lifecycle",
+    "agile"
+  ]
+}

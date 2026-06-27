@@ -1,0 +1,41 @@
+{
+  "id": "status-codes-2xx-4xx-5xx",
+  "moduleId": "rest-assured",
+  "title": "HTTP Status Codes",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "Understand the standard HTTP status codes and what they represent in API testing.",
+  "whyItMatters": "The HTTP status code is the most fundamental indicator of an API request's success or failure. Knowing exactly which code to expect for different scenarios (happy path, validation failure, auth failure) is essential.",
+  "explanation": "HTTP status codes are grouped into five classes. 1xx: Informational. 2xx: Success (200 OK, 201 Created for POST, 204 No Content for DELETE). 3xx: Redirection. 4xx: Client Errors (400 Bad Request for validation, 401 Unauthorized for bad auth, 403 Forbidden for lack of permissions, 404 Not Found). 5xx: Server Errors (500 Internal Error, 502 Bad Gateway, 503 Service Unavailable).",
+  "keyPoints": [
+    "2xx = The server successfully processed the request.",
+    "4xx = The client sent a bad request (wrong data, no auth, wrong URL).",
+    "5xx = The server failed to process a valid request.",
+    "Always assert the status code before validating the body."
+  ],
+  "codeExample": "given().\n    body(invalidPayload).\nwhen().\n    post(\"/users\").\nthen().\n    // Expect a client error due to invalid payload\n    statusCode(400).\n    body(\"error\", equalTo(\"Validation failed\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "In a negative test case for an API, you intentionally omit the Authorization header and assert that the server returns a 401 Unauthorized, ensuring the API is securely locked down.",
+  "commonMistakes": [
+    "Expecting a 200 OK for a resource creation (POST) when the server correctly returns a 201 Created.",
+    "Confusing 401 Unauthorized (unauthenticated) with 403 Forbidden (authenticated but lacking role permissions).",
+    "Writing tests that expect 5xx errors. A 5xx is a bug; tests should expect 4xx for bad input."
+  ],
+  "bestPractices": [
+    "Include both positive (2xx) and negative (4xx) test cases for every endpoint.",
+    "Validate the response body error message alongside the 4xx status code.",
+    "If an API returns a 200 OK with an error message in the JSON body, log a defect—this violates REST principles."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between 401 and 403?",
+      "a": "401 Unauthorized means the user has not provided valid authentication credentials. 403 Forbidden means the user is authenticated, but does not have the necessary permissions (roles) to access the resource."
+    },
+    {
+      "q": "If you send a GET request to a URL that doesn't exist, what status code should you receive?",
+      "a": "404 Not Found."
+    }
+  ],
+  "revisionSummary": "Master HTTP classes: 2xx (Success), 4xx (Client Error), 5xx (Server Error).",
+  "tags": ["HTTP", "Status Codes", "API Testing", "REST"]
+}

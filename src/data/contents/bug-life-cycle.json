@@ -1,0 +1,46 @@
+{
+  "id": "bug-life-cycle",
+  "moduleId": "general-sdet",
+  "title": "Bug / Defect Life Cycle",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "The specific set of states a defect goes through from discovery to closure.",
+  "whyItMatters": "A standardized defect life cycle ensures bugs are tracked, communicated, and resolved efficiently across development and testing teams.",
+  "explanation": "When a tester logs a defect, it typically starts in a 'New' state. It is then 'Assigned' to a developer. Once the developer starts working, it becomes 'Open' or 'In Progress'. If fixed, it moves to 'Fixed' or 'Resolved'. The tester then performs retesting; if it passes, it is 'Closed', if it fails, it is 'Reopened'. Other states include 'Deferred', 'Duplicate', and 'Rejected'.",
+  "keyPoints": [
+    "A bug travels through statuses: New -> Assigned -> Fixed -> Retest -> Closed.",
+    "A bug can be Rejected if it's invalid, or Deferred if it will be fixed in a later release.",
+    "Severity indicates the technical impact of a bug (Blocker, Major, Minor).",
+    "Priority indicates the business urgency to fix the bug (P1, P2, P3)."
+  ],
+  "codeExample": "{\n  \"summary\": \"Checkout button unresponsive on Safari\",\n  \"stepsToReproduce\": \"1. Open Safari. 2. Add item to cart. 3. Click Checkout.\",\n  \"expected\": \"Redirected to payment page.\",\n  \"actual\": \"Console error, no redirection.\",\n  \"severity\": \"Critical\",\n  \"priority\": \"High\"\n}",
+  "codeLanguage": "json",
+  "realWorldExample": "A tester finds a typo on the homepage. They log it as 'New' with Low Severity but High Priority (since it's public-facing). The developer fixes it, marks it 'Resolved', and the tester verifies and marks it 'Closed'.",
+  "commonMistakes": [
+    "Confusing Severity (impact on system) with Priority (urgency to fix).",
+    "Writing vague bug reports without clear reproduction steps.",
+    "Closing a bug without thorough retesting in the correct environment."
+  ],
+  "bestPractices": [
+    "Always include clear steps to reproduce, expected results, and actual results.",
+    "Attach logs, screenshots, and environment details to bug reports.",
+    "Ensure developers and testers agree on the definitions of priority and severity."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Give an example of a bug with High Severity but Low Priority?",
+      "a": "An application crashes completely (High Severity) when a user clicks a very hidden, rarely used link on an obscure legacy page (Low Priority)."
+    },
+    {
+      "q": "What happens if a developer marks a bug as 'Fixed' but it still fails during retesting?",
+      "a": "The tester changes the status to 'Reopened' and assigns it back to the developer with notes detailing why the fix failed."
+    }
+  ],
+  "revisionSummary": "Bug states: New > Assigned > Fixed > Retest > Closed. Severity = technical impact. Priority = business urgency to fix.",
+  "tags": [
+    "Defect",
+    "Bug Report",
+    "Jira",
+    "Lifecycle"
+  ]
+}

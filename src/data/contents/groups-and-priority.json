@@ -1,0 +1,39 @@
+{
+  "id": "groups-and-priority",
+  "moduleId": "selenium-webdriver",
+  "title": "Groups & Priority",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "TestNG provides mechanisms to organize test execution by categorizing them into groups and defining the exact order of execution within a class.",
+  "whyItMatters": "In large projects, you don't always run the full suite. Groups allow you to run specific slices (e.g., just 'smoke' tests). Priority ensures tests that depend on a specific flow run in the correct sequence.",
+  "explanation": "**Groups**: Assign tests to logical categories using `@Test(groups = {\"smoke\", \"regression\"})`. You can then configure the `testng.xml` file to `<include>` or `<exclude>` specific groups. This is how CI pipelines distinguish between a quick post-deployment check and a nightly deep regression.\n\n**Priority**: By default, TestNG executes methods in alphabetical order. Override this using `@Test(priority = 1)`. Lower numbers execute first. You can use negative numbers, zero, and positive numbers.\n\n*Note: Tests without a priority default to priority zero.*",
+  "keyPoints": [
+    "Groups organize tests across multiple classes.",
+    "Priority orders tests within a single class.",
+    "CI/CD pipelines heavily utilize TestNG groups to filter test execution.",
+    "Priority defaults to 0 if not specified."
+  ],
+  "codeExample": "@Test(priority = 1, groups = {\"smoke\"})\npublic void registerAccount() {\n    // test logic\n}\n\n@Test(priority = 2, groups = {\"smoke\", \"regression\"})\npublic void loginAccount() {\n    // test logic\n}\n\n/* In testng.xml:\n<groups>\n    <run>\n        <include name=\"smoke\" />\n    </run>\n</groups>\n*/",
+  "codeLanguage": "java",
+  "realWorldExample": "Before releasing to production, the team runs the 'smoke' group (50 tests). Overnight, the CI server runs the 'regression' group (500 tests). Groups make this dynamic filtering possible without changing Java code.",
+  "commonMistakes": [
+    "Assuming priority guarantees order across *different* classes. (It only guarantees order within the same class unless explicitly configured in XML).",
+    "Hardcoding dependencies using Priority instead of `dependsOnMethods`, making tests brittle if one fails."
+  ],
+  "bestPractices": [
+    "Define group names as constants in a central class (e.g., `Groups.SMOKE`) to avoid typos.",
+    "Prefer making tests independent over using priority. If Test B absolutely requires Test A to pass, use `dependsOnMethods` rather than just priority."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What happens if two @Test methods have the same priority?",
+      "a": "TestNG will fall back to executing them in alphabetical order based on the method names."
+    },
+    {
+      "q": "What is the difference between Priority and dependsOnMethods?",
+      "a": "Priority just orders the execution. If Priority 1 fails, Priority 2 still runs. `dependsOnMethods` enforces a hard dependency: if the parent method fails, the dependent method is completely skipped."
+    }
+  ],
+  "revisionSummary": "Groups allow logical tagging of tests for filtered execution (like smoke vs regression). Priority overrides alphabetical execution order within a class, giving you control over test flow.",
+  "tags": ["testng", "groups", "priority", "execution"]
+}

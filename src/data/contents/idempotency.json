@@ -1,0 +1,40 @@
+{
+  "id": "idempotency",
+  "moduleId": "rest-assured",
+  "title": "Idempotency",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Understand the concept of HTTP idempotency and its impact on API testing.",
+  "whyItMatters": "In distributed systems, network requests can fail. If a client retries a request, it must know if retrying will cause duplicate actions (like charging a credit card twice). Idempotency guarantees safe retries.",
+  "explanation": "An HTTP method is idempotent if executing it once has the same effect on the server state as executing it multiple times. GET, PUT, DELETE, and HEAD are idempotent. (Deleting an item once removes it; deleting it again yields a 404, but the server state—item is gone—remains the same). POST and PATCH are generally NOT idempotent. To make POST idempotent (e.g., payment processing), APIs often use an `Idempotency-Key` header.",
+  "keyPoints": [
+    "Idempotency = multiple identical requests leave the server in the same state as a single request.",
+    "Safe methods (GET, HEAD) are inherently idempotent.",
+    "PUT and DELETE are idempotent.",
+    "POST is not idempotent, but can be made so via idempotency keys."
+  ],
+  "codeExample": "String idempotencyKey = UUID.randomUUID().toString();\n\n// First request creates the payment\ngiven().\n    header(\"Idempotency-Key\", idempotencyKey).\n    body(paymentDetails).\nwhen().\n    post(\"/payments\").\nthen().\n    statusCode(201); // Created\n\n// Second request with the same key returns the existing result\ngiven().\n    header(\"Idempotency-Key\", idempotencyKey).\n    body(paymentDetails).\nwhen().\n    post(\"/payments\").\nthen().\n    statusCode(200); // OK (already processed)",
+  "codeLanguage": "java",
+  "realWorldExample": "When testing a Stripe payment API, you send the same payload twice with the same `Idempotency-Key`. The first request charges the card (201). The second request detects the key, skips the charge, and returns the original transaction details (200), preventing double-billing.",
+  "commonMistakes": [
+    "Assuming idempotent means the response code is identical. (e.g., DELETE #1 returns 204, DELETE #2 returns 404, but the state is still the same: the item is deleted).",
+    "Designing PUT APIs that increment values (not idempotent) rather than replacing values (idempotent)."
+  ],
+  "bestPractices": [
+    "Write automated tests to explicitly verify idempotency constraints on PUT and DELETE methods.",
+    "For critical POST endpoints, test the behavior of the `Idempotency-Key` header by sending duplicate requests.",
+    "Understand idempotency when configuring automated retry mechanisms in your HTTP clients."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What does it mean for an HTTP method to be idempotent?",
+      "a": "It means that making multiple identical requests has the same effect on the server's state as making a single request."
+    },
+    {
+      "q": "Is the DELETE method idempotent? Explain why.",
+      "a": "Yes. The first DELETE removes the resource. Subsequent DELETEs may return a 404, but the state of the server remains the same—the resource is no longer there."
+    }
+  ],
+  "revisionSummary": "Idempotency ensures safe retries. GET, PUT, DELETE are idempotent; POST is not.",
+  "tags": ["HTTP", "Idempotency", "API Design", "Architecture"]
+}

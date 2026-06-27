@@ -1,0 +1,41 @@
+{
+  "id": "jsonpath-extraction",
+  "moduleId": "rest-assured",
+  "title": "JsonPath Extraction",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Extract values from JSON responses using JsonPath expressions in REST Assured.",
+  "whyItMatters": "Extracting data from an API response is critical for end-to-end testing, where the output of one API call (like an auth token or created user ID) is used as input for the next API call.",
+  "explanation": "REST Assured provides the `jsonPath()` method to parse and extract data from JSON responses. You can use dot notation (`\"user.id\"`) or bracket notation (`\"users[0]\"`) to traverse the JSON tree. It supports GPath expressions for filtering lists (e.g., `\"users.findAll { it.age > 18 }\"`). Once extracted, values can be stored in variables and passed into subsequent `given()` blocks.",
+  "keyPoints": [
+    "Use `.jsonPath().get(\"path\")` or type-safe methods like `getString()`, `getInt()`.",
+    "Support for dot and bracket notation for JSON traversal.",
+    "Filter JSON arrays using GPath syntax.",
+    "Store extracted values for chained requests."
+  ],
+  "codeExample": "Response response = given().\n    baseUri(\"https://api.example.com\").\nwhen().\n    post(\"/login\").\nthen().\n    statusCode(200).\n    extract().response();\n\nString token = response.jsonPath().getString(\"data.token\");\nint userId = response.jsonPath().getInt(\"data.user.id\");\n\n// Use token in next request\ngiven().header(\"Authorization\", \"Bearer \" + token)...",
+  "codeLanguage": "java",
+  "realWorldExample": "In an e-commerce flow, you create an order via a POST request, extract the `orderId` from the JSON response, and then use that `orderId` to verify the order details in a subsequent GET request.",
+  "commonMistakes": [
+    "Using the wrong data type (e.g., `getString()` instead of `getInt()`), causing ClassCastExceptions.",
+    "Incorrect JSON path spelling or ignoring array indexes.",
+    "Extracting data from an error response because the status code was not validated first."
+  ],
+  "bestPractices": [
+    "Validate the status code (e.g., 200/201) before calling `extract().response()`.",
+    "Use strongly typed extraction methods (`getInt`, `getBoolean`) rather than generic `get`.",
+    "Create reusable helper methods for common extractions like tokens."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you extract a value from an array in a JSON response?",
+      "a": "You can use index notation, e.g., `response.jsonPath().getString(\"data.items[0].id\")`."
+    },
+    {
+      "q": "What is the difference between extracting a value and validating a value in REST Assured?",
+      "a": "Validation uses the `then().body()` block to assert values directly within the fluent chain. Extraction uses `extract().response().jsonPath()` to retrieve the value into a variable for later use."
+    }
+  ],
+  "revisionSummary": "Extract JSON fields using jsonPath() for passing data between API requests.",
+  "tags": ["REST Assured", "JsonPath", "Extraction", "Chaining"]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "throughput-latency-response-time",
+  "moduleId": "performance-testing",
+  "title": "Throughput, Latency & Response Time",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "These are the three most critical metrics in performance testing. Understanding the distinction between them is essential for analyzing test results and identifying bottlenecks.",
+  "whyItMatters": "Stakeholders often conflate these terms. An SDET must precisely communicate whether a system is struggling with processing capacity (throughput) or speed (latency/response time), as they require different engineering solutions.",
+  "explanation": "### 1. Throughput\n\nThroughput is the amount of work the system can process in a given amount of time. In web testing, it's typically measured in **Requests Per Second (RPS)** or Transactions Per Second (TPS). It is a measure of **capacity**.\n- *Example:* A server handling 500 API calls per second.\n\n### 2. Latency\n\nLatency is the time taken for a request to travel from the client to the server, and for the server to process it and begin sending the first byte of the response back. It is often referred to as **Time to First Byte (TTFB)**.\n- *Formula:* Network Travel Time (Request) + Server Processing Time + Network Travel Time (First Byte of Response).\n\n### 3. Response Time\n\nResponse Time (or Load Time) is the total time taken from the moment the user sends the request until the **last byte** of the response is received by the client.\n- *Formula:* Latency + Data Transfer Time.\n- If a response payload is large (e.g., a 10MB image), Latency might be low (100ms), but Response Time could be high (3000ms).\n\n### Percentiles\n\nAverages (mean) are dangerous because outliers skew them. Percentiles provide a clearer picture of user experience.\n- **P90 (90th Percentile):** 90% of requests were faster than this value, 10% were slower.\n- **P99 (99th Percentile):** Represents the worst-case scenario. High P99 times indicate sporadic slowdowns (e.g., garbage collection pauses).",
+  "keyPoints": [
+    "Throughput measures capacity (RPS).",
+    "Latency measures processing and network delay (Time to First Byte).",
+    "Response Time includes Latency plus the time to download the entire payload.",
+    "Always rely on Percentiles (P90, P95, P99) rather than Averages."
+  ],
+  "codeExample": "// Conceptual representation of metrics\nlet startTime = Date.now();\n\n// Send request over network\nfetch('https://api.example.com/data')\n  .then(response => {\n     let firstByteTime = Date.now();\n     let latency = firstByteTime - startTime;\n     console.log(`Latency (TTFB): ${latency}ms`);\n     return response.json();\n  })\n  .then(data => {\n     let lastByteTime = Date.now();\n     let responseTime = lastByteTime - startTime;\n     console.log(`Total Response Time: ${responseTime}ms`);\n  });",
+  "codeLanguage": "javascript",
+  "realWorldExample": "During a load test, average response time is 200ms, but the P99 is 4500ms. The SDET concludes that while the system is generally fast, 1 in 100 users experiences a massive delay. Investigation reveals this is caused by a periodic JVM Garbage Collection pause.",
+  "commonMistakes": [
+    "Reporting the 'Average' response time to stakeholders, hiding the fact that 5% of users are experiencing 10-second timeouts.",
+    "Confusing Latency with Response Time when downloading large assets (e.g., video files).",
+    "Assuming higher concurrency always leads to higher throughput. (Throughput eventually plateaus and drops as the server queues up)."
+  ],
+  "bestPractices": [
+    "Define SLAs using percentiles (e.g., 'P95 Response Time must be < 500ms').",
+    "Graph Throughput vs. Concurrent Users. When Throughput flattens while Users increase, you have found the system's capacity limit.",
+    "Use tools like APM (AppDynamics, New Relic, Datadog) to break down latency into DB time, application time, and network time."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between Latency and Response Time?",
+      "a": "Latency is the time to receive the first byte of the response (TTFB), mainly reflecting network and server processing. Response time is the total time to receive the entire response, adding the time it takes to transfer the payload data."
+    },
+    {
+      "q": "Why is the 99th percentile (P99) response time more important than the average?",
+      "a": "Averages hide extreme outliers. P99 ensures you are capturing the experience of the slowest 1% of transactions, which often reveals architectural bottlenecks like GC pauses, DB locks, or network drops."
+    }
+  ],
+  "revisionSummary": "Throughput = Capacity (RPS). Latency = TTFB (Network+Processing). Response Time = Total time. Always use percentiles (P90, P95, P99) for SLA reporting.",
+  "tags": ["Metrics", "Throughput", "Latency", "Response Time", "Percentiles"]
+}

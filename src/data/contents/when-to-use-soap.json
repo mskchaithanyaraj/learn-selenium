@@ -1,0 +1,35 @@
+{
+  "id": "when-to-use-soap",
+  "moduleId": "rest-soap-wsdl",
+  "title": "When to Use SOAP",
+  "priority": "normal",
+  "estimatedMinutes": 20,
+  "overview": "An analysis of the architectural scenarios where SOAP remains the superior choice over REST.",
+  "whyItMatters": "While REST dominates modern web development, many enterprise systems (banking, telecom, government) still use SOAP. SDETs must understand the 'why' behind SOAP to communicate effectively with architects and understand legacy system constraints.",
+  "explanation": "It is a misconception that SOAP is a 'dead' or inherently bad technology. SOAP (Simple Object Access Protocol) is highly standardized and provides built-in mechanisms that REST requires developers to build from scratch. \n\n### Scenarios where SOAP is preferred:\n\n1. **Formal Contracts are Required**: \n   SOAP is heavily reliant on WSDL (Web Services Description Language). If a strict, non-negotiable contract between client and server is required (e.g., B2B integration between two different companies), WSDL guarantees that both sides understand exactly what data types are expected.\n\n2. **Enterprise-Grade Security (WS-Security)**: \n   REST relies entirely on HTTPS (transport-level security) to encrypt data in transit. If the message travels through intermediaries (like enterprise service buses), the message might be decrypted at the intermediary. SOAP supports **WS-Security**, which encrypts the XML payload itself (message-level security), ensuring true end-to-end encryption even if the transport layer changes.\n\n3. **ACID Transactions over the Web (WS-AtomicTransaction)**:\n   If you need a distributed transaction across multiple services (e.g., booking a flight, a hotel, and a rental car) where either *all* succeed or *all* roll back, SOAP provides built-in standards (WS-AtomicTransaction) to handle this. REST does not have a native standard for distributed transactions (often relying on complex Saga patterns instead).\n\n4. **Guaranteed Delivery (WS-ReliableMessaging)**:\n   SOAP provides built-in mechanisms to ensure a message is delivered successfully once and only once, even over unreliable networks.\n\n5. **Stateful Operations**: \n   While REST is strictly stateless, SOAP can be implemented in a stateful manner, which is sometimes necessary for conversational business processes.",
+  "keyPoints": [
+    "SOAP is a protocol with strict standards (the WS-* standards).",
+    "It is preferred for B2B enterprise integrations where strict contracts are needed.",
+    "WS-Security provides message-level encryption, superior to REST's reliance on transport-level HTTPS.",
+    "WS-AtomicTransaction handles distributed ACID transactions natively."
+  ],
+  "codeExample": "<!-- Example of WS-Security in a SOAP Header encrypting credentials -->\n<soap:Header>\n  <wsse:Security soap:mustUnderstand=\"1\" xmlns:wsse=\"...\">\n    <wsse:UsernameToken>\n      <wsse:Username>EnterpriseUser</wsse:Username>\n      <wsse:Password Type=\"...#PasswordDigest\">xyz123</wsse:Password>\n    </wsse:UsernameToken>\n  </wsse:Security>\n</soap:Header>",
+  "codeLanguage": "xml",
+  "realWorldExample": "A global bank needs to transfer millions of dollars to another financial institution. They require absolute certainty that the message is not intercepted or altered (WS-Security), that it is delivered exactly once (WS-ReliableMessaging), and that both banks agree on the exact data format (WSDL). They choose SOAP.",
+  "commonMistakes": [
+    "Assuming SOAP is just 'legacy' and should always be replaced by REST. Rewriting a complex SOAP financial gateway into REST often results in having to manually reinvent all the WS-* security and transaction standards.",
+    "Using SOAP for mobile applications or public web APIs, where its heavy XML payload and strictness cause performance issues and poor developer experience."
+  ],
+  "bestPractices": [
+    "Use REST for public-facing APIs, mobile backends, and microservices.",
+    "Use SOAP for complex enterprise integration, financial services, and scenarios requiring distributed transactions or message-level security."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why might a banking application prefer SOAP over REST for internal money transfers?",
+      "a": "Because SOAP provides built-in standards for distributed ACID transactions (WS-AtomicTransaction) and message-level security (WS-Security), ensuring that multi-step transfers are fully rolled back if one step fails, and that payloads are encrypted end-to-end independently of the transport layer."
+    }
+  ],
+  "revisionSummary": "SOAP excels in enterprise environments requiring strict contracts (WSDL), message-level security (WS-Security), and distributed transactions (WS-AtomicTransaction). REST is better for lightweight, stateless web/mobile APIs.",
+  "tags": ["SOAP", "Architecture", "Security"]
+}

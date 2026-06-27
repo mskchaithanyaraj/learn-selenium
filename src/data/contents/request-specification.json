@@ -1,0 +1,41 @@
+{
+  "id": "request-specification",
+  "moduleId": "rest-assured",
+  "title": "RequestSpecification (Reusable Setup)",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Avoid repetition by creating reusable Request and Response Specifications.",
+  "whyItMatters": "In a large test suite, repeating the base URI, authentication headers, and content types in every test makes the code hard to maintain. Specifications centralize this configuration.",
+  "explanation": "A `RequestSpecification` is built using the `RequestSpecBuilder`. You add common properties (like base URI, auth, headers) to the builder and build the specification. You then pass this specification to the `given().spec(...)` method. Similarly, a `ResponseSpecification` (built with `ResponseSpecBuilder`) centralizes common assertions (like asserting 200 OK or content type).",
+  "keyPoints": [
+    "Use `RequestSpecBuilder` to create a `RequestSpecification`.",
+    "Use `ResponseSpecBuilder` to create a `ResponseSpecification`.",
+    "Apply specs using `.spec()` in the `given()` and `then()` blocks.",
+    "Reduces code duplication and enforces consistency across tests."
+  ],
+  "codeExample": "// 1. Define the specification (usually in a BaseTest class)\nRequestSpecification reqSpec = new RequestSpecBuilder()\n    .setBaseUri(\"https://api.example.com\")\n    .addHeader(\"Authorization\", \"Bearer token123\")\n    .setContentType(ContentType.JSON)\n    .build();\n\n// 2. Use it in a test\ngiven().\n    spec(reqSpec).\n    body(\"{ \\\"name\\\": \\\"Test\\\" }\").\nwhen().\n    post(\"/items\").\nthen().\n    statusCode(201);",
+  "codeLanguage": "java",
+  "realWorldExample": "You have 50 API tests that all target the staging environment and require a JWT token. Instead of writing `baseUri(...)` and `header(...)` 50 times, you define a `RequestSpecification` in a `@BeforeClass` and apply it to every request.",
+  "commonMistakes": [
+    "Mutating a shared `RequestSpecification` instance within a specific test, which accidentally affects other tests running in parallel.",
+    "Forgetting to call `.build()` on the `RequestSpecBuilder`.",
+    "Over-complicating specs by adding endpoint-specific logic to global specifications."
+  ],
+  "bestPractices": [
+    "Define base specifications in a `@BeforeSuite` or a Base API Test class.",
+    "Use `RestAssured.requestSpecification` for global defaults if you don't run tests in parallel, but prefer explicit `.spec(reqSpec)` for thread-safe parallel execution.",
+    "Combine with `ResponseSpecification` for common assertions like `statusCode(200)` and performance `time(lessThan(...))`."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you avoid duplicating base URIs and authentication headers across multiple API tests?",
+      "a": "By using a `RequestSpecification`. You build it once with `RequestSpecBuilder` and apply it to the `given()` block of each test, or assign it globally to `RestAssured.requestSpecification`."
+    },
+    {
+      "q": "Can you use both RequestSpecification and ResponseSpecification in the same test?",
+      "a": "Yes, `given().spec(requestSpec)` applies the request setup, and `then().spec(responseSpec)` applies the common assertions."
+    }
+  ],
+  "revisionSummary": "Centralize request configurations (auth, headers, base URI) using RequestSpecBuilder.",
+  "tags": ["REST Assured", "Framework Design", "DRY", "Configuration"]
+}

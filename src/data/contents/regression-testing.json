@@ -1,0 +1,45 @@
+{
+  "id": "regression-testing",
+  "moduleId": "general-sdet",
+  "title": "Regression Testing",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "The practice of testing existing software applications to make sure that a change or addition hasn't broken any existing functionality.",
+  "whyItMatters": "As codebases grow, any new feature or bug fix risks breaking existing logic. Regression testing acts as a safety net to maintain software quality over time.",
+  "explanation": "Regression testing ensures that recent code changes have not adversely affected existing features. It can be performed fully (running the entire test suite) or partially (running selected tests based on impact analysis). Because regression tests are repetitive and run frequently, they are the prime candidates for automation.",
+  "keyPoints": [
+    "Ensures existing functionality remains intact after code changes.",
+    "Highly repetitive, making it essential to automate.",
+    "Requires regular maintenance to remove obsolete tests and add new ones.",
+    "Impact analysis helps in selecting the right subset of regression tests to save time."
+  ],
+  "codeExample": "<!-- In a CI pipeline (Jenkinsfile), regression is often run post-deployment -->\nstage('Regression Tests') {\n    steps {\n        sh 'mvn test -Dsuite=regression.xml'\n    }\n}",
+  "codeLanguage": "groovy",
+  "realWorldExample": "A developer fixes a bug in the shopping cart calculation. The regression suite runs tests on user login, product search, and checkout to ensure the cart fix didn't break other areas.",
+  "commonMistakes": [
+    "Running manual regression tests in an agile environment, which slows down releases.",
+    "Failing to update the regression suite as new features are added.",
+    "Running a bloated regression suite that takes hours and gives flaky results."
+  ],
+  "bestPractices": [
+    "Automate as much of the regression suite as possible.",
+    "Prioritize tests based on risk, business value, and frequency of use.",
+    "Regularly prune the suite to remove redundant or flaky tests."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between Retesting and Regression Testing?",
+      "a": "Retesting is executing a failed test again after a bug fix to ensure the defect is resolved. Regression testing verifies that the bug fix did not introduce new issues in unchanged parts of the application."
+    },
+    {
+      "q": "How do you decide which test cases to include in a regression suite?",
+      "a": "Include tests for core business flows, frequently used features, areas prone to defects, and integration points. Exclude highly specific, edge-case tests if execution time is limited."
+    }
+  ],
+  "revisionSummary": "Regression testing prevents software regression (breaking old features). Automate it, prioritize by risk, and maintain the suite regularly.",
+  "tags": [
+    "Regression",
+    "Automation",
+    "Impact Analysis"
+  ]
+}

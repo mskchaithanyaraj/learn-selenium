@@ -1,0 +1,40 @@
+{
+  "id": "bottleneck-identification",
+  "moduleId": "performance-testing",
+  "title": "Bottleneck Identification",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "A bottleneck is a point of congestion in a system that slows down overall performance. Identifying bottlenecks is the ultimate goal of performance testing, moving beyond just reporting response times to diagnosing root causes.",
+  "whyItMatters": "Simply stating 'the application is slow' is insufficient for an SDET. Providing actionable data on *why* it is slow (e.g., 'the database is locking rows' or 'CPU is maxing out during garbage collection') empowers developers to fix the issue.",
+  "explanation": "### Common System Bottlenecks\n\n**1. CPU Utilization:**\n- **Symptoms:** Throughput plateaus, CPU hits 100%. Thread queuing.\n- **Causes:** Inefficient algorithms, infinite loops, heavy cryptography, aggressive Garbage Collection (GC) due to memory churn.\n\n**2. Memory Leaks / Exhaustion:**\n- **Symptoms:** Gradual increase in memory usage over time (seen in soak tests), eventually leading to OutOfMemoryError (OOM) and JVM crashes. Periodic massive spikes in response time due to 'Stop-the-World' GC pauses.\n- **Causes:** Unclosed database connections, caching too much data, object references held indefinitely.\n\n**3. Network / I/O Bottlenecks:**\n- **Symptoms:** High latency, dropped connections, low throughput despite low CPU/Memory usage.\n- **Causes:** Insufficient bandwidth, slow disk read/writes (e.g., heavy logging), chatty APIs (too many small network calls).\n\n**4. Database Bottlenecks:**\n- **Symptoms:** Application is waiting (blocked), slow API responses.\n- **Causes:** Missing indexes, N+1 query problems, deadlocks, connection pool exhaustion (running out of available connections to the DB).\n\n### APM Tools\nIdentifying these requires Application Performance Monitoring (APM) tools like AppDynamics, New Relic, Dynatrace, or open-source stacks like Prometheus + Grafana. JMeter tells you the *what*; APM tells you the *why*.",
+  "keyPoints": [
+    "CPU, Memory, Disk I/O, Network, and Databases are the primary domains for bottlenecks.",
+    "JMeter alone cannot identify most backend bottlenecks; server-side monitoring is essential.",
+    "Amdahl's Law states that the overall performance improvement is limited by the fraction of the system that cannot be parallelized."
+  ],
+  "codeExample": "# Using standard Linux tools during a load test to monitor backend servers:\n\n# Check CPU and Memory\ntop -c\nhtop\n\n# Check Disk I/O\niostat -xz 1\n\n# Check Network Connections (e.g., looking for TIME_WAIT buildup)\nnetstat -anp | grep :80 | awk '{print $6}' | sort | uniq -c\n\n# Monitor Java Garbage Collection logs (JVM arg)\n-Xlog:gc*:file=gc.log:time,uptime:filecount=10,filesize=10M",
+  "codeLanguage": "bash",
+  "realWorldExample": "During a load test, an SDET observes that response times spike from 200ms to 5000ms at exactly 500 concurrent users, yet the application server's CPU is only at 30%. By checking the APM tool, they discover the database connection pool is maxed out at 50 connections, causing all subsequent threads to wait for an available connection.",
+  "commonMistakes": [
+    "Assuming the bottleneck is always the application code; often it's network latency, load balancer misconfiguration, or DB locks.",
+    "Running the load generator and the application server on the same machine, skewing results because they compete for the same CPU/Memory.",
+    "Failing to monitor the Load Generator itself—if the JMeter machine hits 100% CPU, the bottleneck is your testing tool, not the application."
+  ],
+  "bestPractices": [
+    "Correlate JMeter response time graphs with server CPU/Memory graphs on a unified dashboard (e.g., Grafana) using timestamps.",
+    "Start load testing with isolated tiers (e.g., test the API directly before testing through the UI/Load Balancer).",
+    "Monitor GC logs during Java application load tests to ensure memory churn isn't causing excessive pauses."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "If throughput stops increasing as you add more virtual users, but server CPU and Memory are both under 40%, what might be the bottleneck?",
+      "a": "It is likely a connection pool limit (e.g., database connections, thread pools in Tomcat), a network bandwidth limit, or a database locking issue."
+    },
+    {
+      "q": "How can you tell if the load generator (JMeter machine) is the bottleneck?",
+      "a": "Monitor the load generator's CPU, Memory, and Network during the test. If its CPU hits 90%+, or if it starts throwing 'Socket Bind' or 'OutOfMemory' exceptions locally, the load generator is the bottleneck."
+    }
+  ],
+  "revisionSummary": "Identify bottlenecks by correlating client-side metrics (JMeter) with server-side metrics (APM). Check CPU, Memory, I/O, and DB. Never forget to monitor the Load Generator itself.",
+  "tags": ["Bottleneck", "CPU", "Memory", "APM", "Performance Analysis"]
+}

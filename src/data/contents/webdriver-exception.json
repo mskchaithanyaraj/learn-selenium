@@ -1,0 +1,38 @@
+{
+  "id": "webdriver-exception",
+  "moduleId": "selenium-webdriver",
+  "title": "WebDriverException (General)",
+  "priority": "normal",
+  "estimatedMinutes": 20,
+  "overview": "The root, parent exception for all Selenium-specific exceptions. Catching it acts as a fallback for any unexpected browser automation failure.",
+  "whyItMatters": "While you should always catch specific exceptions (like NoSuchElementException), understanding the parent exception is useful for building global error handlers or screenshot utilities.",
+  "explanation": "Every exception specific to Selenium extends `WebDriverException`. This includes errors communicating with the browser driver, network issues between the client and Grid, or session crashes.\n\nExamples of direct WebDriverExceptions:\n- **SessionNotCreatedException**: The browser driver (e.g., ChromeDriver) version does not match the installed browser version.\n- **UnreachableBrowserException**: The browser crashed mid-test or the Grid node went offline.\n- **Connection refused**: The script cannot talk to the driver's local server.",
+  "keyPoints": [
+    "It is the base class for all Selenium exceptions.",
+    "Usually indicates a severe environment or infrastructure issue, rather than a script logic issue.",
+    "Commonly seen when browser auto-updates break compatibility with the driver executable."
+  ],
+  "codeExample": "try {\n    driver.get(\"https://example.com\");\n} catch (WebDriverException e) {\n    System.err.println(\"A critical browser error occurred: \" + e.getMessage());\n    // E.g., restart driver, log failure, take screenshot\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "Overnight, Chrome auto-updates to version 120. Your script uses ChromeDriver 119. When the suite runs in the morning, every test instantly fails with a SessionNotCreatedException (a subclass of WebDriverException).",
+  "commonMistakes": [
+    "Catching `WebDriverException` for everything, ignoring more specific exceptions, which hides the true cause of the failure.",
+    "Not using WebDriverManager to automatically resolve browser/driver version mismatches."
+  ],
+  "bestPractices": [
+    "Use WebDriverManager (e.g., `io.github.bonigarcia.wdm`) to manage driver binaries automatically.",
+    "Catch `WebDriverException` in global teardown methods to ensure resources are cleaned up even if the browser crashes."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the parent class of NoSuchElementException?",
+      "a": "NoSuchElementException extends NotFoundException, which in turn extends WebDriverException, which extends RuntimeException."
+    },
+    {
+      "q": "How do you handle a SessionNotCreatedException?",
+      "a": "This requires an infrastructure fix, not a code fix. You must update the browser driver executable to match the installed browser version."
+    }
+  ],
+  "revisionSummary": "WebDriverException is the root of all Selenium errors. It often points to infrastructure or driver compatibility issues rather than script bugs. Handle it globally to prevent suite crashes.",
+  "tags": ["selenium", "exceptions", "infrastructure"]
+}

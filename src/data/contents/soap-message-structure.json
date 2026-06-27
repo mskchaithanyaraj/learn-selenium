@@ -1,0 +1,41 @@
+{
+  "id": "soap-message-structure",
+  "moduleId": "rest-soap-wsdl",
+  "title": "SOAP Message Structure",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "An breakdown of the anatomy of a SOAP XML message, including the Envelope, Header, Body, and Fault elements.",
+  "whyItMatters": "To automate SOAP API tests using REST Assured or interpret failures in SoapUI, SDETs must understand how SOAP messages are constructed and how errors are communicated via SOAP Faults.",
+  "explanation": "A SOAP (Simple Object Access Protocol) message is an ordinary XML document containing specific elements defined by the SOAP specification. Every SOAP message must be formatted with the following structure:\n\n1. **`<Envelope>` (Required)**: The root element of every SOAP message. It identifies the XML document as a SOAP message using the SOAP namespace.\n2. **`<Header>` (Optional)**: Contains application-specific metadata. It is most commonly used for passing security credentials (via WS-Security), transaction contexts, or routing information. If present, it must be the first child of the Envelope.\n3. **`<Body>` (Required)**: Contains the actual payload of the request or the response. This is where the method name and parameters are defined.\n4. **`<Fault>` (Optional)**: If an error occurs, the server responds with a `<Fault>` block *inside* the `<Body>`. It provides structured error information.\n\n### SOAP 1.1 vs SOAP 1.2\n- **Namespaces**: SOAP 1.1 uses `http://schemas.xmlsoap.org/soap/envelope/`. SOAP 1.2 uses `http://www.w3.org/2003/05/soap-envelope`.\n- **Content-Type**: SOAP 1.1 requires the HTTP header `Content-Type: text/xml`. SOAP 1.2 uses `Content-Type: application/soap+xml`.\n- **Fault Codes**: SOAP 1.1 uses `faultcode` and `faultstring`. SOAP 1.2 uses `Code` (and `Value`) and `Reason` (and `Text`).",
+  "keyPoints": [
+    "A SOAP message is always an XML document.",
+    "The <Envelope> is the root element.",
+    "The <Header> handles metadata like WS-Security tokens.",
+    "The <Body> holds the actual request/response payload.",
+    "The <Fault> element resides inside the <Body> and handles error reporting."
+  ],
+  "codeExample": "<?xml version=\"1.0\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:m=\"http://www.example.org/stock\">\n  <soap:Header>\n    <!-- Optional security/routing info goes here -->\n  </soap:Header>\n  <soap:Body>\n    <!-- Application payload -->\n    <m:GetStockPrice>\n      <m:StockName>GOOG</m:StockName>\n    </m:GetStockPrice>\n  </soap:Body>\n</soap:Envelope>\n\n<!-- Example SOAP Fault Response -->\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <soap:Body>\n    <soap:Fault>\n      <faultcode>soap:Client</faultcode>\n      <faultstring>Invalid Stock Name</faultstring>\n    </soap:Fault>\n  </soap:Body>\n</soap:Envelope>",
+  "codeLanguage": "xml",
+  "realWorldExample": "When testing a B2B payment gateway, you might need to insert an encrypted token into the `<soap:Header>`. If the token is invalid, the gateway won't return a standard REST 401 Unauthorized; instead, it returns an HTTP 500 status code with a `<soap:Fault>` inside the XML body containing `<faultstring>Authentication Failed</faultstring>`.",
+  "commonMistakes": [
+    "Sending a SOAP 1.1 message with the `Content-Type: application/json`, causing the server to reject it.",
+    "Expecting HTTP 4xx status codes for client errors; SOAP traditionally returns HTTP 500 Internal Server Error for application-level faults (like bad input), relying on the `<Fault>` block to explain the issue."
+  ],
+  "bestPractices": [
+    "Always set the correct `Content-Type` header (`text/xml` for 1.1) when testing with REST Assured.",
+    "When automating SOAP tests, assert against the elements inside the `<Body>`, not just the HTTP status code, as HTTP 200 can sometimes contain business-logic errors wrapped in normal XML.",
+    "Use XPath or XmlPath in REST Assured to extract and validate values from the SOAP response."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the role of the SOAP Header?",
+      "a": "The SOAP Header is an optional element used to pass application-agnostic metadata. It is predominantly used for passing authentication tokens (via WS-Security), transaction IDs, and routing information."
+    },
+    {
+      "q": "How does SOAP handle error reporting?",
+      "a": "SOAP handles errors using the <Fault> element, which is placed inside the <Body> of the response envelope. It contains a fault code, a human-readable fault string, and optional detailed information. Often, SOAP services return an HTTP 500 status when a Fault is generated."
+    }
+  ],
+  "revisionSummary": "SOAP messages are XML documents comprising a required <Envelope>, optional <Header> for metadata/security, required <Body> for the payload, and an optional <Fault> within the body for errors.",
+  "tags": ["SOAP", "XML", "API Testing"]
+}

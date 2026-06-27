@@ -1,0 +1,34 @@
+{
+  "id": "endpoints-and-bindings",
+  "moduleId": "rest-soap-wsdl",
+  "title": "Endpoints & Bindings",
+  "priority": "normal",
+  "estimatedMinutes": 20,
+  "overview": "Clarifying how abstract operations in a WSDL are mapped to physical network protocols and URLs.",
+  "whyItMatters": "When configuring SOAP test tools, you often have to choose a binding and an endpoint. Understanding these WSDL concepts ensures you send the right message format to the right address.",
+  "explanation": "In a WSDL document, the architecture is split into the **abstract** definition (what the service does) and the **concrete** definition (how and where to access it). Bindings and Endpoints belong to the concrete definition.\n\n### Bindings (`<binding>`)\nThe `<binding>` element maps the abstract operations (defined in the `<portType>`) to a specific data format and communication protocol.\n- **Protocol**: It specifies the transport mechanism. The vast majority of the time, this is SOAP over HTTP (`http://schemas.xmlsoap.org/soap/http`), but SOAP can also be bound to SMTP (email) or JMS (message queues).\n- **Style**: It specifies how the XML payload is structured. \n  - *Document/Literal*: The payload is a standard XML document validated against an XSD schema. (Most common modern approach).\n  - *RPC/Encoded*: The payload is formatted to look like a Remote Procedure Call (passing function arguments). (Legacy approach).\n\n### Endpoints / Ports (`<port>` and `<service>`)\nThe `<service>` element groups together a set of related ports. \nA `<port>` (often referred to as the **Endpoint**) specifies the physical network address where the bound service is hosted.\n- It contains the `<soap:address>` tag, which provides the actual URL (e.g., `http://api.bank.com/paymentservice`).\n\n### Why separate them?\nSeparating the abstract operations from the bindings allows the same service to be exposed over multiple protocols simultaneously. A company could expose `GetAccountBalance` over HTTP for web clients, and over JMS for internal asynchronous processing, using the exact same abstract `<portType>`.",
+  "keyPoints": [
+    "A Binding maps abstract operations to a concrete protocol (like HTTP) and data style.",
+    "An Endpoint (Port) provides the physical network address (URL) to access the service.",
+    "Separating bindings from operations allows a single service to be exposed over multiple transport protocols."
+  ],
+  "codeExample": "<!-- Abstract Operations -->\n<portType name=\"PaymentOperations\">\n  <operation name=\"ProcessPayment\">\n    <!-- inputs/outputs -->\n  </operation>\n</portType>\n\n<!-- Concrete Binding: Mapping to SOAP over HTTP -->\n<binding name=\"PaymentHttpBinding\" type=\"tns:PaymentOperations\">\n  <soap:binding style=\"document\" transport=\"http://schemas.xmlsoap.org/soap/http\"/>\n  <operation name=\"ProcessPayment\">\n    <soap:operation soapAction=\"http://example.com/ProcessPayment\"/>\n  </operation>\n</binding>\n\n<!-- Concrete Endpoint: The actual URL -->\n<service name=\"PaymentService\">\n  <port name=\"PaymentPort\" binding=\"tns:PaymentHttpBinding\">\n    <soap:address location=\"https://api.example.com/v1/payments\"/>\n  </port>\n</service>",
+  "codeLanguage": "xml",
+  "realWorldExample": "You are given a WSDL for an internal shipping calculator. The WSDL defines one `<portType>` but contains two `<port>` elements inside the `<service>`: one bound to HTTP for synchronous web requests, and another bound to JMS for asynchronous internal queue processing. Depending on your test scenario, you select the appropriate endpoint URL/queue address.",
+  "commonMistakes": [
+    "Confusing the namespace URIs found throughout the WSDL with the actual endpoint URL. Only the URL inside `<soap:address>` is the destination for network requests.",
+    "Attempting to send an RPC-style payload to a service bound as Document/Literal, causing XML parsing errors on the server."
+  ],
+  "bestPractices": [
+    "When automating SOAP tests, extract the endpoint URL dynamically from the WSDL if the environment (dev/qa/prod) changes, rather than hardcoding it.",
+    "Ensure the `SOAPAction` HTTP header in your request matches the `soapAction` defined in the WSDL `<binding>` block."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between a portType and a binding in WSDL?",
+      "a": "A portType is abstract; it defines the operations (methods) and the messages (parameters) they use, similar to a Java Interface. A binding is concrete; it dictates how those abstract operations are actually transmitted over the wire, such as specifying SOAP over HTTP and the XML serialization style."
+    }
+  ],
+  "revisionSummary": "Bindings map abstract WSDL operations to concrete protocols (e.g., SOAP over HTTP). Endpoints (Ports) specify the physical network URL where the bound service is hosted.",
+  "tags": ["WSDL", "SOAP", "Architecture"]
+}

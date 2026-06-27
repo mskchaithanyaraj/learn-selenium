@@ -1,0 +1,50 @@
+{
+  "id": "stale-element-reference",
+  "moduleId": "selenium-webdriver",
+  "title": "StaleElementReferenceException",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "StaleElementReferenceException is thrown when a WebElement reference is no longer valid because the DOM was refreshed or the element was recreated after the reference was taken.",
+  "whyItMatters": "This is one of the most common Selenium exceptions in real-world automation, especially in Single Page Applications (SPAs). Every SDET is expected to know how to handle it.",
+  "explanation": "**What causes StaleElementReferenceException?**\nWhen you find a WebElement with findElement(), Selenium stores a reference to that DOM node. If the DOM is then modified (AJAX refresh, navigation, SPA re-render), that DOM node may be destroyed and recreated. The stored reference now points to a \"stale\" (old) element that no longer exists in the DOM.\n\n**Common Scenarios:**\n1. Page refresh after findElement()\n2. AJAX call that updates part of the DOM\n3. React/Angular component re-rendering\n4. Navigating back and forward\n5. JavaScript that replaces DOM nodes\n\n**Handling Strategies:**\n\n1. **Re-find the element** — Store the locator, not the element\n2. **WebDriverWait with ignoredExceptions** — Retry until element is fresh\n3. **FluentWait ignoring StaleElementReferenceException**\n4. **Custom retry logic**\n5. **JavaScriptExecutor as a fallback**",
+  "keyPoints": [
+    "Thrown when a WebElement reference becomes invalid after DOM modification",
+    "Common in SPAs using React, Angular, Vue due to virtual DOM updates",
+    "Solution: re-find the element instead of storing WebElement references long-term",
+    "FluentWait can ignore StaleElementReferenceException during polling",
+    "Store locators (By objects), not WebElements, when working with dynamic pages"
+  ],
+  "codeExample": "// ❌ BAD — storing element reference long-term\nWebElement button = driver.findElement(By.id(\"submit\"));\n// ... some AJAX happens and the page partially refreshes ...\nbutton.click(); // StaleElementReferenceException!\n\n// ✅ SOLUTION 1: Re-find element fresh every time\nBy submitLocator = By.id(\"submit\");\n// ... some AJAX happens ...\ndriver.findElement(submitLocator).click(); // Fresh find — works!\n\n// ✅ SOLUTION 2: Retry wrapper method\npublic void clickWithRetry(By locator, int maxAttempts) {\n    int attempts = 0;\n    while (attempts < maxAttempts) {\n        try {\n            driver.findElement(locator).click();\n            return;\n        } catch (StaleElementReferenceException e) {\n            attempts++;\n            if (attempts == maxAttempts) throw e;\n        }\n    }\n}\n\n// ✅ SOLUTION 3: FluentWait ignoring StaleElementReferenceException\nWait<WebDriver> wait = new FluentWait<>(driver)\n    .withTimeout(Duration.ofSeconds(10))\n    .pollingEvery(Duration.ofMillis(500))\n    .ignoring(StaleElementReferenceException.class);\n\nwait.until(driver -> {\n    driver.findElement(By.id(\"submit\")).click();\n    return true;\n});\n\n// ✅ SOLUTION 4: WebDriverWait with refresh\nWebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));\nwait.ignoring(StaleElementReferenceException.class)\n    .until(ExpectedConditions.elementToBeClickable(By.id(\"submit\")));",
+  "codeLanguage": "java",
+  "realWorldExample": "In a React-based admin dashboard, a table re-renders every 5 seconds with fresh data. If you find a table row element and then the table refreshes before you click a button in that row, you get StaleElementReferenceException. Solution: re-find the row using its unique data attribute each time.",
+  "commonMistakes": [
+    "Storing WebElement references at class level in page objects (they go stale)",
+    "Not using ignoring(StaleElementReferenceException.class) in FluentWait",
+    "Using Thread.sleep() to \"wait for the page to settle\" — not reliable",
+    "Catching StaleElementReferenceException but not re-finding the element"
+  ],
+  "bestPractices": [
+    "Never store WebElement references between method calls in dynamic pages",
+    "Use @FindBy with PageFactory — elements are re-found on each access",
+    "Add StaleElementReferenceException to your FluentWait ignored exceptions",
+    "Implement a click() retry utility in your BasePage class"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is StaleElementReferenceException and how do you handle it?",
+      "a": "It is thrown when a WebElement reference is no longer valid because the DOM was modified after the element was found. Handle it by: 1) Re-finding the element before interacting, 2) Using FluentWait with ignoring(StaleElementReferenceException.class), 3) Implementing a retry mechanism."
+    },
+    {
+      "q": "When does StaleElementReferenceException commonly occur?",
+      "a": "In SPAs (React, Angular, Vue) when components re-render, after AJAX calls update the DOM, after page navigation, or when JavaScript replaces DOM nodes. It is very common in modern web applications."
+    }
+  ],
+  "revisionSummary": "StaleElementReferenceException = DOM modified after element was found. Fix: re-find element, use FluentWait.ignoring(), store By locators not WebElements.",
+  "tags": [
+    "stale-element",
+    "exception",
+    "selenium",
+    "spa",
+    "dynamic-dom"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "appium-vs-selenium",
+  "moduleId": "appium",
+  "title": "Appium vs Selenium",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Both use the WebDriver protocol, but Appium extends it for mobile: additional commands for gestures, app management, device interaction. Appium acts as a 'mobile Selenium' with vendor-specific drivers.",
+  "whyItMatters": "Understanding the differences ensures you don't try to apply web-centric automation paradigms directly to mobile apps, and you leverage mobile-specific commands correctly.",
+  "explanation": "Selenium is built for web browsers, executing commands to interact with the DOM via ChromeDriver/GeckoDriver. Appium is built for mobile devices, translating WebDriver commands into UIAutomator2 (Android) or XCUITest (iOS) commands. Appium extends the protocol for mobile features: installing apps, locking the screen, touch actions, and rotating the device. While Selenium uses CSS/XPath natively, Appium relies on Accessibility IDs and platform-specific locators.",
+  "keyPoints": [
+    "Appium is built on top of the WebDriver protocol.",
+    "Selenium targets browsers; Appium targets mobile (native, hybrid, and mobile web).",
+    "Appium provides mobile-specific APIs (e.g. TouchActions, Context switching).",
+    "Appium supports platform-specific drivers (UiAutomator2, XCUITest)."
+  ],
+  "codeExample": "// Appium specific command not available in Selenium\n((AndroidDriver) driver).lockDevice(Duration.ofSeconds(5));\n// Context switching for Hybrid apps\nSet<String> contexts = ((AndroidDriver) driver).getContextHandles();",
+  "codeLanguage": "java",
+  "realWorldExample": "If your company has a web portal and a native mobile app, you would use Selenium for the portal and Appium for the app, but both could share the same reporting framework (TestNG/ExtentReports) because of the shared WebDriver foundation.",
+  "commonMistakes": [
+    "Using Selenium locators (CSS) for native mobile app elements.",
+    "Trying to use driver.get(url) to launch a native app (you must use app capabilities instead)."
+  ],
+  "bestPractices": [
+    "Design cross-platform page objects where possible, but maintain separate locators for iOS and Android.",
+    "Use Appium-specific drivers (`AndroidDriver`, `IOSDriver`) instead of plain `WebDriver` to access mobile methods."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the primary difference between Appium and Selenium?",
+      "a": "Selenium is strictly for web browser automation, while Appium extends the WebDriver protocol to automate mobile applications (native, hybrid) and offers mobile-specific actions."
+    }
+  ],
+  "revisionSummary": "Appium is 'Selenium for Mobile'. It uses the WebDriver protocol but extends it with commands for touch gestures, device management, and app context switching, using platform-specific drivers like UiAutomator2 and XCUITest.",
+  "tags": [
+    "appium",
+    "selenium",
+    "webdriver",
+    "comparison"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "native-hybrid-web-app",
+  "moduleId": "appium",
+  "title": "Native, Hybrid & Web App Testing",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Differentiate and test Native (mobile locators), Hybrid (WebView context switching), and Web (browser app) applications using Appium.",
+  "whyItMatters": "An SDET must know which context they are in to choose the right locators. Selenium locators won't work in a native app, and Mobile locators won't work inside a WebView.",
+  "explanation": "Native apps use platform UI components (Swift/Kotlin). Hybrid apps are native shells embedding a web browser (WebView) using frameworks like Ionic/React Native. Mobile Web apps run in Chrome/Safari on the phone. For Hybrid apps, Appium starts in a `NATIVE_APP` context. You must get available contexts (`getContextHandles()`), find the `WEBVIEW` context, and switch to it (`context()`). Once in the WEBVIEW, you use standard Selenium locators (CSS/XPath) and DOM interactions.",
+  "keyPoints": [
+    "Native Apps: Use Accessibility ID and native locators.",
+    "Hybrid Apps: Switch context to `WEBVIEW_<id>` to interact with HTML elements.",
+    "Mobile Web: Set `browserName` capability (e.g., Chrome, Safari) instead of `app`.",
+    "ChromeDriver must match the WebView/Chrome version on the Android device."
+  ],
+  "codeExample": "Set<String> contextNames = ((AndroidDriver) driver).getContextHandles();\nfor (String contextName : contextNames) {\n    if (contextName.contains(\"WEBVIEW\")) {\n        ((AndroidDriver) driver).context(contextName);\n        break;\n    }\n}\n// Now use Selenium web locators\ndriver.findElement(By.cssSelector(\"input.search\")).sendKeys(\"Appium\");\n\n// Switch back to native\n((AndroidDriver) driver).context(\"NATIVE_APP\");",
+  "codeLanguage": "java",
+  "realWorldExample": "In a banking app, the login screen is Native, but the 'Terms and Conditions' is a WebView. The script interacts with Native locators to log in, switches to WEBVIEW context to scroll and click 'Agree', then switches back to NATIVE_APP.",
+  "commonMistakes": [
+    "Trying to click an HTML element inside a WebView without switching contexts.",
+    "Not having the correct version of ChromeDriver installed on the Appium server for the device's Android WebView version."
+  ],
+  "bestPractices": [
+    "Use `chromedriverExecutable` capability if you face version mismatch errors in Hybrid Android apps.",
+    "Always switch back to `NATIVE_APP` context immediately after completing WebView interactions to avoid stale references."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you automate a Hybrid application in Appium?",
+      "a": "You must retrieve the available contexts using getContextHandles(), switch the driver context from NATIVE_APP to the WEBVIEW context, perform the interactions using web locators, and then switch back to NATIVE_APP."
+    }
+  ],
+  "revisionSummary": "Appium handles Native, Hybrid, and Mobile Web apps. Hybrid testing requires switching the driver context to `WEBVIEW` to interact with the embedded HTML DOM using standard Selenium locators.",
+  "tags": [
+    "appium",
+    "hybrid",
+    "webview",
+    "context"
+  ]
+}

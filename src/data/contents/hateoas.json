@@ -1,0 +1,41 @@
+{
+  "id": "hateoas",
+  "moduleId": "rest-soap-wsdl",
+  "title": "HATEOAS",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Understanding HATEOAS (Hypermedia As The Engine Of Application State), the final and most complex constraint of REST's Uniform Interface.",
+  "whyItMatters": "HATEOAS represents Level 3 (the highest level) of the Richardson Maturity Model. While rarely implemented perfectly in the wild, understanding it is a common interview differentiator for senior roles.",
+  "explanation": "HATEOAS stands for **Hypermedia As The Engine Of Application State**. It is a principle that states a REST client should be able to enter an API through a single initial URL, and then navigate the rest of the API entirely through hyperlinks provided in the server's responses.\n\nThink of it like browsing a website. When you go to `amazon.com`, you don't know the exact URL for the checkout page. You click a link for a product, then a button (link) to 'Add to Cart', then a button to 'Checkout'. The HTML (hypermedia) guides your state transitions.\n\nHATEOAS applies this same concept to APIs. Instead of the client hardcoding URLs like `/users/{id}/orders`, the API response includes a `links` array with URLs the client can follow based on the current state of the resource.\n\n### Advantages of HATEOAS\n1. **Decoupling**: The server can change its URL structures without breaking the client, as long as the link relation names (`rel`) stay the same.\n2. **Discoverability**: A developer can explore the API dynamically by following links.\n3. **State Management**: The API can dictate what actions are currently allowed. For example, if a bank account balance is negative, the API can simply omit the 'withdraw' link, and the client UI can automatically hide the withdraw button.",
+  "keyPoints": [
+    "HATEOAS uses hypermedia (links) to dynamically guide the client through application states.",
+    "Clients should not hardcode API URIs, but instead follow links provided in responses.",
+    "It forms Level 3 of the Richardson Maturity Model.",
+    "Commonly implemented using formats like HAL (Hypertext Application Language)."
+  ],
+  "codeExample": "{\n  \"accountId\": \"12345\",\n  \"balance\": 100.00,\n  \"status\": \"active\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"/api/accounts/12345\"\n    },\n    \"deposit\": {\n      \"href\": \"/api/accounts/12345/deposit\"\n    },\n    \"withdraw\": {\n      \"href\": \"/api/accounts/12345/withdraw\"\n    },\n    \"close-account\": {\n      \"href\": \"/api/accounts/12345/close\"\n    }\n  }\n}",
+  "codeLanguage": "json",
+  "realWorldExample": "In an e-commerce API, requesting an Order that is in 'Shipped' state might return links to 'track-shipment' and 'return-item'. If the Order is in 'Processing' state, it might return a link to 'cancel-order'. The frontend dynamically renders buttons based on which links are present in the JSON response, shifting business logic away from the frontend.",
+  "commonMistakes": [
+    "Hardcoding all API endpoints in the client frontend, defeating the purpose of HATEOAS.",
+    "Providing static links that are always identical, regardless of the resource's actual state or user permissions.",
+    "Over-engineering simple CRUD APIs with HATEOAS when a fixed schema would suffice (violating YAGNI)."
+  ],
+  "bestPractices": [
+    "Use standard hypermedia formats like HAL (Hypertext Application Language) or JSON:API to structure links consistently.",
+    "Ensure the links accurately reflect the permissions of the authenticated user (e.g., don't send a 'delete' link to a read-only user).",
+    "Test HATEOAS implementations by validating the presence or absence of links based on resource state transitions."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What does HATEOAS stand for and what is its purpose?",
+      "a": "Hypermedia As The Engine Of Application State. Its purpose is to decouple the client from the server's URI structure by allowing the server to dynamically provide navigable links in its responses, indicating what actions are currently available to the client."
+    },
+    {
+      "q": "How does HATEOAS help with application state management?",
+      "a": "The server includes only the links that are valid for the resource's current state. For example, if an invoice is already paid, the API will not include a 'pay' link in the response. The client can simply render UI buttons based on the links provided, centralizing business rules on the server."
+    }
+  ],
+  "revisionSummary": "HATEOAS allows REST APIs to be self-descriptive and navigable by embedding hypermedia links in responses, removing the need for clients to hardcode URLs and state logic.",
+  "tags": ["REST", "HATEOAS", "Architecture", "Richardson Maturity Model"]
+}

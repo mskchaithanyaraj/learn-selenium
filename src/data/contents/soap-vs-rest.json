@@ -1,0 +1,51 @@
+{
+  "id": "soap-vs-rest",
+  "moduleId": "rest-soap-wsdl",
+  "title": "SOAP vs REST",
+  "priority": "hot",
+  "estimatedMinutes": 40,
+  "overview": "SOAP (Simple Object Access Protocol) is a strict XML-based messaging protocol, while REST (Representational State Transfer) is an architectural style using standard HTTP methods.",
+  "whyItMatters": "Understanding the fundamental differences between SOAP and REST is expected knowledge for any SDET interviewing at enterprise companies that use web services.",
+  "explanation": "**SOAP (Simple Object Access Protocol):**\n- A **protocol** with strict specifications\n- Uses **XML** for all messages\n- Has its own error handling (SOAP Fault)\n- Supports WS-Security, WS-ReliableMessaging (enterprise features)\n- Works over HTTP, SMTP, TCP\n- Contract-first development using WSDL\n- Stateful or stateless\n\n**REST (Representational State Transfer):**\n- An **architectural style**, not a protocol\n- Can use JSON, XML, HTML, plain text\n- Uses HTTP status codes for errors\n- Stateless by constraint\n- Uses HTTP methods (GET, POST, PUT, DELETE)\n- No strict contract (though OpenAPI/Swagger is common)\n\n| Feature | SOAP | REST |\n|---|---|---|\n| Format | XML only | JSON, XML, HTML, etc. |\n| Protocol | Protocol | Architecture style |\n| Transport | HTTP, SMTP, TCP | HTTP only |\n| Security | WS-Security built-in | OAuth, JWT, HTTPS |\n| Error handling | SOAP Fault XML | HTTP status codes |\n| Contract | WSDL (required) | OpenAPI (optional) |\n| Performance | Slower (XML overhead) | Faster (JSON) |\n| State | Stateful or stateless | Stateless |\n| Use case | Enterprise, banking, healthcare | Public APIs, mobile, web |",
+  "keyPoints": [
+    "SOAP is a protocol; REST is an architectural style",
+    "SOAP uses XML only; REST supports JSON, XML, and other formats",
+    "SOAP has WS-Security built-in; REST relies on HTTPS + OAuth/JWT",
+    "SOAP has WSDL contract (machine-readable); REST uses OpenAPI (optional)",
+    "SOAP Fault for errors; REST uses HTTP status codes",
+    "SOAP is preferred in banking, healthcare, enterprise; REST for web/mobile APIs"
+  ],
+  "codeExample": "// ── SOAP REQUEST EXAMPLE ──────────────────────────────────────────\n// SOAP messages are XML with envelope structure\n/*\nPOST /WeatherService HTTP/1.1\nContent-Type: text/xml; charset=utf-8\nSOAPAction: \"GetWeather\"\n\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soap:Envelope\n    xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n    xmlns:weath=\"http://www.example.com/weather\">\n    <soap:Header>\n        <weath:Authentication>\n            <weath:Username>user</weath:Username>\n            <weath:Password>pass</weath:Password>\n        </weath:Authentication>\n    </soap:Header>\n    <soap:Body>\n        <weath:GetWeather>\n            <weath:City>New York</weath:City>\n        </weath:GetWeather>\n    </soap:Body>\n</soap:Envelope>\n*/\n\n// ── TESTING SOAP WITH REST ASSURED ────────────────────────────────\n@Test\npublic void testSoapWeatherService() {\n    String soapBody = \"\"\"\n        <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n        <soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n            <soap:Body>\n                <GetWeather xmlns=\"http://www.example.com/weather\">\n                    <City>New York</City>\n                </GetWeather>\n            </soap:Body>\n        </soap:Envelope>\n        \"\"\";\n    \n    given()\n        .contentType(\"text/xml; charset=UTF-8\")\n        .header(\"SOAPAction\", \"GetWeather\")\n        .body(soapBody)\n    .when()\n        .post(\"http://www.example.com/WeatherService\")\n    .then()\n        .statusCode(200)\n        .body(\"Envelope.Body.GetWeatherResponse.Temperature\", \n              notNullValue());\n}\n\n// ── REST EQUIVALENT ───────────────────────────────────────────────\n// Same functionality in REST:\n// GET https://api.weather.com/v1/weather?city=New+York\n// Response: { \"city\": \"New York\", \"temperature\": 72, \"unit\": \"F\" }",
+  "codeLanguage": "java",
+  "realWorldExample": "A banking system uses SOAP for inter-bank transactions because SOAP's WS-Security provides built-in message-level encryption, digital signatures, and reliable messaging — critical for financial transactions. The bank's customer-facing mobile app uses REST (JSON) because it is lighter and faster.",
+  "commonMistakes": [
+    "Saying REST is a protocol — it is an architectural style",
+    "Thinking REST is always better — SOAP is essential in enterprise/regulated industries",
+    "Forgetting SOAPAction header when testing SOAP services",
+    "Using Content-Type: application/json for SOAP — must be text/xml"
+  ],
+  "bestPractices": [
+    "Use SoapUI tool for testing SOAP services (generates requests from WSDL)",
+    "Rest Assured can test SOAP services by sending XML body with text/xml content type",
+    "Always validate SOAP Fault responses (error scenarios)",
+    "Use WSDL to understand the contract before writing SOAP tests"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between SOAP and REST?",
+      "a": "SOAP is a protocol using XML for messages, with strict contract (WSDL), built-in WS-Security, and works over multiple transports. REST is an architectural style using HTTP with any format (usually JSON), stateless, no strict contract, uses HTTP status codes for errors. REST is faster and simpler; SOAP is more enterprise-grade with built-in security and reliability features."
+    },
+    {
+      "q": "When would you choose SOAP over REST?",
+      "a": "Choose SOAP when: 1) You need built-in message-level security (WS-Security) for banking/healthcare, 2) You need ACID transactions and reliable messaging, 3) The existing system uses WSDL contracts, 4) Enterprise SOA architecture is in place."
+    }
+  ],
+  "revisionSummary": "SOAP=protocol+XML+WSDL+WS-Security+SOAP Fault. REST=architecture+HTTP+JSON+stateless+status codes. SOAP for enterprise/regulated. REST for web/mobile APIs.",
+  "tags": [
+    "soap",
+    "rest",
+    "wsdl",
+    "web-services",
+    "api"
+  ]
+}

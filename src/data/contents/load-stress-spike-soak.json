@@ -1,0 +1,58 @@
+{
+  "id": "load-stress-spike-soak",
+  "moduleId": "performance-testing",
+  "title": "Load vs Stress vs Spike vs Soak Testing",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "Different performance test types simulate different real-world usage patterns to identify system behavior under various load conditions.",
+  "whyItMatters": "Interviewers frequently ask candidates to differentiate between performance test types. These are fundamental concepts for any SDET role involving performance testing.",
+  "explanation": "**Types of Performance Tests:**\n\n**1. Load Testing**\n- Tests system under **expected normal load**\n- Goal: Verify system performs acceptably under typical usage\n- Example: 500 concurrent users during business hours\n- Validates: Response times, throughput, error rate under normal conditions\n\n**2. Stress Testing**\n- Tests system **beyond normal capacity** to find the breaking point\n- Goal: Find maximum load the system can handle before failure\n- Example: Gradually increase from 500 → 1000 → 2000 users until system fails\n- Validates: System limits, failure behavior, recovery after failure\n\n**3. Spike Testing**\n- Tests system with **sudden large increases** in load (spikes)\n- Goal: Verify system handles sudden traffic surges (flash sales, news events)\n- Example: Instantly jump from 100 to 10,000 users, then back to 100\n- Validates: Auto-scaling, circuit breakers, graceful degradation\n\n**4. Soak Testing (Endurance Testing)**\n- Tests system under **sustained normal load for extended period** (hours/days)\n- Goal: Find memory leaks, connection pool exhaustion, performance degradation over time\n- Example: 500 users for 24 hours\n- Validates: Memory management, connection handling, stability over time\n\n**5. Volume Testing**\n- Tests with **large amounts of data** (not users)\n- Example: Database with 10 million records vs 100 records\n\n**6. Scalability Testing**\n- Tests system's ability to **scale up/down** with load",
+  "keyPoints": [
+    "Load testing = normal expected load to verify baseline performance",
+    "Stress testing = beyond capacity to find breaking point",
+    "Spike testing = sudden burst of users (flash sales, viral events)",
+    "Soak testing = extended duration to find memory leaks / gradual degradation",
+    "Throughput = requests per second. Latency = time for first byte. Response time = total time.",
+    "All these tests can be designed in JMeter using Thread Group configurations"
+  ],
+  "codeExample": "// JMeter concepts expressed as pseudo-configuration:\n\n/*\n── LOAD TEST CONFIGURATION ──────────────────────────────────────────\nThread Group:\n  Number of Threads: 500       (concurrent users)\n  Ramp-Up Period: 60 seconds   (gradually add users over 60s)\n  Loop Count: Forever\n  Duration: 1800 seconds       (30 minutes)\n  \nExpected: All requests respond within 2 seconds, error rate < 1%\n\n── STRESS TEST CONFIGURATION ────────────────────────────────────────\nThread Group (Ultimate Thread Group plugin):\n  Start: 100 users\n  Every 2 minutes, add 100 more users\n  Until system shows errors > 5% or response time > 10s\n  Goal: Find the breaking point\n\n── SPIKE TEST CONFIGURATION ──────────────────────────────────────────\nConcurrent Thread Groups:\n  Phase 1: 100 users for 5 minutes (baseline)\n  Phase 2: SPIKE to 5000 users instantly\n  Phase 3: Hold 5000 users for 2 minutes\n  Phase 4: Drop back to 100 users\n  \nExpected: System recovers within 30 seconds after spike\n\n── SOAK TEST CONFIGURATION ───────────────────────────────────────────\nThread Group:\n  Number of Threads: 500\n  Ramp-Up Period: 120 seconds\n  Duration: 86400 seconds      (24 hours)\n  \nMonitor: Memory usage, GC frequency, connection pool size, error rate\nAlert if: Response time increases by >20% from baseline during the test\n*/\n\n// JMX file snippet (JMeter Test Plan XML):\n/*\n<ThreadGroup guiclass=\"ThreadGroupGui\" testname=\"Load Test\">\n    <intProp name=\"ThreadGroup.num_threads\">500</intProp>\n    <intProp name=\"ThreadGroup.ramp_time\">60</intProp>\n    <boolProp name=\"ThreadGroup.scheduler\">true</boolProp>\n    <stringProp name=\"ThreadGroup.duration\">1800</stringProp>\n</ThreadGroup>\n*/",
+  "codeLanguage": "java",
+  "realWorldExample": "An e-commerce site runs: 1) Load test simulating 1000 users during normal hours — response times must be <2s. 2) Stress test for Black Friday peak (10,000 users) to find limits. 3) Spike test simulating a product going viral (+50,000 users in seconds). 4) Soak test for 48 hours to find memory leaks before a major release.",
+  "commonMistakes": [
+    "Confusing stress testing (breaking point) with load testing (normal load)",
+    "Not monitoring server-side metrics (CPU, memory, DB connections) during tests",
+    "Running soak tests only for minutes instead of hours",
+    "Not including ramp-up period in load tests — sudden spike on startup is unrealistic",
+    "Ignoring soak test results — memory leaks only appear after sustained load"
+  ],
+  "bestPractices": [
+    "Always define acceptance criteria before running performance tests",
+    "Monitor application AND infrastructure metrics (CPU, memory, GC, DB)",
+    "Run performance tests in a production-like environment",
+    "Establish a baseline before running stress/spike tests",
+    "Use JMeter dashboards and listeners for real-time monitoring"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between load testing and stress testing?",
+      "a": "Load testing validates system behavior under expected normal load (e.g., 500 concurrent users) to ensure performance meets SLAs. Stress testing pushes the system beyond normal capacity to find its breaking point and observe failure behavior."
+    },
+    {
+      "q": "What is soak testing and what does it detect?",
+      "a": "Soak testing (endurance testing) runs the system under normal load for an extended period (hours/days). It detects memory leaks, connection pool exhaustion, file descriptor leaks, and gradual performance degradation that only appears with sustained usage over time."
+    },
+    {
+      "q": "What is spike testing?",
+      "a": "Spike testing simulates sudden, extreme increases in load (like a flash sale or viral event). It verifies that the system can handle sudden traffic surges, auto-scale appropriately, and recover gracefully when the spike subsides."
+    }
+  ],
+  "revisionSummary": "Load=normal expected load. Stress=beyond capacity to find breaking point. Spike=sudden large burst. Soak=sustained load for hours to find memory leaks. Volume=large data. Scalability=scale up/down testing.",
+  "tags": [
+    "performance-testing",
+    "load-testing",
+    "stress-testing",
+    "spike-testing",
+    "soak-testing",
+    "jmeter"
+  ]
+}

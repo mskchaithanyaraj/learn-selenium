@@ -1,0 +1,41 @@
+{
+  "id": "dataprovider",
+  "moduleId": "selenium-webdriver",
+  "title": "@DataProvider",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "A core TestNG feature that allows you to run the exact same test method multiple times with different sets of input data.",
+  "whyItMatters": "Data-driven testing is essential for scaling automation. Without @DataProvider, you would have to write separate test methods for every possible input combination (e.g., valid login, invalid login, empty login).",
+  "explanation": "A method annotated with `@DataProvider` returns a 2D array of Objects (`Object[][]`). Each row in this array represents one execution of the test. The columns represent the parameters passed to the test method.\n\nYou link the test to the provider using `@Test(dataProvider = \"name\")`.\n\nAdvanced usage:\n- **Cross-class DataProviders**: Store all providers in a separate class and reference them using `dataProviderClass = DataHelper.class`.\n- **Parallel Execution**: Add `parallel = true` to the DataProvider annotation to run the data permutations simultaneously.",
+  "keyPoints": [
+    "Returns `Object[][]` or `Iterator<Object[]>`.",
+    "Drastically reduces code duplication.",
+    "Parameters in the `@Test` method must exactly match the columns in the `Object[][]`.",
+    "Can be configured to run data sets in parallel."
+  ],
+  "codeExample": "@DataProvider(name = \"loginData\")\npublic Object[][] createData() {\n    return new Object[][] {\n        { \"validUser\", \"validPass\", true },\n        { \"invalidUser\", \"validPass\", false },\n        { \"\", \"\", false }\n    };\n}\n\n@Test(dataProvider = \"loginData\")\npublic void verifyLogin(String username, String password, boolean expectedSuccess) {\n    loginPage.login(username, password);\n    Assert.assertEquals(loginPage.isSuccess(), expectedSuccess);\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "Testing a search bar. Instead of 50 test methods for 50 different search queries, you write one test method and a DataProvider that feeds it an array of 50 strings. If 2 fail, TestNG reports 48 passed and 2 failed independently.",
+  "commonMistakes": [
+    "Mismatching the number of arguments in the test method with the number of columns in the DataProvider.",
+    "Not making the DataProvider method `static` when it is in a different class.",
+    "Loading massive datasets into memory all at once instead of using an Iterator."
+  ],
+  "bestPractices": [
+    "Keep DataProviders in separate, dedicated data utility classes for better organization.",
+    "Combine DataProvider with Apache POI to read data sets directly from Excel files.",
+    "Use meaningful names for DataProviders rather than 'dp1' or 'testData'."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Can a DataProvider return something other than Object[][]?",
+      "a": "Yes, it can return an `Iterator<Object[]>`. This is highly recommended for reading large files (like Excel or CSV) row by row so you don't load the entire file into memory."
+    },
+    {
+      "q": "How do you use a DataProvider located in a different class?",
+      "a": "You must specify the class in the Test annotation: `@Test(dataProvider = \"name\", dataProviderClass = MyData.class)`. Also, the DataProvider method must be declared as static."
+    }
+  ],
+  "revisionSummary": "TestNG's @DataProvider is the backbone of data-driven testing in Java. It feeds multidimensional arrays into test methods, allowing a single script to validate countless input scenarios efficiently.",
+  "tags": ["testng", "data-driven", "dataprovider"]
+}

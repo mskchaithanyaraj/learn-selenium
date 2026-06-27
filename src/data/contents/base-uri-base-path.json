@@ -1,0 +1,41 @@
+{
+  "id": "base-uri-base-path",
+  "moduleId": "rest-assured",
+  "title": "Base URI & Base Path Configuration",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Configure global default endpoints to avoid repetition and enable environment-driven testing.",
+  "whyItMatters": "Tests run against multiple environments (QA, Staging, Prod). Hardcoding URLs makes tests brittle. Configuring the Base URI globally solves this problem.",
+  "explanation": "You can configure REST Assured globally using static fields: `RestAssured.baseURI` and `RestAssured.basePath`. `baseURI` sets the domain (e.g., `https://api.example.com`). `basePath` sets the common API version or route prefix (e.g., `/api/v1`). You can also configure the `port`. These defaults apply to all requests unless explicitly overridden in a specific `given()` block.",
+  "keyPoints": [
+    "Set `RestAssured.baseURI` for the host/domain.",
+    "Set `RestAssured.basePath` for the common path prefix.",
+    "Set `RestAssured.port` if using a non-standard port (e.g., 8080).",
+    "Read these values from a properties file to support multi-environment testing."
+  ],
+  "codeExample": "// In a @BeforeSuite or setup method\nRestAssured.baseURI = \"https://api.example.com\";\nRestAssured.basePath = \"/v1\";\nRestAssured.port = 443;\n\n// In a @Test method (resolves to https://api.example.com:443/v1/users)\ngiven().\nwhen().\n    get(\"/users\").\nthen().\n    statusCode(200);",
+  "codeLanguage": "java",
+  "realWorldExample": "You use Maven profiles or a `config.properties` file to define `env=staging`. Your setup code reads this property, sets `RestAssured.baseURI = \"https://staging.api.example.com\"`, and all your tests automatically hit the staging environment without changing any test code.",
+  "commonMistakes": [
+    "Hardcoding the Base URI in every test, making environment switching painful.",
+    "Forgetting to clear or reset the global configuration in teardown when running different test suites in the same JVM.",
+    "Confusing baseURI with basePath (e.g., putting `/v1/users` in the baseURI)."
+  ],
+  "bestPractices": [
+    "Always externalize the Base URI to a configuration file or environment variable.",
+    "Use RequestSpecifications instead of static RestAssured variables if tests run in parallel and require different base URIs.",
+    "Keep endpoint paths (like `/users`) in the test method, not in the global `basePath`."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you switch between QA and Staging environments in your API tests?",
+      "a": "I read the environment URL from a properties file or system property at runtime, and assign it to `RestAssured.baseURI` in the setup method."
+    },
+    {
+      "q": "What is the difference between Base URI and Base Path?",
+      "a": "Base URI is the host and protocol (e.g., `https://api.example.com`). Base Path is the trailing path prefix common to all endpoints (e.g., `/api/v1`)."
+    }
+  ],
+  "revisionSummary": "Use RestAssured.baseURI and basePath for global, environment-driven configuration.",
+  "tags": ["REST Assured", "Configuration", "Environment", "Setup"]
+}

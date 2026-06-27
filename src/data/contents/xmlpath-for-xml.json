@@ -1,0 +1,40 @@
+{
+  "id": "xmlpath-for-xml",
+  "moduleId": "rest-assured",
+  "title": "XmlPath for XML Responses",
+  "priority": "normal",
+  "estimatedMinutes": 20,
+  "overview": "Parse and validate XML API responses using XmlPath.",
+  "whyItMatters": "While JSON is dominant, many legacy enterprise systems and SOAP web services still communicate using XML. Testing these endpoints requires XML traversal skills.",
+  "explanation": "REST Assured supports XML validation out of the box using `XmlPath` (which internally leverages GPath for XML). You can assert XML node values directly in the `body()` block. To access attributes (rather than text nodes), you prefix the attribute name with an `@` symbol. You can also extract the response and parse it manually using `XmlPath` just like `JsonPath`.",
+  "keyPoints": [
+    "Navigate XML nodes using dot notation.",
+    "Access attributes using `@attributeName`.",
+    "Support for XML namespaces is available but requires configuration.",
+    "Works well for SOAP responses and hybrid REST/XML endpoints."
+  ],
+  "codeExample": "// Assuming XML Response:\n// <company>\n//   <employee id=\"101\">\n//     <name>Jane Doe</name>\n//   </employee>\n// </company>\n\ngiven().\n    accept(ContentType.XML).\nwhen().\n    get(\"/company/xml\").\nthen().\n    statusCode(200).\n    // Validate text node\n    body(\"company.employee.name\", equalTo(\"Jane Doe\")).\n    // Validate attribute\n    body(\"company.employee.@id\", equalTo(\"101\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "When testing a legacy SOAP payment gateway, the response comes back as an XML envelope. You use `XmlPath` to navigate down to the `<TransactionStatus>` node and assert its text is 'APPROVED'.",
+  "commonMistakes": [
+    "Forgetting the `@` symbol when trying to read an XML attribute.",
+    "Struggling with XML namespaces. If the XML uses namespaces (e.g., `soapenv:Body`), you may need to configure `XmlPath` to be namespace-aware or use wildcard syntax.",
+    "Applying JSON logic (like array indexes) incorrectly to XML node lists."
+  ],
+  "bestPractices": [
+    "If dealing with complex SOAP XML, consider extracting the payload and using dedicated XML libraries (like XPath in Java) if GPath becomes too cumbersome.",
+    "Ensure you request XML using `.accept(ContentType.XML)` if the API supports multiple formats."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you validate an XML attribute (e.g., id=\"1\") in REST Assured?",
+      "a": "You use the `@` symbol before the attribute name in your path, like `body(\"root.element.@id\", equalTo(\"1\"))`."
+    },
+    {
+      "q": "Does REST Assured support SOAP web services?",
+      "a": "Yes, REST Assured can test any HTTP endpoint. You can send a SOAP envelope as a String in the POST body, set Content-Type to text/xml, and validate the XML response using XmlPath."
+    }
+  ],
+  "revisionSummary": "Use XmlPath to assert XML nodes (dot notation) and attributes (@).",
+  "tags": ["REST Assured", "XML", "XmlPath", "SOAP"]
+}

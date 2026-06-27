@@ -1,0 +1,41 @@
+{
+  "id": "status-code-body-validation",
+  "moduleId": "rest-assured",
+  "title": "Status Code & Body Validation",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Assert HTTP status codes and validate response body fields using REST Assured's fluent API.",
+  "whyItMatters": "Verifying the status code is the first line of defense in API testing. Validating the body ensures the API returns the correct data and structure.",
+  "explanation": "In REST Assured, the `then()` block is used for assertions. You can chain `.statusCode(200)` to ensure the response was successful. To validate the body, REST Assured uses Hamcrest matchers under the hood. You can specify a JSON path (like `\"data.user.id\"`) and an expected condition (like `equalTo(42)`). You can also extract the `Response` object to perform multiple assertions or use SoftAssertions (e.g., via AssertJ) so that a failure in one assertion doesn't prevent subsequent assertions from executing.",
+  "keyPoints": [
+    "Use `.then().statusCode(200)` to validate the HTTP status code.",
+    "Use `.then().body(\"path\", equalTo(\"value\"))` to assert field values.",
+    "Extract the `Response` object for custom or SoftAssertions.",
+    "Validate headers and content types as part of the assertions."
+  ],
+  "codeExample": "given().\n    baseUri(\"https://api.example.com\").\nwhen().\n    get(\"/users/1\").\nthen().\n    statusCode(200).\n    contentType(ContentType.JSON).\n    body(\"data.id\", equalTo(1)).\n    body(\"data.email\", containsString(\"@example.com\")).\n    time(lessThan(2000L));",
+  "codeLanguage": "java",
+  "realWorldExample": "When testing a user registration endpoint, you want to verify that the server returns a 201 Created status, the content type is JSON, and the returned user object has an ID greater than 0.",
+  "commonMistakes": [
+    "Forgetting to validate the Content-Type, leading to silent failures when the API returns an HTML error page.",
+    "Hardcoding absolute values instead of flexible matchers when data is dynamic.",
+    "Not validating the status code before trying to parse the body."
+  ],
+  "bestPractices": [
+    "Always assert the status code first.",
+    "Validate response times for critical endpoints.",
+    "Use SoftAssertions when verifying large JSON responses to get a complete picture of all failures."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you validate multiple fields in a response without the test failing on the first error?",
+      "a": "You can use SoftAssertions (provided by AssertJ or TestNG) by extracting the Response object and making assertions on it, or you can chain multiple `.body()` calls (though native REST Assured `.body()` chains will fail fast on the first error). Validating multiple paths in a single `.body()` call using Hamcrest can also group them."
+    },
+    {
+      "q": "How do you check if a response took less than 2 seconds?",
+      "a": "Use the `.time(Matchers.lessThan(2000L))` method in the `then()` block."
+    }
+  ],
+  "revisionSummary": "Use then().statusCode() and then().body() with Hamcrest matchers to validate APIs.",
+  "tags": ["REST Assured", "Validation", "Status Code", "Hamcrest"]
+}

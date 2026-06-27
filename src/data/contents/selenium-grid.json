@@ -1,0 +1,44 @@
+{
+  "id": "selenium-grid",
+  "moduleId": "selenium-webdriver",
+  "title": "Selenium Grid (Hub & Node)",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Selenium Grid allows you to run tests in parallel across multiple machines and browser versions by distributing commands from a central Hub to various Nodes.",
+  "whyItMatters": "In enterprise automation, running tests sequentially on a single machine is too slow. Grid drastically reduces execution time and enables cross-browser/cross-platform compatibility testing at scale.",
+  "explanation": "Selenium Grid 4 introduced a fully revamped architecture compared to Grid 3. It can be run in various modes: Standalone, Hub and Node, or Distributed (Router, Distributor, Session Map, etc.). The **Hub** acts as a central point, receiving test requests and routing them to appropriate **Nodes** based on `Capabilities` (like browser name, version, and platform). Nodes are machines where the actual browser instances are launched and tests are executed. \n\nModern Grid setups heavily leverage Docker (Docker-Selenium) to spin up disposable containers for each test session, ensuring a clean state and avoiding 'dirty' test environments.",
+  "keyPoints": [
+    "Grid distributes tests across multiple machines.",
+    "Hub acts as the central coordinator for test requests.",
+    "Nodes register to the Hub and execute tests on specific browsers/platforms.",
+    "Selenium 4 supports Standalone, Hub/Node, and Distributed modes natively.",
+    "Capabilities dictate which Node a test is routed to."
+  ],
+  "codeExample": "DesiredCapabilities caps = new DesiredCapabilities();\ncaps.setBrowserName(\"chrome\");\ncaps.setPlatform(Platform.LINUX);\n\nWebDriver driver = new RemoteWebDriver(new URL(\"http://hub_ip:4444/wd/hub\"), caps);\ndriver.get(\"https://example.com\");",
+  "codeLanguage": "java",
+  "realWorldExample": "Running a regression suite of 1,000 tests. Sequentially on one machine, it takes 10 hours. With Selenium Grid and 10 Nodes, running in parallel, it finishes in roughly 1 hour.",
+  "commonMistakes": [
+    "Hardcoding IP addresses instead of using environment variables.",
+    "Not ensuring network connectivity between Hub and Nodes (firewalls, ports).",
+    "Failing to quit the driver, which leaves orphaned sessions on the Grid.",
+    "Not matching the DesiredCapabilities properly with available Node capabilities."
+  ],
+  "bestPractices": [
+    "Use Docker containers for Nodes to ensure clean environments.",
+    "Set session timeouts to clean up hanging tests automatically.",
+    "Scale Nodes dynamically in CI/CD pipelines (e.g., using Kubernetes or ECS).",
+    "Always use a `finally` block or `@AfterMethod` to call `driver.quit()`."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between Selenium Grid 3 and Grid 4?",
+      "a": "Grid 4 is a complete rewrite. It natively supports Docker, introduces new components for fully distributed mode (Router, Distributor, Session Map), and no longer requires separate JARs for Hub and Node."
+    },
+    {
+      "q": "How does the Hub know which Node to send a test to?",
+      "a": "The Hub inspects the `Capabilities` (like browserName and platformName) requested by the test and matches them against the capabilities registered by the available Nodes."
+    }
+  ],
+  "revisionSummary": "Selenium Grid enables parallel, cross-browser test execution. It consists of a Hub (coordinator) and Nodes (executors). Essential for reducing test execution time in CI/CD pipelines.",
+  "tags": ["selenium", "grid", "parallel", "cross-browser", "docker"]
+}

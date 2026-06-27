@@ -1,0 +1,41 @@
+{
+  "id": "request-headers",
+  "moduleId": "rest-assured",
+  "title": "Request Headers",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Set and validate custom and standard HTTP headers.",
+  "whyItMatters": "Headers control metadata like content types, client identifiers, cache controls, and API versioning. Ensuring headers are sent and received correctly is crucial for robust API communication.",
+  "explanation": "You can add headers to a request using the `header(\"Name\", \"Value\")` method in the `given()` block. Common headers like `Content-Type` and `Accept` have dedicated methods (`contentType()` and `accept()`). To validate headers returned by the server, use `header(\"Name\", expectedValue)` or `headers(...)` in the `then()` block.",
+  "keyPoints": [
+    "Set request headers using `.header(\"Key\", \"Value\")`.",
+    "Validate response headers using `.then().header(\"Key\", \"ExpectedValue\")`.",
+    "Use dedicated `.contentType()` and `.accept()` for standard MIME type headers.",
+    "Pass multiple headers at once using the `Headers` class or a Map."
+  ],
+  "codeExample": "given().\n    baseUri(\"https://api.example.com\").\n    header(\"X-Request-ID\", \"req-999\").\n    header(\"X-API-Version\", \"v2\").\n    accept(ContentType.JSON).\nwhen().\n    get(\"/data\").\nthen().\n    statusCode(200).\n    header(\"X-Rate-Limit-Remaining\", notNullValue()).\n    header(\"Content-Type\", containsString(\"application/json\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "APIs often require an API key in a custom header like `x-api-key`. You pass this using `.header(\"x-api-key\", \"secret-key\")`. On the response, you might validate that rate-limiting headers like `X-RateLimit-Remaining` are present.",
+  "commonMistakes": [
+    "Misspelling header keys, which the server ignores, leading to default behavior rather than failures.",
+    "Asserting exact equality on `Content-Type` when it includes a charset (e.g., `application/json; charset=utf-8`), causing test failures. Use `containsString()` instead.",
+    "Not sending the `Accept` header when the API supports multiple formats (JSON, XML)."
+  ],
+  "bestPractices": [
+    "Use global `RequestSpecification` to add common headers (like API keys or User-Agents) to all requests.",
+    "Validate important response headers like CORS headers (`Access-Control-Allow-Origin`) if testing a public API.",
+    "Use `containsString` for `Content-Type` validation to avoid charset mismatch."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you validate a specific header in the response?",
+      "a": "You use `.then().header(\"Header-Name\", \"Expected Value\")`. You can also use Hamcrest matchers for partial validation."
+    },
+    {
+      "q": "What is the difference between Content-Type and Accept headers?",
+      "a": "Content-Type describes the format of the data being sent in the request body. Accept describes the format the client wants to receive in the response body."
+    }
+  ],
+  "revisionSummary": "Use .header() in given() to send headers, and .header() in then() to validate them.",
+  "tags": ["REST Assured", "Headers", "HTTP", "Metadata"]
+}

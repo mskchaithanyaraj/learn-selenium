@@ -1,0 +1,34 @@
+{
+  "id": "multiple-sheets",
+  "moduleId": "selenium-webdriver",
+  "title": "Working with Multiple Sheets",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Excel files often contain multiple sheets (tabs). POI allows you to navigate, read, and write across these different sheets.",
+  "whyItMatters": "Enterprise test data is rarely flat. A single config file might have a 'Dev' sheet, a 'QA' sheet, and a 'Prod' sheet. Your framework must know how to pick the right one.",
+  "explanation": "You can retrieve a specific sheet from a Workbook in two ways:\n1. **By Index**: `workbook.getSheetAt(0)` gets the first tab. Useful when you don't know the name of the sheet, or if the file only ever has one sheet.\n2. **By Name**: `workbook.getSheet(\"QA_Env\")` gets the tab specifically named \"QA_Env\". This is much safer and more readable for configuration files.\n\nYou can also calculate how many sheets exist using `workbook.getNumberOfSheets()` and iterate through them.",
+  "keyPoints": [
+    "`getSheetAt(int index)` is 0-indexed.",
+    "`getSheet(String name)` is case-sensitive.",
+    "Structuring test data across multiple sheets keeps data organized."
+  ],
+  "codeExample": "Workbook wb = WorkbookFactory.create(new FileInputStream(\"config.xlsx\"));\n\n// Read from QA config sheet\nSheet qaSheet = wb.getSheet(\"QA\");\nString qaUrl = qaSheet.getRow(0).getCell(1).getStringCellValue();\n\n// Read from Prod config sheet\nSheet prodSheet = wb.getSheet(\"PROD\");\nString prodUrl = prodSheet.getRow(0).getCell(1).getStringCellValue();\n\nSystem.out.println(\"QA URL: \" + qaUrl);\nSystem.out.println(\"Prod URL: \" + prodUrl);",
+  "codeLanguage": "java",
+  "realWorldExample": "You have a `TestData.xlsx` file. Tab 1 is 'LoginData', Tab 2 is 'CheckoutData'. When the Login Test runs, it specifically requests `wb.getSheet(\"LoginData\")`. When the Checkout Test runs, it requests `wb.getSheet(\"CheckoutData\")`.",
+  "commonMistakes": [
+    "Using `getSheetAt(0)` for everything, and then someone reorders the tabs in Excel, breaking all the tests.",
+    "Making typos in the sheet name when using `getSheet()`, resulting in a NullPointerException when you try to access rows."
+  ],
+  "bestPractices": [
+    "Prefer `getSheet(String name)` over index for stability.",
+    "Pass the sheet name as a parameter to your reusable `ExcelReader` utility method."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you access a specific tab in an Excel file using Apache POI?",
+      "a": "You can access it by index using `workbook.getSheetAt(0)` or by its string name using `workbook.getSheet(\"SheetName\")`."
+    }
+  ],
+  "revisionSummary": "Apache POI can navigate multi-tab Excel files easily. Retrieving sheets by name (`getSheet(\"name\")`) is preferred over retrieving by index to prevent errors if tabs are rearranged.",
+  "tags": ["apache-poi", "excel", "data-driven"]
+}

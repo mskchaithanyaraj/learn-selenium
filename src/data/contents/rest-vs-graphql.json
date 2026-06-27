@@ -1,0 +1,40 @@
+{
+  "id": "rest-vs-graphql",
+  "moduleId": "rest-soap-wsdl",
+  "title": "REST vs GraphQL",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "A comparison between the REST architectural style and the GraphQL query language, highlighting when to use each and the testing implications.",
+  "whyItMatters": "GraphQL is heavily adopted in modern web development. SDETs must understand its differences from REST to effectively design test automation strategies for both paradigms.",
+  "explanation": "While REST relies on multiple endpoints returning fixed data structures, GraphQL is a query language that operates over a single endpoint (usually `POST /graphql`), allowing the client to specify exactly what data it needs.\n\n### Over-fetching and Under-fetching\n- **REST**: Often suffers from over-fetching (returning more data than the client needs, e.g., fetching a whole user object just to get their name) or under-fetching (requiring multiple API calls to get related data, like calling `/users/1` then `/users/1/posts`).\n- **GraphQL**: Solves this by letting the client send a structured query specifying only the exact fields and relationships required. A single request can fetch a user and their posts.\n\n### Key Differences\n1. **Endpoints**: REST uses many resource-based URLs (`/users`, `/orders`). GraphQL uses one URL.\n2. **HTTP Methods**: REST maps operations to HTTP verbs (GET, POST, PUT, DELETE). GraphQL mostly uses POST for everything, defining operations as `queries` (read) and `mutations` (write) inside the request body.\n3. **Caching**: REST natively leverages HTTP caching via URLs. GraphQL is harder to cache at the HTTP level because all requests are POSTs to the same endpoint.\n4. **Schema**: GraphQL is strongly typed with a strict schema definition. REST is often schemaless (though OpenAPI/Swagger provides schema documentation).\n\n### Testing Implications\nTesting GraphQL requires sending complex JSON bodies containing the query string and variables, and validating the response against the expected structure. REST Assured can be used, but specialized GraphQL clients or dedicated payload construction are often necessary.",
+  "keyPoints": [
+    "GraphQL operates via a single endpoint, whereas REST uses multiple resource-specific URIs.",
+    "GraphQL eliminates over-fetching and under-fetching.",
+    "REST maps actions to HTTP verbs; GraphQL uses Queries for reading and Mutations for writing.",
+    "REST leverages native HTTP caching; GraphQL requires complex client-side or server-side caching solutions."
+  ],
+  "codeExample": "// REST equivalent requires multiple calls:\n// GET /users/1\n// GET /users/1/posts\n\n// GraphQL equivalent (Single POST request to /graphql):\n{\n  \"query\": \"query GetUserAndPosts($userId: ID!) { user(id: $userId) { name posts { title } } }\",\n  \"variables\": { \"userId\": \"1\" }\n}",
+  "codeLanguage": "json",
+  "realWorldExample": "A mobile app needs to display a user's profile picture, their top 3 recent posts, and the number of followers. In REST, this might take 3 separate network requests or require the backend to build a custom composite endpoint. In GraphQL, the mobile app sends one query requesting exactly those specific fields, saving bandwidth and battery life.",
+  "commonMistakes": [
+    "Assuming GraphQL is always 'better' than REST. GraphQL adds complexity and makes HTTP-level caching extremely difficult.",
+    "Testing GraphQL endpoints by simply asserting HTTP 200. GraphQL often returns 200 OK even when there are business logic errors, placing the error details inside an `errors` array in the JSON response."
+  ],
+  "bestPractices": [
+    "When testing GraphQL, always parse the JSON response and assert that the `errors` array is absent or null.",
+    "Use GraphQL for mobile/frontend APIs where bandwidth and flexibility are critical. Use REST for server-to-server microservice communication where caching and simplicity are preferred.",
+    "Use REST Assured to construct GraphQL payloads by passing the query and variables inside a JSON object."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What problems does GraphQL solve compared to REST?",
+      "a": "It solves over-fetching (downloading unnecessary data) and under-fetching (needing multiple round trips to get related data). It allows the client to request exactly what it needs in a single request."
+    },
+    {
+      "q": "How does error handling differ between REST and GraphQL?",
+      "a": "REST uses standard HTTP status codes (e.g., 404 for Not Found, 400 for Bad Request). GraphQL typically returns a 200 OK status code for all requests, and if an error occurs, it includes an 'errors' array in the JSON response detailing what went wrong."
+    }
+  ],
+  "revisionSummary": "GraphQL provides a single endpoint for clients to query exactly the data they need, solving REST's over/under-fetching problems, but trades off HTTP-native caching and simplicity.",
+  "tags": ["REST", "GraphQL", "API Design", "Comparison"]
+}

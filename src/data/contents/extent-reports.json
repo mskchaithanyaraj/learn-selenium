@@ -1,0 +1,39 @@
+{
+  "id": "extent-reports",
+  "moduleId": "selenium-webdriver",
+  "title": "ExtentReports Integration",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "ExtentReports is an open-source reporting library for Java that generates highly interactive, customizable, and visually appealing HTML test execution reports.",
+  "whyItMatters": "TestNG's default reports are difficult to read and not suitable for sharing with management. ExtentReports creates professional dashboards with charts, embedded screenshots, and step-by-step logs.",
+  "explanation": "Core classes in ExtentReports 5+:\n1. **ExtentSparkReporter**: Configures the HTML file (path, document title, theme).\n2. **ExtentReports**: The engine. You attach the reporter to this and use it to add system info (OS, Environment, Tester).\n3. **ExtentTest**: Represents an individual test case. You use this to log steps (`pass`, `fail`, `info`), attach screenshots, and record execution time.\n\n**Thread Safety**: If you run tests in parallel, ExtentReports requires management. The `ExtentReports` object is thread-safe, but `ExtentTest` is not. You must use `ThreadLocal<ExtentTest>` to ensure parallel threads log to the correct test in the report.",
+  "keyPoints": [
+    "Replaces default TestNG reports with rich HTML dashboards.",
+    "Requires `extentreports` dependency.",
+    "Integrates seamlessly with TestNG Listeners.",
+    "Must use `ThreadLocal` for logging in parallel execution environments."
+  ],
+  "codeExample": "// 1. Setup (run once before suite)\nExtentSparkReporter spark = new ExtentSparkReporter(\"target/Spark.html\");\nspark.config().setTheme(Theme.DARK);\nExtentReports extent = new ExtentReports();\nextent.attachReporter(spark);\n\n// 2. Create a test (run before each method)\nExtentTest test = extent.createTest(\"Verify Login\");\n\n// 3. Log steps during execution\ntest.info(\"Navigated to login page\");\ntest.pass(\"Login successful\");\n// On failure, attach Base64 screenshot\n// test.fail(\"Element not found\", MediaEntityBuilder.createScreenCaptureFromBase64String(base64Str).build());\n\n// 4. Teardown (run once after suite)\nextent.flush();",
+  "codeLanguage": "java",
+  "realWorldExample": "After a nightly regression run of 500 tests, the CI pipeline emails an ExtentReport link to the QA manager. The manager sees a pie chart showing 90% pass rate, filters by failed tests, and clicks a failed test to instantly see the error log and screenshot.",
+  "commonMistakes": [
+    "Forgetting to call `extent.flush()` at the end of the suite. The report file will be created but will remain completely blank.",
+    "Not using ThreadLocal for `ExtentTest`, resulting in logs from Test A being written into the report section for Test B during parallel execution."
+  ],
+  "bestPractices": [
+    "Embed screenshots as Base64 strings rather than absolute file paths, making the HTML file completely standalone and portable via email.",
+    "Add system info (`extent.setSystemInfo(\"Environment\", \"QA\")`) so reviewers know exactly where the tests ran."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why is my ExtentReport completely empty after the tests finish?",
+      "a": "You most likely forgot to call `extent.flush()` in your `@AfterSuite` or suite listener. Flush writes the data from RAM into the HTML file."
+    },
+    {
+      "q": "How do you handle ExtentReports in parallel execution?",
+      "a": "You must use `ThreadLocal<ExtentTest>`. Each thread creates its own `ExtentTest` instance and registers it in the ThreadLocal, ensuring step logs are routed to the correct test node in the report."
+    }
+  ],
+  "revisionSummary": "ExtentReports generates rich HTML test reports. It utilizes ExtentSparkReporter (config), ExtentReports (manager), and ExtentTest (logger). Essential for CI/CD reporting and requires ThreadLocal for parallel execution.",
+  "tags": ["selenium", "reporting", "extent-reports", "testng"]
+}

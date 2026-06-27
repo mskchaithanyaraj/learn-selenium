@@ -1,0 +1,39 @@
+{
+  "id": "element-not-interactable",
+  "moduleId": "selenium-webdriver",
+  "title": "ElementNotInteractableException",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Occurs when an element is technically present in the DOM, but it is not in a state that allows user interaction (e.g., hidden, disabled, or off-screen).",
+  "whyItMatters": "This exception highlights the difference between an element 'existing' and an element being 'usable'. It often reveals issues with CSS transitions or hidden UI states.",
+  "explanation": "Unlike `NoSuchElementException`, when you get `ElementNotInteractableException`, the locator worked! The element is there. However, Selenium mimics human behavior. If a human can't click it, Selenium won't either.\n\nCommon causes:\n- **Hidden**: `display: none`, `visibility: hidden`, or zero height/width.\n- **Disabled**: An input field has the `disabled` attribute.\n- **Off-screen**: The element is outside the viewport (though Selenium often attempts to auto-scroll).\n- **Under an overlay**: Something else is covering it (often throws `ElementClickInterceptedException` instead, but sometimes this one).\n\nFixes include waiting for `visibilityOfElementLocated`, using JavascriptExecutor to force the click, or ensuring preceding steps were completed correctly.",
+  "keyPoints": [
+    "Element exists in the DOM, but cannot be clicked/typed into.",
+    "Usually caused by CSS styling (`display: none`).",
+    "Requires waiting for visibility or interactability, not just presence."
+  ],
+  "codeExample": "// ❌ Throws ElementNotInteractableException if the button is still fading in\ndriver.findElement(By.id(\"submit\")).click();\n\n// ✅ Wait for the element to be visible and interactable\nWebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));\nWebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id(\"submit\")));\nsubmitBtn.click();\n\n// ⚠️ Workaround: Force click using JavaScript (bypasses UI visibility checks)\nJavascriptExecutor js = (JavascriptExecutor) driver;\njs.executeScript(\"arguments[0].click();\", driver.findElement(By.id(\"submit\")));",
+  "codeLanguage": "java",
+  "realWorldExample": "A dropdown menu's items are in the DOM, but they are set to `display: none` until you click the dropdown header. If your script tries to click an item without clicking the header first, you get this exception.",
+  "commonMistakes": [
+    "Using `ExpectedConditions.presenceOfElementLocated` instead of `visibilityOfElementLocated` or `elementToBeClickable`.",
+    "Immediately using JavascriptExecutor to bypass the error without understanding *why* the element is hidden (masking a real bug)."
+  ],
+  "bestPractices": [
+    "Use `ExpectedConditions.elementToBeClickable()` for buttons and links.",
+    "Ensure your test workflow strictly follows the required UI steps to reveal the element.",
+    "Use JavascriptExecutor only as a last resort when a known, unfixable UI quirk blocks interaction."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why would `ExpectedConditions.presenceOfElementLocated` still result in an ElementNotInteractableException?",
+      "a": "`presenceOf` only checks if the element is in the HTML DOM. It does not check if it is visible or enabled. You must use `visibilityOf` or `elementToBeClickable`."
+    },
+    {
+      "q": "How can you force a click on an element that Selenium refuses to interact with?",
+      "a": "You can cast the driver to `JavascriptExecutor` and execute `arguments[0].click();` on the element."
+    }
+  ],
+  "revisionSummary": "ElementNotInteractableException means the element is in the DOM but hidden, disabled, or unclickable. Fix it by waiting for it to be clickable or ensuring the UI is in the correct state.",
+  "tags": ["selenium", "exceptions", "debugging", "waits"]
+}

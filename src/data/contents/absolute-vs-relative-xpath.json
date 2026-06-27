@@ -1,0 +1,40 @@
+{
+  "id": "absolute-vs-relative-xpath",
+  "moduleId": "selenium-webdriver",
+  "title": "Absolute vs Relative XPath",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "Understanding the difference between absolute and relative XPath is fundamental to creating resilient automation scripts. Relative XPath is the industry standard.",
+  "whyItMatters": "Using absolute XPath is a common beginner mistake that leads to highly brittle tests. Knowing how to write strong relative XPath expressions ensures tests survive UI updates.",
+  "explanation": "**Absolute XPath** provides the complete path from the root element (`<html>`) to the target element. It starts with a single forward slash `/`. Example: `/html/body/div[2]/div/form/input[1]`.\n\n**Relative XPath** starts searching from anywhere in the document, based on a specific matching criteria (like an attribute or text). It starts with a double forward slash `//`. Example: `//input[@id='username']`.\n\nAbsolute XPaths break if any structural change happens anywhere in the path (e.g., a developer adds a new `<div>` wrapper). Relative XPaths are decoupled from the exact structure and only break if the specific target element's attributes or immediate context changes.",
+  "keyPoints": [
+    "Absolute XPath starts with `/` and originates from the root.",
+    "Relative XPath starts with `//` and searches globally or from a specific context.",
+    "Absolute XPath is extremely brittle and should be avoided.",
+    "Relative XPath is robust and resilient to DOM changes."
+  ],
+  "codeExample": "// ❌ BAD: Absolute XPath (Brittle)\nWebElement usernameAbsolute = driver.findElement(By.xpath(\"/html/body/div[1]/section/div[2]/form/div[1]/input\"));\n\n// ✅ GOOD: Relative XPath (Robust)\nWebElement usernameRelative = driver.findElement(By.xpath(\"//input[@name='username']\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "A marketing team asks developers to add an alert banner at the top of a page. This wraps the main content in an extra `<div>`. All absolute XPaths fail immediately. The relative XPaths continue working perfectly.",
+  "commonMistakes": [
+    "Copying XPath directly from Chrome DevTools ('Copy full XPath') and pasting it into scripts.",
+    "Writing overly long relative XPaths that act like absolute ones (e.g., `//div[@id='app']/div/div/ul/li/a`)."
+  ],
+  "bestPractices": [
+    "Always use relative XPath.",
+    "Find a stable, unique attribute near the target element and build the relative XPath from there.",
+    "Use `contains()`, `starts-with()`, or `text()` to make relative XPaths even more robust."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between single slash `/` and double slash `//` in XPath?",
+      "a": "Single slash `/` looks for the element immediately as a direct child of the current node (or root). Double slash `//` looks for the element anywhere in the descendant tree (children, grandchildren, etc.)."
+    },
+    {
+      "q": "When would you ever use Absolute XPath?",
+      "a": "Practically never in professional test automation. It might be used for quick ad-hoc scraping of a completely static, unchangeable XML document, but not for web UI testing."
+    }
+  ],
+  "revisionSummary": "Absolute XPath specifies the exact path from root and is highly prone to breaking. Relative XPath finds elements based on attributes or context, providing the resilience required for UI automation.",
+  "tags": ["selenium", "xpath", "locators"]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "given-when-then",
+  "moduleId": "rest-assured",
+  "title": "Given / When / Then Structure",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "Rest Assured uses a BDD (Behavior Driven Development) syntax: given() for request setup, when() for the HTTP method call, and then() for response validation.",
+  "whyItMatters": "This is the foundational syntax of Rest Assured that every API test is built on. It is readable, expressive, and maps directly to the three phases of any HTTP interaction.",
+  "explanation": "**Rest Assured BDD Syntax:**\n\n```\ngiven()          → Set up the request (headers, body, auth, params)\n    .when()      → Execute the HTTP call (get, post, put, delete)\n    .then()      → Validate the response (status, body, headers)\n```\n\n**Three Phases:**\n\n1. **given()** — Request Specification\n   - Headers (Content-Type, Authorization)\n   - Request body (JSON, XML, form data)\n   - Query parameters and path parameters\n   - Authentication configuration\n   - Base URL and base path\n\n2. **when()** — HTTP Method Execution\n   - .get(\"/endpoint\")\n   - .post(\"/endpoint\")\n   - .put(\"/endpoint\")\n   - .delete(\"/endpoint\")\n   - .patch(\"/endpoint\")\n\n3. **then()** — Response Validation\n   - Status code assertion\n   - Response body assertion (JSON/XML path)\n   - Header assertion\n   - Response time assertion\n   - Extract values for chaining",
+  "keyPoints": [
+    "given() → request setup, when() → HTTP call, then() → validation",
+    "Can chain: given().header().body().when().post().then().statusCode(200)",
+    "RequestSpecification can be built and reused across tests",
+    "then() returns ValidatableResponse which supports method chaining",
+    "extract() after then() allows pulling out response values",
+    "Rest Assured tests are essentially readable HTTP test scripts"
+  ],
+  "codeExample": "import io.restassured.RestAssured;\nimport io.restassured.response.Response;\nimport static io.restassured.RestAssured.*;\nimport static org.hamcrest.Matchers.*;\n\npublic class ApiTest {\n\n    @BeforeClass\n    public static void setup() {\n        RestAssured.baseURI = \"https://reqres.in\";\n        RestAssured.basePath = \"/api\";\n    }\n\n    // ── GET REQUEST ───────────────────────────────────────────────────\n    @Test\n    public void testGetUser() {\n        given()\n            .header(\"Accept\", \"application/json\")\n        .when()\n            .get(\"/users/2\")\n        .then()\n            .statusCode(200)\n            .body(\"data.id\", equalTo(2))\n            .body(\"data.first_name\", equalTo(\"Janet\"))\n            .body(\"data.email\", containsString(\"@reqres.in\"))\n            .time(lessThan(2000L)); // Response time < 2 seconds\n    }\n\n    // ── POST REQUEST ──────────────────────────────────────────────────\n    @Test\n    public void testCreateUser() {\n        String requestBody = \"\"\"\n            {\n                \"name\": \"John Doe\",\n                \"job\": \"SDET\"\n            }\n            \"\"\";\n        \n        given()\n            .contentType(\"application/json\")\n            .body(requestBody)\n        .when()\n            .post(\"/users\")\n        .then()\n            .statusCode(201)\n            .body(\"name\", equalTo(\"John Doe\"))\n            .body(\"job\", equalTo(\"SDET\"))\n            .body(\"id\", notNullValue())\n            .body(\"createdAt\", notNullValue());\n    }\n\n    // ── EXTRACT RESPONSE ──────────────────────────────────────────────\n    @Test\n    public void testExtractUserId() {\n        String userId = \n            given()\n                .contentType(\"application/json\")\n                .body(\"{ \\\"name\\\": \\\"Alice\\\", \\\"job\\\": \\\"Tester\\\" }\")\n            .when()\n                .post(\"/users\")\n            .then()\n                .statusCode(201)\n                .extract()\n                .path(\"id\");  // Extract specific field\n        \n        System.out.println(\"Created user ID: \" + userId);\n        Assert.assertNotNull(userId);\n    }\n\n    // ── EXTRACT FULL RESPONSE ─────────────────────────────────────────\n    @Test  \n    public void testExtractFullResponse() {\n        Response response = \n            given()\n                .queryParam(\"page\", 2)\n            .when()\n                .get(\"/users\")\n            .then()\n                .statusCode(200)\n                .extract()\n                .response();\n        \n        int total = response.jsonPath().getInt(\"total\");\n        List<String> emails = response.jsonPath().getList(\"data.email\");\n        System.out.println(\"Total users: \" + total);\n        System.out.println(\"Emails: \" + emails);\n    }\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "Testing a user management REST API: given() provides the auth token and JSON content type header, when().post(\"/users\") creates a new user, then().statusCode(201).body(\"id\", notNullValue()) validates the creation was successful.",
+  "commonMistakes": [
+    "Forgetting contentType(\"application/json\") for POST/PUT requests",
+    "Not setting baseURI globally — repeating it in every test",
+    "Using then() before asserting — then() must come after when()",
+    "Not using extract() when you need the response data in subsequent tests"
+  ],
+  "bestPractices": [
+    "Set RestAssured.baseURI in @BeforeClass to avoid repetition",
+    "Use RequestSpecBuilder to create reusable request specifications",
+    "Extract response values and assert them separately for better error messages",
+    "Use logging: given().log().all() and then().log().ifError() for debugging"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Explain the given/when/then structure in Rest Assured.",
+      "a": "given() is the request specification phase where you set headers, body, auth, and parameters. when() executes the HTTP call (get/post/put/delete). then() validates the response (status code, body, headers). They chain together to form a complete API test."
+    },
+    {
+      "q": "How do you extract a value from a Rest Assured response?",
+      "a": "Use .then().extract().path(\"jsonPath\") to extract a specific field, or .extract().response() to get the full Response object and then use response.jsonPath().get(\"field\") to extract values."
+    }
+  ],
+  "revisionSummary": "given()=request setup, when()=HTTP call, then()=validation. Chain: given().header().body().when().post().then().statusCode(201). Use extract().path() to pull values. Set baseURI globally.",
+  "tags": [
+    "rest-assured",
+    "given-when-then",
+    "bdd",
+    "api-testing"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "uiautomator2-driver",
+  "moduleId": "appium",
+  "title": "UiAutomator2 Driver",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "UiAutomator2 is the default Android automation driver in Appium 2, bootstrapping a test server APK on the device that processes commands.",
+  "whyItMatters": "Understanding the driver architecture helps troubleshoot connection issues, app installation failures, and explains the limits of Android automation.",
+  "explanation": "When an Appium session starts with `automationName: UiAutomator2`, Appium installs a helper APK (`appium-uiautomator2-server`) onto the device. This server uses Google's native UIAutomator V2 framework to interact with the device. It supports deep OS integration: changing network settings, reading notifications, accessing the clipboard, and sending SMS via adb. It replaced the older Appium Android Driver.",
+  "keyPoints": [
+    "Default Android driver in Appium 2.",
+    "Requires Appium to install two helper APKs on the device.",
+    "Uses Google's native UIAutomator API.",
+    "Can interact with system apps (Settings, Notifications) unlike Espresso."
+  ],
+  "codeExample": "// Setting the capability for the driver\nUiAutomator2Options options = new UiAutomator2Options();\noptions.setPlatformName(\"Android\");\noptions.setAutomationName(\"UiAutomator2\");\n\n// Android-specific commands provided by the driver\n((AndroidDriver) driver).openNotifications();\nString clipboardText = ((AndroidDriver) driver).getClipboardText();",
+  "codeLanguage": "java",
+  "realWorldExample": "To verify an OTP sent via SMS, an SDET uses the UiAutomator2 driver to open the notification shade (`openNotifications()`), read the text from the message, and then switch back to the app to input it.",
+  "commonMistakes": [
+    "Not uninstalling the `appium-uiautomator2-server` APKs when troubleshooting weird session creation errors.",
+    "Expecting it to interact with web views easily (context switching is required)."
+  ],
+  "bestPractices": [
+    "Use `appium driver update uiautomator2` via CLI to keep the driver up to date in Appium 2.",
+    "Use `adb` commands alongside the driver when necessary for deep OS control."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How does Appium interact with an Android device?",
+      "a": "Appium installs the UiAutomator2 server APK onto the device. The Appium server sends REST commands to this APK, which translates them into native Google UIAutomator API calls."
+    }
+  ],
+  "revisionSummary": "UiAutomator2 is the engine for Android automation in Appium. It operates via a helper APK on the device, providing access to both the AUT and system-level features like notifications and the clipboard.",
+  "tags": [
+    "appium",
+    "uiautomator2",
+    "android",
+    "driver"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "contains-starts-with-text",
+  "moduleId": "selenium-webdriver",
+  "title": "contains(), starts-with() & text()",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "XPath string functions allow for partial matching of attributes and visible text, making locators highly adaptable to dynamic content.",
+  "whyItMatters": "Modern web frameworks (React, Angular, Vue) often generate dynamic IDs or classes (e.g., `id=\"btn-1234-login\"`). Exact matching fails; you must use partial matching.",
+  "explanation": "- **contains()**: Checks if an attribute or text contains a specific substring. Syntax: `//tag[contains(@attribute, 'value')]`.\n- **starts-with()**: Checks if an attribute or text begins with a specific substring. Syntax: `//tag[starts-with(@attribute, 'value')]`.\n- **text()**: Matches the exact visible text node of an element. Syntax: `//tag[text()='Exact Text']`.\n\nYou can combine these! For example, finding a button that contains specific text: `//button[contains(text(), 'Submit')]`.\n\n*Note: `ends-with()` is part of XPath 2.0 and is generally not supported by browsers, which rely on XPath 1.0.*",
+  "keyPoints": [
+    "`contains()` is perfect for dynamic attributes where the core value is embedded.",
+    "`starts-with()` is ideal for attributes that have a fixed prefix and dynamic suffix.",
+    "`text()` targets the visible inner text of an element.",
+    "`normalize-space(text())` is highly recommended to handle unwanted leading/trailing whitespace."
+  ],
+  "codeExample": "// Match dynamic ID (e.g. 'submit-84729')\nWebElement btn1 = driver.findElement(By.xpath(\"//button[starts-with(@id, 'submit-')]\"));\n\n// Match multiple classes (e.g. class=\"btn primary active\")\nWebElement btn2 = driver.findElement(By.xpath(\"//button[contains(@class, 'primary')]\"));\n\n// Match exact text\nWebElement link1 = driver.findElement(By.xpath(\"//a[text()='Privacy Policy']\"));\n\n// Match partial text with whitespace handling\nWebElement link2 = driver.findElement(By.xpath(\"//a[contains(normalize-space(text()), 'Terms')]\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "In an e-commerce app, session-specific IDs are generated for list items like `item-laptop-99x12`. By using `//div[starts-with(@id, 'item-laptop')]`, you ensure the test works across all sessions.",
+  "commonMistakes": [
+    "Using `text()` without `normalize-space()` when developers add accidental newlines or spaces in the HTML.",
+    "Trying to use `ends-with()`, which fails in standard browser XPath 1.0 engines.",
+    "Using `contains()` on very generic strings (e.g., `contains(text(), 'a')`), which matches too many elements."
+  ],
+  "bestPractices": [
+    "Use `normalize-space()` defensively when dealing with text matching.",
+    "Combine `contains` with other attributes to ensure uniqueness: `//button[contains(@class, 'btn') and text()='Save']`."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why is `normalize-space()` used in XPath?",
+      "a": "It strips leading and trailing whitespace, and replaces sequences of whitespace characters with a single space. This prevents locators from failing due to invisible formatting changes in the HTML."
+    },
+    {
+      "q": "Why does `ends-with()` not work in Selenium?",
+      "a": "Selenium relies on the browser's native XPath engine, which universally supports XPath 1.0. `ends-with()` was introduced in XPath 2.0."
+    }
+  ],
+  "revisionSummary": "XPath functions `contains()`, `starts-with()`, and `text()` are essential for locating elements with dynamic attributes or targeting elements based on their visible text. Use them to build highly robust locators.",
+  "tags": ["selenium", "xpath", "locators", "dynamic-content"]
+}

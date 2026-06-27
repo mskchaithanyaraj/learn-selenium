@@ -1,0 +1,47 @@
+{
+  "id": "desired-capabilities",
+  "moduleId": "appium",
+  "title": "Desired Capabilities",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Configure Appium sessions using DesiredCapabilities or Options objects. Required capabilities: platformName, deviceName, automationName (UiAutomator2/XCUITest), app (APK/IPA path or app package).",
+  "whyItMatters": "Without capabilities, Appium doesn't know which device, platform, or app to automate. Correct configuration is the foundation of any mobile automation script.",
+  "explanation": "Desired Capabilities are JSON objects sent by the client to the server when requesting a new automation session. In Appium 2.0, capabilities are structured using W3C standards (e.g., `appium:deviceName`). Common properties include `platformName` (Android/iOS), `appium:automationName` (UiAutomator2, XCUITest), and app-specific caps like `appium:appPackage` and `appium:appActivity`. You can use `UiAutomator2Options` and `XCUITestOptions` classes in modern Appium Java bindings instead of plain `DesiredCapabilities` to ensure type safety.",
+  "keyPoints": [
+    "W3C capability format is mandatory in Appium 2 (prefix vendor-specific caps with `appium:`).",
+    "Use `UiAutomator2Options` and `XCUITestOptions` for type-safe configuration.",
+    "Essential caps: platformName, automationName, deviceName, app/appPackage.",
+    "iOS specifics: udid, bundleId, xcodeOrgId, xcodeSigningId."
+  ],
+  "codeExample": "UiAutomator2Options options = new UiAutomator2Options();\noptions.setPlatformName(\"Android\");\noptions.setDeviceName(\"emulator-5554\");\noptions.setAppPackage(\"com.example.android\");\noptions.setAppActivity(\".MainActivity\");\nAndroidDriver driver = new AndroidDriver(new URL(\"http://127.0.0.1:4723\"), options);",
+  "codeLanguage": "java",
+  "realWorldExample": "When running tests on a device farm like BrowserStack, you pass a vast array of custom capabilities to define the OS version, device model, and debugging options like capturing video and network logs.",
+  "commonMistakes": [
+    "Not using the `appium:` prefix for Appium 2 vendor capabilities.",
+    "Confusing `appPackage` and `appActivity` on Android.",
+    "Setting `app` (the APK/IPA) when the app is already installed (should use package/bundle ID instead)."
+  ],
+  "bestPractices": [
+    "Externalize capabilities into a configuration file (.properties or JSON) to switch devices easily.",
+    "Use typed Options classes (e.g. UiAutomator2Options) rather than raw DesiredCapabilities.",
+    "Keep Appium server logs handy to debug session creation failures."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between DesiredCapabilities and Options classes in Appium?",
+      "a": "DesiredCapabilities is a generic key-value map, whereas Options classes (like UiAutomator2Options) are platform-specific and type-safe, preventing typos and enforcing W3C compliance."
+    },
+    {
+      "q": "What are the required capabilities to launch an Android app in Appium 2?",
+      "a": "platformName, appium:automationName (e.g. UiAutomator2), and either appium:app (path to APK) or appium:appPackage/appActivity."
+    }
+  ],
+  "revisionSummary": "Desired Capabilities configure the Appium session. In Appium 2, use W3C format (`appium:` prefix) and type-safe Options classes (UiAutomator2Options/XCUITestOptions) to define platform, device, and app details.",
+  "tags": [
+    "appium",
+    "capabilities",
+    "session",
+    "w3c",
+    "options"
+  ]
+}

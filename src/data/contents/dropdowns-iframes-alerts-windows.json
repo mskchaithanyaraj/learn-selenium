@@ -1,0 +1,40 @@
+{
+  "id": "dropdowns-iframes-alerts-windows",
+  "moduleId": "selenium-webdriver",
+  "title": "Dropdowns, iFrames, Alerts & Windows",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Handling secondary UI components and context switching. These are fundamental Selenium skills required in almost every interview.",
+  "whyItMatters": "Web pages are not just flat HTML. They contain native browser popups, embedded documents (iframes), multiple tabs, and select menus. You must know how to interact with them.",
+  "explanation": "**1. Dropdowns (`<select>`)**: Use the `Select` class. You can select by Index, Value, or VisibleText. *Note: Does not work for custom JS dropdowns (like React Select), which require standard click actions.*\n\n**2. iFrames (`<iframe>`)**: Selenium cannot see inside an iframe by default. You must shift focus: `driver.switchTo().frame(index/name/WebElement)`. To go back: `driver.switchTo().defaultContent()`.\n\n**3. Alerts (JS Popups)**: These are native browser popups, not HTML elements. Shift focus: `Alert alert = driver.switchTo().alert()`. You can `accept()`, `dismiss()`, `getText()`, or `sendKeys()`.\n\n**4. Windows/Tabs**: Browsers assign a unique alphanumeric string (Handle) to every tab. Get them via `getWindowHandles()`. Shift focus: `driver.switchTo().window(handle)`.",
+  "keyPoints": [
+    "Dropdowns require the `Select` class (for standard `<select>` tags).",
+    "iFrames require context switching before interaction.",
+    "Alerts are non-HTML native popups that must be accepted or dismissed.",
+    "Multiple tabs are managed via Window Handles."
+  ],
+  "codeExample": "// DROPDOWN\nSelect dropdown = new Select(driver.findElement(By.id(\"country\")));\ndropdown.selectByVisibleText(\"India\");\n\n// IFRAME\ndriver.switchTo().frame(\"payment-frame\");\ndriver.findElement(By.id(\"credit-card\")).sendKeys(\"1234\");\ndriver.switchTo().defaultContent(); // back to main page\n\n// ALERT\nAlert alert = driver.switchTo().alert();\nSystem.out.println(alert.getText());\nalert.accept(); // clicks OK\n\n// WINDOWS\nString originalWindow = driver.getWindowHandle();\nfor (String handle : driver.getWindowHandles()) {\n    if (!handle.equals(originalWindow)) {\n        driver.switchTo().window(handle);\n        break;\n    }\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "Logging in via Google. You click 'Sign in with Google', a new tab opens. You must fetch window handles, switch to the new tab, enter credentials, wait for the tab to close, and switch back to the original window handle.",
+  "commonMistakes": [
+    "Trying to use the `Select` class on a custom `<div>`/`<ul>` based dropdown.",
+    "Forgetting to call `defaultContent()` after working inside an iframe, breaking subsequent locators.",
+    "Assuming switching windows is instant; you must wait for the new window handle to appear in the set."
+  ],
+  "bestPractices": [
+    "Always wrap alert handling in an Explicit Wait (`ExpectedConditions.alertIsPresent()`).",
+    "Store the original window handle before clicking links that open new tabs, so you can easily return."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you handle a dropdown that does not have a `<select>` tag?",
+      "a": "You cannot use the `Select` class. You must handle it like normal web elements: find the dropdown header, click it to expand, then find the desired option element and click it."
+    },
+    {
+      "q": "What happens if you don't switch to an iframe before looking for an element inside it?",
+      "a": "Selenium will throw a `NoSuchElementException` because it only searches the current DOM context, which does not automatically include the contents of embedded iframes."
+    }
+  ],
+  "revisionSummary": "Master context switching: use Select for dropdowns, switchTo().frame() for embedded docs, switchTo().alert() for JS popups, and manage getWindowHandles() for multiple tabs.",
+  "tags": ["selenium", "iframe", "alerts", "windows", "dropdown"]
+}

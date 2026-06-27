@@ -1,0 +1,40 @@
+{
+  "id": "response-assertions",
+  "moduleId": "performance-testing",
+  "title": "Response Assertions",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Response Assertions in JMeter are used to validate that the server's response (status code, headers, or body data) matches the expected criteria, failing the sample if it does not.",
+  "whyItMatters": "Without assertions, JMeter only flags requests as failed if they return an HTTP error (4xx/5xx) or encounter a network error. Assertions verify the functional correctness of the application under load.",
+  "explanation": "### Assertion Types\n\n- **Response Assertion:** The most versatile. Can check text response, response code, response message, response headers, or document (text). Supports patterns (Contains, Matches, Equals, Substring).\n- **JSON Assertion:** Specifically designed to validate JSON responses using JSONPath expressions.\n- **Duration Assertion:** Fails the request if it takes longer than a specified time (in milliseconds).\n- **Size Assertion:** Validates the byte size of the response (e.g., response must be > 1024 bytes).\n\n### Configuring a Response Assertion\n\n1. **Apply to:** Main sample and sub-samples, Main sample only, Sub-samples only, or JMeter Variable.\n2. **Field to Test:** Text Response, Response Code, Response Message, Response Headers.\n3. **Pattern Matching Rules:**\n   - *Contains:* Uses regular expressions. The text contains the regex.\n   - *Matches:* Uses regular expressions. The text exactly matches the regex.\n   - *Equals:* Exact string match (case-sensitive).\n   - *Substring:* Contains the literal string (not a regex).\n   - *Not:* Inverts the assertion (e.g., must NOT contain 'Error').",
+  "keyPoints": [
+    "Assertions add processing overhead; use them judiciously during high-load tests.",
+    "A 200 OK status code does not guarantee business success (e.g., an HTML page showing 'Out of Stock').",
+    "JSON Assertions are highly efficient for REST API testing."
+  ],
+  "codeExample": "// Example of JSONPath used in a JSON Assertion\n// Assuming response is: { \"status\": \"success\", \"data\": { \"userId\": 12345 } }\n\n// Asserting the status field:\nJSON Path: $.status\nExpected Value: success\n\n// Asserting the userId exists:\nJSON Path: $.data.userId\nCheck 'Expect null' if validating absence, or leave unchecked to ensure it exists.",
+  "codeLanguage": "json",
+  "realWorldExample": "An API might return an HTTP 200 OK even when a search yields zero results. An SDET adds a Response Assertion checking that the JSON response body contains '\"totalResults\": 0' using a 'Not Contains' rule to ensure valid searches return data.",
+  "commonMistakes": [
+    "Using complex Regular Expressions in Response Assertions during massive load tests, causing high CPU usage on the load generator.",
+    "Assuming HTTP 200 implies a successful transaction without validating the response body.",
+    "Applying an assertion at the Thread Group level when it should only apply to a specific HTTP Request."
+  ],
+  "bestPractices": [
+    "Prefer 'Substring' over 'Contains' if you are searching for plain text, as it uses less CPU.",
+    "Keep assertions simple. Validate minimal necessary criteria (e.g., a unique success token).",
+    "Use JSON Assertions instead of Regex for JSON payloads for better accuracy and readability."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why is it important to use Assertions in a load test even if the server returns HTTP 200?",
+      "a": "Because servers can return custom application errors formatted as a successful HTTP 200 response page. Assertions verify the actual content to ensure functional correctness under load."
+    },
+    {
+      "q": "What is the performance impact of assertions in JMeter?",
+      "a": "Assertions consume CPU and memory on the load generator. Overusing complex assertions (like heavy regex) can cause the load generator to become the bottleneck instead of the server."
+    }
+  ],
+  "revisionSummary": "Assertions validate response correctness. Use JSON Assertions for APIs, avoid heavy regex, and scope them strictly to the necessary samplers to minimize CPU overhead.",
+  "tags": ["JMeter", "Assertions", "Validation", "Performance"]
+}

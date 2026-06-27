@@ -1,0 +1,41 @@
+{
+  "id": "no-such-element",
+  "moduleId": "selenium-webdriver",
+  "title": "NoSuchElementException",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "The most common exception in Selenium. It occurs when `findElement` cannot locate the specified element in the current DOM.",
+  "whyItMatters": "Resolving this exception quickly is a core skill for any SDET. It usually indicates a synchronization issue, a bad locator, or a context problem (like iframes).",
+  "explanation": "When Selenium throws a `NoSuchElementException`, it means the element literally does not exist in the DOM structure *at the exact moment* Selenium looked for it.\n\nRoot causes:\n1. **Synchronization**: The script executed `findElement` before the page finished rendering. Fix: Add an Explicit Wait.\n2. **Bad Locator**: The locator is misspelled, dynamic, or the UI changed. Fix: Update the locator.\n3. **Wrong Context**: The element is inside an iframe. Fix: Switch to the iframe first using `driver.switchTo().frame()`.\n4. **Conditionally Rendered**: The element only appears after a specific user action (e.g., hovering or clicking something else).",
+  "keyPoints": [
+    "It means the element is not in the DOM.",
+    "Usually fixed by applying a `WebDriverWait` (Explicit Wait).",
+    "If the element is in an iframe, Selenium cannot see it until you switch contexts.",
+    "Using `findElements` (plural) returns an empty list instead of throwing this exception."
+  ],
+  "codeExample": "// ❌ BAD: No wait, throws NoSuchElementException if page is slow\nWebElement slowButton = driver.findElement(By.id(\"delayed-btn\"));\nslowButton.click();\n\n// ✅ GOOD: Use Explicit Wait to prevent the exception\nWebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));\nWebElement button = wait.until(ExpectedConditions.presenceOfElementLocated(By.id(\"delayed-btn\")));\nbutton.click();",
+  "codeLanguage": "java",
+  "realWorldExample": "A test logs in and immediately tries to click 'Dashboard'. The login takes 2 seconds to process, but the script looks for 'Dashboard' in 10 milliseconds. It throws NoSuchElementException. Adding a wait solves it.",
+  "commonMistakes": [
+    "Adding `Thread.sleep()` to fix it (which is anti-pattern).",
+    "Failing to check if the element is inside a `<frame>` or `<iframe>`.",
+    "Not checking if the developer changed the ID or class name in the latest build."
+  ],
+  "bestPractices": [
+    "Always use Explicit Waits for elements that load dynamically.",
+    "When debugging, open the DevTools console and verify the locator works manually.",
+    "If you want to check if an element exists without throwing an exception, use `driver.findElements(...).size() > 0`."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between NoSuchElementException and ElementNotVisibleException?",
+      "a": "NoSuchElementException means the element is completely absent from the DOM. ElementNotVisibleException (or ElementNotInteractable) means the element is in the DOM, but its CSS properties (like `display: none`) prevent interaction."
+    },
+    {
+      "q": "How do you handle an element that is inside an iframe and throwing NoSuchElementException?",
+      "a": "You must first call `driver.switchTo().frame(locator)` to change the driver's focus to the iframe, and then call `findElement`."
+    }
+  ],
+  "revisionSummary": "NoSuchElementException means the element isn't in the DOM. Troubleshoot by checking locators, adding explicit waits, checking for iframes, and ensuring prerequisite UI actions occurred.",
+  "tags": ["selenium", "exceptions", "debugging"]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "schema-validation",
+  "moduleId": "rest-assured",
+  "title": "JSON Schema Validation",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Validate API response structures against a JSON Schema.",
+  "whyItMatters": "Field-by-field validation is brittle and misses structural changes (like an unexpected new field or a changed data type). Schema validation ensures the API adheres strictly to its contract.",
+  "explanation": "JSON Schema defines the expected structure, data types, and required fields of a JSON document. REST Assured integrates with the `json-schema-validator` library. You define your schema in a `.json` file (usually placed in `src/test/resources`), and then use the `matchesJsonSchemaInClasspath()` matcher in the `then().body()` block to validate the entire response structure at once.",
+  "keyPoints": [
+    "Requires the `rest-assured-json-schema-validator` dependency.",
+    "Schema covers field types, required fields, formats (e.g., date-time), and arrays.",
+    "Use `matchesJsonSchemaInClasspath(\"schema.json\")`.",
+    "Catches structural contract breakages early."
+  ],
+  "codeExample": "import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;\n\ngiven().\nwhen().\n    get(\"/users/1\").\nthen().\n    statusCode(200).\n    // Validates the response against src/test/resources/user-schema.json\n    body(matchesJsonSchemaInClasspath(\"user-schema.json\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "A microservices team adopts Contract Testing. They publish a JSON schema for their API. The QA team uses this schema in REST Assured tests to ensure the developers never accidentally change a field type from Integer to String, breaking downstream consumers.",
+  "commonMistakes": [
+    "Missing the `json-schema-validator` dependency in `pom.xml`.",
+    "Providing the wrong file path, resulting in a File Not Found error. (Ensure the schema is in the `resources` folder).",
+    "Making the schema too strict (e.g., `additionalProperties: false`), causing tests to fail on harmless additive changes to the API."
+  ],
+  "bestPractices": [
+    "Keep schemas up to date with the API documentation (Swagger/OpenAPI can generate these schemas).",
+    "Combine schema validation with specific data validation. (Schema checks the shape, field assertions check the actual values).",
+    "Place schema files centrally in the `src/test/resources/schemas` directory."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why is JSON schema validation better than asserting individual fields?",
+      "a": "Schema validation checks the structure, data types, and required fields of the entire payload at once. Asserting fields individually is verbose, prone to missing new/deleted fields, and doesn't easily enforce type constraints across large arrays."
+    },
+    {
+      "q": "How do you implement schema validation in REST Assured?",
+      "a": "Add the json-schema-validator dependency, place the schema JSON in the resources folder, and use `matchesJsonSchemaInClasspath()` inside the `body()` assertion."
+    }
+  ],
+  "revisionSummary": "Enforce API contracts using matchesJsonSchemaInClasspath() to validate structure and types.",
+  "tags": ["REST Assured", "JSON Schema", "Contract Testing", "Validation"]
+}

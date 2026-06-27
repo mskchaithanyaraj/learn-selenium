@@ -1,0 +1,53 @@
+{
+  "id": "cicd-basics",
+  "moduleId": "general-sdet",
+  "title": "CI/CD Basics",
+  "priority": "normal",
+  "estimatedMinutes": 35,
+  "overview": "CI (Continuous Integration) is the practice of frequently merging code changes and running automated tests. CD (Continuous Delivery/Deployment) extends this to automating the release process.",
+  "whyItMatters": "Modern SDETs are expected to integrate their automation tests into CI/CD pipelines. Jenkins is the most common CI tool used with Selenium in enterprises.",
+  "explanation": "**Continuous Integration (CI):**\n- Developers merge code changes frequently (multiple times per day)\n- Every merge triggers automated build + test execution\n- Quick feedback on code quality\n- Tools: Jenkins, GitHub Actions, GitLab CI, CircleCI, Azure DevOps\n\n**Continuous Delivery (CD):**\n- Extends CI by automating the deployment to staging\n- Every successful CI build is ready to deploy to production\n- Requires manual approval for production deployment\n\n**Continuous Deployment:**\n- Fully automated — every successful build deploys to production automatically\n- No manual gates (requires very mature test automation)\n\n**CI/CD Pipeline Stages for Selenium:**\n1. Code commit → Git trigger\n2. Maven Build (mvn compile)\n3. Unit Tests (JUnit/TestNG)\n4. Integration Tests\n5. Selenium/API Tests (Selenium Grid)\n6. Test Report Generation (ExtentReports/Allure)\n7. Deploy to Staging\n8. Smoke Tests on Staging\n9. Manual Approval / Auto-Deploy to Production\n\n**Jenkins + Maven + Selenium Setup:**\n- Jenkins pulls code from Git\n- Runs: mvn test -Dgroups=regression -Dbrowser=chrome\n- Publishes HTML test reports\n- Sends email on failure",
+  "keyPoints": [
+    "CI = frequent code integration + automated test execution",
+    "CD = automated delivery/deployment after CI succeeds",
+    "Jenkins is the most common CI tool in Java SDET projects",
+    "Maven is used to build projects and run tests: mvn test",
+    "Selenium tests run in headless mode on CI servers (no display)",
+    "Git webhooks trigger Jenkins builds on code push"
+  ],
+  "codeExample": "// ── JENKINS PIPELINE (Jenkinsfile) ───────────────────────────────\npipeline {\n    agent any\n    \n    environment {\n        MAVEN_HOME = '/usr/share/maven'\n        BROWSER    = 'chrome'\n        ENV        = 'staging'\n    }\n    \n    stages {\n        stage('Checkout') {\n            steps {\n                git branch: 'main',\n                    url: 'https://github.com/company/selenium-framework.git'\n            }\n        }\n        \n        stage('Build') {\n            steps {\n                sh 'mvn clean compile -q'\n            }\n        }\n        \n        stage('Unit Tests') {\n            steps {\n                sh 'mvn test -Dgroups=unit -q'\n            }\n        }\n        \n        stage('API Tests') {\n            steps {\n                sh 'mvn test -Dgroups=api -Denv=[ENV]'\n            }\n        }\n        \n        stage('Selenium Tests') {\n            steps {\n                sh '''\n                    mvn test \\\n                        -Dgroups=regression \\\n                        -Dbrowser=[BROWSER] \\\n                        -Denv=[ENV] \\\n                        -Dheadless=true \\\n                        -Dsurefire.parallel.methods=true \\\n                        -Dthreads=4\n                '''\n            }\n            post {\n                always {\n                    publishHTML([\n                        allowMissing: false,\n                        reportDir: 'target/extent-reports',\n                        reportFiles: 'ExtentReport.html',\n                        reportName: 'Selenium Test Report'\n                    ])\n                }\n            }\n        }\n        \n        stage('Deploy to Staging') {\n            when {\n                expression { currentBuild.result == null || \n                             currentBuild.result == 'SUCCESS' }\n            }\n            steps {\n                sh './deploy.sh staging'\n            }\n        }\n    }\n    \n    post {\n        failure {\n            emailext(\n                subject: \"Build FAILED: [env.JOB_NAME] #[env.BUILD_NUMBER]\",\n                body: \"Check console: [env.BUILD_URL]\",\n                to: 'sdet-team@company.com'\n            )\n        }\n    }\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "At a fintech company, every Git push to the \"develop\" branch triggers a Jenkins pipeline. It builds the Maven project, runs 200 API tests with Rest Assured, then runs 50 Selenium regression tests on Chrome (headless) via Selenium Grid. The entire pipeline takes 15 minutes. If all pass, the app is deployed to staging automatically.",
+  "commonMistakes": [
+    "Running Selenium tests without headless mode on CI servers (no display available)",
+    "Not setting up Selenium Grid for CI — running all tests sequentially is too slow",
+    "Hardcoding environment URLs in tests instead of passing via -D parameters",
+    "Not publishing test reports in Jenkins (developers cannot see what failed)"
+  ],
+  "bestPractices": [
+    "Always run Selenium in headless mode on CI: --headless=new",
+    "Use TestNG parallel execution to speed up CI runs",
+    "Parameterize environment and browser via Maven -D flags",
+    "Publish ExtentReports or Allure reports in Jenkins for visibility",
+    "Fail fast — run smoke tests first, then full regression"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you integrate Selenium tests with Jenkins?",
+      "a": "Create a Jenkins pipeline (Jenkinsfile) that: 1) Pulls code from Git, 2) Runs mvn test with headless browser, 3) Publishes HTML test reports using Jenkins HTML Publisher plugin, 4) Sends email notification on failure. The pipeline is triggered by a Git webhook on every commit."
+    },
+    {
+      "q": "What is the difference between CI and CD?",
+      "a": "CI (Continuous Integration) is about frequently merging code and automatically building and testing it. CD (Continuous Delivery) extends CI by also automating the delivery to staging environments, with optional manual approval for production. Continuous Deployment goes further by automatically deploying to production after all tests pass."
+    }
+  ],
+  "revisionSummary": "CI = frequent merge + automated build+test. CD = automated delivery to staging. Jenkins pipeline: Git pull → Build → Tests → Report → Deploy. Selenium on CI must use headless mode. Maven runs tests with mvn test.",
+  "tags": [
+    "cicd",
+    "jenkins",
+    "maven",
+    "continuous-integration",
+    "devops",
+    "automation"
+  ]
+}

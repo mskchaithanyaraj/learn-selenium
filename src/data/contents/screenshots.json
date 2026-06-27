@@ -1,0 +1,39 @@
+{
+  "id": "screenshots",
+  "moduleId": "selenium-webdriver",
+  "title": "Screenshots & Visual Validation",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Taking screenshots of the browser viewport or specific elements to aid debugging, provide evidence of test execution, and perform visual comparisons.",
+  "whyItMatters": "When a test fails in a headless CI pipeline at 2 AM, the log trace isn't enough. A screenshot shows you exactly what the UI looked like, making debugging exponentially faster.",
+  "explanation": "Selenium provides the `TakesScreenshot` interface. You must cast the WebDriver instance to this interface.\n\n`File src = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);`\n\nThis captures the visible portion of the viewport. \n\n**Element-level screenshots**: In Selenium 4, you can capture a specific element rather than the whole page: `element.getScreenshotAs(OutputType.FILE)`.\n\n**Full-page screenshots**: Capturing the entire scrollable page natively in Selenium is difficult and browser-dependent. Often, third-party libraries like `AShot` are used to stitch together a full-page image.",
+  "keyPoints": [
+    "Requires casting the driver to `TakesScreenshot`.",
+    "By default, captures only the visible viewport.",
+    "Selenium 4 supports capturing individual WebElements.",
+    "Screenshots are typically integrated into TestNG Listeners (onTestFailure)."
+  ],
+  "codeExample": "// Capture full viewport\nFile srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);\nFile destFile = new File(\"./target/screenshots/error.png\");\nFileUtils.copyFile(srcFile, destFile);\n\n// Capture specific element (Selenium 4+)\nWebElement logo = driver.findElement(By.id(\"header-logo\"));\nFile logoSrc = logo.getScreenshotAs(OutputType.FILE);\nFileUtils.copyFile(logoSrc, new File(\"./target/screenshots/logo.png\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "A test asserts that a user's profile picture is updated. By taking a screenshot of the specific `<img>` element before and after the upload, and using an image comparison library (like AShot), the framework can verify the pixels changed.",
+  "commonMistakes": [
+    "Not appending a timestamp or unique test ID to the screenshot filename, causing the framework to overwrite the same file repeatedly.",
+    "Trying to take a screenshot after the browser has crashed (`UnreachableBrowserException`), which will throw another exception."
+  ],
+  "bestPractices": [
+    "Automate screenshot capture by implementing `ITestListener.onTestFailure`.",
+    "Convert the screenshot to Base64 (`OutputType.BASE64`) if you want to embed it directly into HTML reports (like ExtentReports) without managing separate image files."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you take a screenshot in Selenium WebDriver?",
+      "a": "Cast the WebDriver instance to the TakesScreenshot interface, call `getScreenshotAs(OutputType.FILE)`, and use a utility like Apache Commons IO or Spring FileCopyUtils to save the file to disk."
+    },
+    {
+      "q": "Can you take a screenshot of a specific web element?",
+      "a": "Yes, starting in Selenium 4, the `WebElement` interface implements `TakesScreenshot`, allowing you to call `element.getScreenshotAs(...)` directly."
+    }
+  ],
+  "revisionSummary": "Screenshots are critical for debugging CI failures. Use the TakesScreenshot interface for viewport capture or WebElement for specific components. Best combined with TestNG Listeners for automated failure evidence.",
+  "tags": ["selenium", "screenshots", "reporting", "debugging"]
+}

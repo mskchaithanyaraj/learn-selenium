@@ -1,0 +1,41 @@
+{
+  "id": "post-request-body",
+  "moduleId": "rest-assured",
+  "title": "POST Request with Body",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Send POST, PUT, or PATCH requests with JSON bodies, maps, or POJOs.",
+  "whyItMatters": "Most state-changing operations in an API require sending data in the request body. Mastering body serialization is essential for testing creation and update endpoints.",
+  "explanation": "REST Assured supports multiple ways to define a request body: Raw Strings, HashMaps, or POJOs (Plain Old Java Objects). Passing a POJO is the most robust approach, as REST Assured will automatically serialize it to JSON using Jackson or Gson. You must specify the `ContentType.JSON` header so the server knows how to parse the incoming data.",
+  "keyPoints": [
+    "Set the content type using `.contentType(ContentType.JSON)`.",
+    "Pass a raw String, a `Map<String, Object>`, or a POJO to `.body()`.",
+    "REST Assured automatically serializes Maps and POJOs to JSON.",
+    "Use Jackson or Gson annotations on POJOs to control serialization."
+  ],
+  "codeExample": "// Using a POJO\nUserPayload user = new UserPayload(\"John Doe\", \"john@example.com\");\n\ngiven().\n    baseUri(\"https://api.example.com\").\n    contentType(ContentType.JSON).\n    body(user).\nwhen().\n    post(\"/users\").\nthen().\n    statusCode(201).\n    body(\"message\", equalTo(\"User created\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "When testing a 'Create Account' endpoint, you populate a Java object with mock user data, pass it to the `.body()` method, and verify that the database successfully registers the user.",
+  "commonMistakes": [
+    "Forgetting to set `contentType(ContentType.JSON)`, resulting in 415 Unsupported Media Type errors.",
+    "Using raw Strings for large JSON payloads, which is hard to maintain and prone to syntax errors.",
+    "Missing default constructors in POJOs, causing serialization failures."
+  ],
+  "bestPractices": [
+    "Prefer POJOs over raw Strings or Maps for better type safety and maintainability.",
+    "Use libraries like Lombok to reduce boilerplate code in POJO classes.",
+    "Create test data factories to generate POJOs with random/faker data."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How does REST Assured convert a Java object into a JSON payload?",
+      "a": "It uses a serialization library like Jackson or Gson. If one of these is in the classpath, REST Assured automatically maps the POJO fields to JSON properties."
+    },
+    {
+      "q": "What happens if you forget to set the Content-Type header in a POST request?",
+      "a": "The server will likely reject the request with a 415 Unsupported Media Type or a 400 Bad Request, as it doesn't know how to parse the body."
+    }
+  ],
+  "revisionSummary": "Send JSON bodies in POST requests using POJOs and contentType(ContentType.JSON).",
+  "tags": ["REST Assured", "POST", "JSON", "Serialization", "POJO"]
+}

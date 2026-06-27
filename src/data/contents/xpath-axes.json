@@ -1,0 +1,41 @@
+{
+  "id": "xpath-axes",
+  "moduleId": "selenium-webdriver",
+  "title": "XPath Axes",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "XPath axes define spatial and hierarchical relationships between elements in an XML/HTML document. They allow you to traverse from a known element to other related elements.",
+  "whyItMatters": "In dynamic web pages, direct locators often don't exist. XPath axes empower you to find complex elements by establishing relationships (e.g., finding a 'Delete' button in a table row next to a specific user's name).",
+  "explanation": "An XPath axis represents a relationship to the context (current) node. \n\nKey axes include:\n- **parent::** selects the parent of the current node.\n- **child::** selects the children of the current node.\n- **ancestor::** selects all ancestors (parent, grandparent, etc.).\n- **descendant::** selects all descendants (children, grandchildren, etc.).\n- **following-sibling::** selects siblings after the current node.\n- **preceding-sibling::** selects siblings before the current node.\n- **following::** selects all nodes in the document after the closing tag of the current node.\n- **preceding::** selects all nodes in the document before the opening tag of the current node.\n\nThey are often used in the format: `//element[@attr='val']/axis::element`.",
+  "keyPoints": [
+    "Axes allow traversal up, down, and across the DOM tree.",
+    "Sibling axes are extremely useful for web tables and lists.",
+    "Ancestor axis is helpful when an inner element has a stable locator, but you need to interact with its container.",
+    "XPath is the only locator strategy that supports traversing upwards (parent/ancestor)."
+  ],
+  "codeExample": "// Finds a table row containing the text 'John Doe', then finds the preceding sibling checkbox\nWebElement checkbox = driver.findElement(By.xpath(\"//td[text()='John Doe']/preceding-sibling::td/input[@type='checkbox']\"));\n\n// Finds the parent div of an input field\nWebElement parentDiv = driver.findElement(By.xpath(\"//input[@id='username']/parent::div\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "In a shopping cart table, you want to remove an item named 'Wireless Mouse'. You locate the `<td>` with the text 'Wireless Mouse', use `following-sibling::td` to find the column with the remove action, and locate the `<button>` inside it.",
+  "commonMistakes": [
+    "Confusing `following` with `following-sibling`. `following` searches the entire remainder of the DOM, while `following-sibling` only searches siblings under the same parent.",
+    "Overcomplicating the XPath chain, making it unreadable.",
+    "Using axes when a simpler CSS selector or direct XPath would work."
+  ],
+  "bestPractices": [
+    "Use sibling axes for tabular data or aligned UI components.",
+    "Keep axes chains as short as possible to maintain performance and readability.",
+    "Test XPath expressions in the browser console (`$x(\"//path\")`) before using them in code."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between `following-sibling` and `following`?",
+      "a": "`following-sibling` only looks at nodes that share the exact same parent and appear after the current node. `following` looks at every single node in the document that occurs after the current node, regardless of parent."
+    },
+    {
+      "q": "Can you traverse up the DOM tree using CSS Selectors?",
+      "a": "No, CSS Selectors only support traversing downwards (children/descendants) and to subsequent siblings (`+`, `~`). Upward traversal requires XPath."
+    }
+  ],
+  "revisionSummary": "XPath axes are powerful tools for DOM traversal. They allow navigation from a known reference point to parents, children, and siblings, making them essential for complex UI structures like dynamic tables.",
+  "tags": ["selenium", "xpath", "locators", "dom"]
+}

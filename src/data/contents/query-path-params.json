@@ -1,0 +1,41 @@
+{
+  "id": "query-path-params",
+  "moduleId": "rest-assured",
+  "title": "Query & Path Parameters",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "Pass query parameters and path parameters dynamically using REST Assured methods.",
+  "whyItMatters": "Endpoints dynamically load data based on identifiers (Path Parameters) or filters (Query Parameters). Automating tests for these endpoints requires dynamic parameter passing.",
+  "explanation": "Query parameters are appended to the URL after a question mark (e.g., `?page=2&sort=desc`). In REST Assured, use `queryParam(\"key\", \"value\")`. Path parameters are part of the URL path itself, like `/users/42`, defined via placeholders like `/users/{id}`. You populate them using `pathParam(\"id\", 42)`. You can also use `queryParams()` to pass multiple query parameters as a Map.",
+  "keyPoints": [
+    "Use `.queryParam(\"key\", \"value\")` for URL filtering/pagination.",
+    "Use `.pathParam(\"placeholder\", \"value\")` with `{placeholder}` in the endpoint string.",
+    "REST Assured handles URL encoding automatically for query parameters.",
+    "Pass multiple parameters using Maps with `.queryParams()` and `.pathParams()`."
+  ],
+  "codeExample": "given().\n    baseUri(\"https://api.example.com\").\n    pathParam(\"userId\", 123).\n    queryParam(\"status\", \"active\").\n    queryParam(\"page\", 1).\nwhen().\n    get(\"/users/{userId}/orders\").\nthen().\n    statusCode(200);",
+  "codeLanguage": "java",
+  "realWorldExample": "When testing a search API, you pass the search term and filters as query parameters. When fetching a specific user's profile, you pass the user's ID as a path parameter.",
+  "commonMistakes": [
+    "Confusing query parameters with path parameters.",
+    "Forgetting to include the `{}` placeholder in the URL string when using `pathParam`, causing an exception.",
+    "Manually URL-encoding values before passing them to `queryParam`, which can result in double-encoding."
+  ],
+  "bestPractices": [
+    "Avoid hardcoding IDs in URLs; use `pathParam` to make tests readable and flexible.",
+    "Use Maps for endpoints that require many query parameters to keep the given() block clean.",
+    "Rely on REST Assured's automatic URL encoding."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between a query parameter and a path parameter?",
+      "a": "A path parameter is part of the URI structure used to identify a specific resource (e.g., `/users/123`). A query parameter is appended to the URI to sort, filter, or paginate the resource collection (e.g., `/users?status=active`)."
+    },
+    {
+      "q": "How do you pass a path parameter in REST Assured?",
+      "a": "You use `.pathParam(\"paramName\", value)` in the `given()` block and reference it as `{paramName}` in the URI string in the `when()` block."
+    }
+  ],
+  "revisionSummary": "Use queryParam() for ?key=value filters and pathParam() for /resource/{id} routing.",
+  "tags": ["REST Assured", "HTTP", "Parameters", "Routing"]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "appium-inspector",
+  "moduleId": "appium",
+  "title": "Appium Inspector",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Use Appium Inspector to inspect mobile UI element hierarchies, identify element attributes, and generate locators.",
+  "whyItMatters": "Unlike web browsers that have built-in Developer Tools, native mobile apps require a dedicated tool to inspect the UI tree and find reliable locators for test automation.",
+  "explanation": "Appium Inspector is a standalone GUI tool (previously bundled with Appium Desktop). It connects to a running Appium server and a mobile device/emulator. It fetches the XML source of the current screen, allowing you to click on elements visually to see their attributes (resource-id, content-desc, class, bounds). It also provides a recorder to generate boilerplate automation code based on your interactions.",
+  "keyPoints": [
+    "Successor to Appium Desktop's built-in inspector.",
+    "Connects via Desired Capabilities to start a session.",
+    "Displays the UI as an XML hierarchy.",
+    "Allows testing locators interactively (Search for Element)."
+  ],
+  "codeExample": "// No direct code for the tool, but the tool generates locators like this:\nBy loginBtn = AppiumBy.accessibilityId(\"LoginButton\");\n// Or testing an XPath:\nBy dynamicBtn = AppiumBy.xpath(\"//android.widget.TextView[@text='Submit']\");",
+  "codeLanguage": "java",
+  "realWorldExample": "When a developer adds a new feature to the Android app, the SDET uses Appium Inspector to find the exact `resource-id` and `content-desc` of the new buttons before writing any code.",
+  "commonMistakes": [
+    "Relying solely on the auto-generated XPath from Inspector, which is often absolute and fragile.",
+    "Leaving the Inspector connected and trying to run automated tests at the same time (causes session conflicts)."
+  ],
+  "bestPractices": [
+    "Always prefer Accessibility ID (content-desc) over XPath when inspecting elements.",
+    "Use the Inspector's 'Search for Element' feature to validate your locators before adding them to your Page Object."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you inspect elements in a native mobile application?",
+      "a": "Using Appium Inspector, which connects to an Appium session and retrieves the XML UI hierarchy, allowing inspection of attributes like resource-id and accessibility-id."
+    }
+  ],
+  "revisionSummary": "Appium Inspector is the mobile equivalent of Chrome DevTools. It connects to the Appium server to display the UI tree, inspect element attributes, and validate locators like Accessibility ID.",
+  "tags": [
+    "appium",
+    "inspector",
+    "locators",
+    "ui-automator"
+  ]
+}

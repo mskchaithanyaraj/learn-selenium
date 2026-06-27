@@ -1,0 +1,40 @@
+{
+  "id": "vusers-and-scenarios",
+  "moduleId": "performance-testing",
+  "title": "VUsers & Scenarios in LoadRunner",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "In LoadRunner, Virtual Users (VUsers) emulate human behavior by executing scripts, while Scenarios define how these VUsers behave en masse during a load test execution.",
+  "whyItMatters": "Understanding the separation between script creation (VUser) and execution logic (Scenario) is fundamental to LoadRunner methodology, allowing testers to reuse the same script in multiple types of load tests.",
+  "explanation": "### VUsers (Virtual Users)\n\nDeveloped in **VuGen** (Virtual User Generator), a VUser script is a programmatic representation of a business process (e.g., logging in, booking a flight). \n- Scripts are divided into three main sections: `vuser_init` (login/setup, runs once), `Action` (the core business loop, runs multiple times), and `vuser_end` (logout/teardown, runs once).\n- VUsers consume memory on the Load Generator. The C-based Web HTTP/HTML protocol is highly efficient, allowing thousands of VUsers per machine.\n\n### Scenarios\n\nDesigned and executed in the **Controller**. A Scenario maps out the execution profile. There are two main types:\n\n1. **Manual Scenario:** The tester explicitly defines the load model. You assign scripts to VUser Groups, specify the number of VUsers, set the Ramp-up rate (e.g., start 5 VUsers every 10 seconds), set the Duration, and set the Tear-down rate.\n2. **Goal-Oriented Scenario:** The tester defines a target (e.g., 'Achieve 100 Transactions Per Second' or 'Maintain a Response Time of < 2 seconds'). The Controller automatically adds or removes VUsers dynamically to try and hit that goal.",
+  "keyPoints": [
+    "VUser scripts are created in VuGen; Scenarios are designed in the Controller.",
+    "vuser_init and vuser_end execute only once per VUser; the Action block iterates.",
+    "Goal-Oriented scenarios are unique to LoadRunner and useful for finding capacity limits automatically."
+  ],
+  "codeExample": "/* VuGen Script Structure */\n\nvuser_init()\n{\n    // Establish DB connection or login\n    lr_start_transaction(\"login\");\n    web_submit_data(\"login.pl\", ...);\n    lr_end_transaction(\"login\", LR_AUTO);\n    return 0;\n}\n\nAction()\n{\n    // Search for flights (Iterates multiple times based on Run Logic)\n    lr_start_transaction(\"search_flight\");\n    web_url(\"Search\", ...);\n    lr_think_time(10);\n    lr_end_transaction(\"search_flight\", LR_AUTO);\n    return 0;\n}\n\nvuser_end()\n{\n    // Logout and close connections\n    lr_start_transaction(\"logout\");\n    web_url(\"Logout\", ...);\n    lr_end_transaction(\"logout\", LR_AUTO);\n    return 0;\n}",
+  "codeLanguage": "c",
+  "realWorldExample": "An SDET writes a single VuGen script for creating a support ticket. In the Controller, they create two scenarios using this script: a Manual Scenario ramping up 500 VUsers to simulate standard daily traffic, and a Goal-Oriented scenario targeting 50 ticket creations per second to test the database throughput limits.",
+  "commonMistakes": [
+    "Putting iterative business logic inside `vuser_init`, causing it to only execute once instead of repeatedly generating load.",
+    "Using a Goal-Oriented scenario without setting reasonable maximum VUser limits, causing the Controller to overwhelm and crash the load generators.",
+    "Ignoring think time (`lr_think_time`) during scenario design, resulting in unrealistic stress."
+  ],
+  "bestPractices": [
+    "Keep `vuser_init` lightweight. Extensive setup logic slows down the Ramp-up phase of the scenario.",
+    "Use Manual Scenarios for standard baseline and regression performance testing.",
+    "Use Multiple Action blocks (Action1, Action2) to logically separate steps and configure different weightings in the Controller's Run Logic."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between vuser_init and Action in a LoadRunner script?",
+      "a": "vuser_init runs only once at the beginning of the VUser lifecycle, typically used for login or initialization. The Action block contains the main business process and loops multiple times according to the scenario's Run Logic."
+    },
+    {
+      "q": "How does a Goal-Oriented Scenario differ from a Manual Scenario?",
+      "a": "In a Manual Scenario, the tester defines the exact number of VUsers and their schedule. In a Goal-Oriented Scenario, the tester defines a target metric (like specific RPS or Response Time), and the Controller automatically scales VUsers up or down to achieve that goal."
+    }
+  ],
+  "revisionSummary": "VuGen handles script logic (init, action, end). The Controller handles Scenarios. Manual scenarios dictate VUser schedules; Goal-Oriented scenarios target specific KPIs dynamically.",
+  "tags": ["LoadRunner", "VUser", "Scenario", "Controller", "VuGen"]
+}

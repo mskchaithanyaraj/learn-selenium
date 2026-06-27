@@ -1,0 +1,40 @@
+{
+  "id": "touch-actions",
+  "moduleId": "appium",
+  "title": "Touch Actions & Gestures",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Simulate mobile gestures using Appium's W3C Actions API (Appium 2) and legacy TouchAction (Appium 1). Gestures include tap, longPress, swipe, scroll, pinch-to-zoom.",
+  "whyItMatters": "Mobile apps rely heavily on touch interactions. Without gestures, you cannot test core functionalities like pull-to-refresh, swiping carousels, or drag-and-drop.",
+  "explanation": "In Appium 1, `TouchAction` was used, but it's deprecated. Appium 2 embraces the W3C Actions API (`PointerInput` and `Sequence`) for building complex touch gestures. You define pointer events (pointerDown, pointerMove, pointerUp) and combine them into a sequence to perform on the driver. Alternatively, Appium provides mobile-specific execute scripts (e.g., `mobile: swipeGestures`) via plugins to simplify common gestures.",
+  "keyPoints": [
+    "TouchAction and MultiTouchAction are deprecated.",
+    "W3C Actions API uses `PointerInput` for simulating fingers.",
+    "A swipe is pointer down -> pointer move -> pointer up.",
+    "`mobile: swipe` and `mobile: scroll` are convenient alternatives."
+  ],
+  "codeExample": "PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, \"finger\");\nSequence swipe = new Sequence(finger, 1);\nswipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), 500, 1500));\nswipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));\nswipe.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), 500, 500));\nswipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));\ndriver.perform(Arrays.asList(swipe));",
+  "codeLanguage": "java",
+  "realWorldExample": "Testing a dating app requires a 'swipe right' gesture. You create a W3C sequence that moves the pointer from the center of the screen to the right edge over 500 milliseconds.",
+  "commonMistakes": [
+    "Using the deprecated `TouchAction` class in new Appium 2 frameworks.",
+    "Hardcoding screen coordinates instead of calculating them dynamically based on screen size."
+  ],
+  "bestPractices": [
+    "Calculate swipe coordinates dynamically using `driver.manage().window().getSize()` to support different screen resolutions.",
+    "Use mobile-specific extensions (`driver.executeScript(\"mobile: swipe\", ImmutableMap.of(...))`) when available for simpler code."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you perform a swipe in Appium 2?",
+      "a": "Using the W3C Actions API with `PointerInput` and `Sequence`, simulating a pointerDown, pointerMove with a duration, and pointerUp. Or using the `mobile: swipe` execute script."
+    }
+  ],
+  "revisionSummary": "Mobile gestures (swipe, zoom) are performed using the W3C Actions API in Appium 2. Calculate coordinates dynamically to ensure cross-device compatibility, and avoid deprecated TouchAction classes.",
+  "tags": [
+    "appium",
+    "gestures",
+    "actions",
+    "swipe"
+  ]
+}

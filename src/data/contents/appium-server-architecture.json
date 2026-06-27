@@ -1,0 +1,52 @@
+{
+  "id": "appium-server-architecture",
+  "moduleId": "appium",
+  "title": "Appium Server Architecture",
+  "priority": "hot",
+  "estimatedMinutes": 50,
+  "overview": "Appium is an open-source mobile automation framework that extends Selenium WebDriver protocol to automate native, hybrid, and web apps on iOS and Android.",
+  "whyItMatters": "Appium is the industry standard for mobile test automation. Understanding its architecture explains how it differs from Selenium and how to set it up correctly.",
+  "explanation": "**Appium Architecture Components:**\n\n**1. Appium Client Libraries**\nSame as Selenium — Java, Python, JavaScript, Ruby clients. Use the WebDriver protocol extended with mobile-specific capabilities.\n\n**2. Appium Server**\nA Node.js server that:\n- Accepts WebDriver protocol requests from client libraries\n- Manages sessions and device connections\n- Routes commands to appropriate drivers (XCUITest for iOS, UIAutomator2 for Android)\n\n**3. Mobile Automation Drivers**\n- **UIAutomator2** (Android) — Google's official Android automation framework\n- **XCUITest** (iOS) — Apple's official iOS automation framework\n- **Espresso** (Android) — Google's Android UI testing library (faster than UIAutomator2)\n- **Mac2** (Mac desktop apps)\n\n**4. Devices**\n- Real physical devices (Android/iOS)\n- Android Emulators (AVD)\n- iOS Simulators\n\n**Request Flow:**\nTest Code → Appium Client → HTTP to Appium Server → Driver (UIAutomator2/XCUITest) → Device\n\n**Appium 2.x Changes:**\n- Drivers are now separate plugins (install separately)\n- appium driver install uiautomator2\n- appium driver install xcuitest",
+  "keyPoints": [
+    "Appium Server is a Node.js HTTP server that translates WebDriver calls to mobile commands",
+    "UIAutomator2 for Android, XCUITest for iOS are the underlying automation frameworks",
+    "Uses WebDriver protocol — same API style as Selenium but with mobile-specific commands",
+    "Supports native (installed app), hybrid (embedded webview), and mobile web apps",
+    "Appium 2.x has modular drivers — install them separately",
+    "Desired Capabilities configure which device, platform, app to use"
+  ],
+  "codeExample": "// ── ANDROID SETUP ─────────────────────────────────────────────────\nimport io.appium.java_client.android.AndroidDriver;\nimport io.appium.java_client.android.options.UiAutomator2Options;\n\npublic class AppiumTest {\n\n    private AndroidDriver driver;\n\n    @BeforeMethod\n    public void setUp() throws MalformedURLException {\n        UiAutomator2Options options = new UiAutomator2Options()\n            .setDeviceName(\"Pixel_4_API_31\")         // AVD or device name\n            .setPlatformVersion(\"12.0\")\n            .setApp(\"/path/to/app.apk\")               // APK path\n            .setAppPackage(\"com.example.app\")         // App package\n            .setAppActivity(\"com.example.app.MainActivity\") // Launch activity\n            .setAutoGrantPermissions(true)            // Auto-accept permissions\n            .setNewCommandTimeout(Duration.ofSeconds(60));\n        \n        driver = new AndroidDriver(\n            new URL(\"http://localhost:4723\"), // Appium server URL\n            options\n        );\n    }\n\n    @Test\n    public void testLogin() {\n        // Find elements using mobile locators\n        driver.findElement(AppiumBy.accessibilityId(\"username-field\"))\n              .sendKeys(\"testuser\");\n        \n        driver.findElement(AppiumBy.androidUIAutomator(\n            \"new UiSelector().text(\\\"Login\\\")\"\n        )).click();\n        \n        // Wait for home screen\n        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));\n        WebElement homeScreen = wait.until(\n            ExpectedConditions.visibilityOfElementLocated(\n                AppiumBy.id(\"com.example.app:id/home_title\")\n            )\n        );\n        Assert.assertTrue(homeScreen.isDisplayed());\n    }\n\n    @AfterMethod\n    public void tearDown() {\n        if (driver != null) driver.quit();\n    }\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "At a bank, the mobile banking app needs to be tested on both Android and iOS. Appium allows the same test logic (with different capabilities) to run on both platforms. A CI/CD pipeline starts an Android emulator, runs Appium tests, then starts an iOS simulator and runs the same tests.",
+  "commonMistakes": [
+    "Not starting the Appium server before running tests",
+    "Wrong appPackage or appActivity causing app not to launch",
+    "Using Selenium locators (By.id without package prefix) instead of Appium-specific ones",
+    "Not setting automationName capability (UIAutomator2 for Android, XCUITest for iOS)"
+  ],
+  "bestPractices": [
+    "Use UiAutomator2Options/XCUITestOptions instead of raw DesiredCapabilities in Appium 2",
+    "Use Appium Inspector to find locators on the device",
+    "Use AccessibilityId (content-desc on Android, accessibility identifier on iOS) for cross-platform locators",
+    "Set newCommandTimeout to prevent session timeout during long operations"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How does Appium architecture work?",
+      "a": "Appium is a Node.js server that accepts WebDriver protocol HTTP requests from client libraries. It routes commands to platform-specific drivers (UIAutomator2 for Android, XCUITest for iOS) which control the actual device. The architecture is similar to Selenium but adds a mobile automation layer."
+    },
+    {
+      "q": "What is the difference between Appium and Selenium?",
+      "a": "Selenium automates web browsers (Chrome, Firefox). Appium automates mobile apps (native, hybrid) and uses mobile-specific frameworks (UIAutomator2, XCUITest). Appium extends the WebDriver protocol with mobile capabilities, so the API syntax is similar but Appium adds mobile-specific commands (gestures, capabilities)."
+    }
+  ],
+  "revisionSummary": "Appium = Node.js server + mobile drivers (UIAutomator2 for Android, XCUITest for iOS). Same WebDriver protocol as Selenium. Supports native/hybrid/web apps. Desired Capabilities configure device+app.",
+  "tags": [
+    "appium",
+    "mobile-testing",
+    "uiautomator2",
+    "xcuitest",
+    "android",
+    "ios"
+  ]
+}

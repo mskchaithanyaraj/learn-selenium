@@ -1,0 +1,41 @@
+{
+  "id": "accessibility-id-uiautomator",
+  "moduleId": "appium",
+  "title": "Accessibility ID & UiAutomator Selectors",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Mobile-specific locator strategies: Accessibility ID is the preferred cross-platform locator. UiAutomator2 selectors provide Android-specific advanced querying.",
+  "whyItMatters": "Mobile locators differ from web locators. Using native locators (Accessibility ID, UiAutomator) drastically improves test performance and reliability compared to XPath.",
+  "explanation": "Accessibility ID maps to `content-description` on Android and `accessibilityIdentifier` on iOS, making it ideal for cross-platform tests. When you need complex queries on Android, `UiAutomator2` provides native Java-based selectors like `new UiSelector().text(\"Submit\")` which execute much faster than XPath. On iOS, you can use `-ios class chain` or `-ios predicate string` for similar performance benefits. XPath should be the last resort due to XML tree traversal overhead.",
+  "keyPoints": [
+    "Accessibility ID is the fastest and most robust cross-platform locator.",
+    "UiAutomator2 uses Android's native UIAutomator API for fast element finding.",
+    "UiScrollable is used for scrolling to elements on Android.",
+    "XPath is significantly slower on mobile than on web."
+  ],
+  "codeExample": "// Accessibility ID\ndriver.findElement(AppiumBy.accessibilityId(\"SubmitButton\")).click();\n\n// UiAutomator2 Selector\ndriver.findElement(AppiumBy.androidUIAutomator(\"new UiSelector().text(\\\"Login\\\")\")).click();\n\n// UiScrollable for scrolling to text\ndriver.findElement(AppiumBy.androidUIAutomator(\"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text(\\\"Settings\\\"))\")).click();",
+  "codeLanguage": "java",
+  "realWorldExample": "In an e-commerce app, a list of products might require scrolling. You use `UiScrollable` via `androidUIAutomator` to automatically scroll until the specific product text is visible, rather than writing a custom scroll loop.",
+  "commonMistakes": [
+    "Using XPath for everything, causing slow test execution.",
+    "Confusing `resource-id` with `Accessibility ID` (resource-id should be located using `AppiumBy.id`)."
+  ],
+  "bestPractices": [
+    "Request developers to add accessibility identifiers to all interactable UI elements.",
+    "Use `-ios class chain` instead of XPath for iOS for better performance.",
+    "Use `androidUIAutomator` for complex text matching and scrolling on Android."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Why is Accessibility ID preferred over XPath in Appium?",
+      "a": "Accessibility ID is evaluated natively by the OS (UIAutomator/XCUITest), making it extremely fast. XPath requires Appium to dump the entire UI hierarchy to XML and parse it, which is resource-intensive and slow."
+    }
+  ],
+  "revisionSummary": "Accessibility ID is the best cross-platform locator. For Android-specific advanced search and scrolling, use `AppiumBy.androidUIAutomator` with `UiSelector` and `UiScrollable`. Avoid XPath to maintain performance.",
+  "tags": [
+    "appium",
+    "locators",
+    "uiautomator",
+    "accessibility-id"
+  ]
+}

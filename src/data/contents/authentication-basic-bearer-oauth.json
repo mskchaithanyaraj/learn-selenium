@@ -1,0 +1,41 @@
+{
+  "id": "authentication-basic-bearer-oauth",
+  "moduleId": "rest-assured",
+  "title": "Authentication: Basic, Bearer & OAuth2",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Implement Basic, Bearer Token, and OAuth2 authentication in REST Assured.",
+  "whyItMatters": "Almost all enterprise APIs are secured. Without knowing how to authenticate, you cannot access or test the endpoints.",
+  "explanation": "REST Assured provides built-in methods under the `auth()` configuration. For Basic Auth, use `auth().basic(\"username\", \"password\")`. For Bearer tokens (commonly JWTs), you can add a header manually: `header(\"Authorization\", \"Bearer \" + token)` or use the `auth().oauth2(token)` method. Preemptive authentication ensures credentials are sent in the first request, avoiding a 401 challenge-response cycle.",
+  "keyPoints": [
+    "Basic Auth: `given().auth().preemptive().basic(\"user\", \"pass\")`.",
+    "Bearer/OAuth2: `given().header(\"Authorization\", \"Bearer token\")`.",
+    "Tokens often need to be dynamically extracted from a login API response.",
+    "Use `RequestSpecification` to apply authentication globally across tests."
+  ],
+  "codeExample": "// Preemptive Basic Auth\ngiven().\n    auth().preemptive().basic(\"admin\", \"secret\").\nwhen().\n    get(\"/secure/data\").\nthen().\n    statusCode(200);\n\n// Bearer Token Auth\nString token = \"eyJhbGciOiJIUzI1...\";\ngiven().\n    header(\"Authorization\", \"Bearer \" + token).\nwhen().\n    get(\"/profile\").\nthen().\n    statusCode(200);",
+  "codeLanguage": "java",
+  "realWorldExample": "In an automated test suite, a `@BeforeSuite` method calls the authentication endpoint, extracts the JWT token, and saves it in a singleton RequestSpecification. All subsequent tests use this spec, eliminating the need to log in repeatedly.",
+  "commonMistakes": [
+    "Not using preemptive basic auth, leading to test failures if the server doesn't send a WWW-Authenticate challenge.",
+    "Hardcoding tokens that expire, causing tests to fail after a few hours.",
+    "Exposing credentials in source code instead of using environment variables."
+  ],
+  "bestPractices": [
+    "Fetch authentication tokens programmatically at runtime rather than hardcoding them.",
+    "Store credentials in secure environment variables or vault systems.",
+    "Use RequestSpecifications to centralize auth logic and reduce duplication."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between preemptive and challenged basic authentication?",
+      "a": "Preemptive sends the credentials in the initial request. Challenged waits for the server to return a 401 Unauthorized before sending the credentials in a second request. Preemptive is faster and often required for APIs."
+    },
+    {
+      "q": "How do you handle expiring JWT tokens in an API test suite?",
+      "a": "Generate a fresh token in the test setup (e.g., @BeforeSuite or @BeforeClass) by hitting the login endpoint and extracting the token, then pass it to all subsequent requests."
+    }
+  ],
+  "revisionSummary": "Handle API security using auth().basic() or passing Bearer tokens via headers.",
+  "tags": ["REST Assured", "Authentication", "Security", "OAuth2", "JWT"]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "file-upload-download",
+  "moduleId": "selenium-webdriver",
+  "title": "File Upload & Download",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Automating the process of uploading files to a web server and verifying downloaded files.",
+  "whyItMatters": "Many business processes involve documents (e.g., uploading a resume, downloading a CSV report). Automating these flows requires interacting with the OS file system.",
+  "explanation": "**Uploading**:\nIf the upload element is an `<input type=\"file\">`, Selenium can handle it natively. You simply use `sendKeys()` and pass the absolute path of the file. \nIf it's a complex JS dropzone without an input tag, Selenium cannot interact with the native OS file picker window. You must use third-party tools like Java's `Robot` class, `AutoIt`, or `Sikuli` to automate the OS-level window.\n\n**Downloading**:\nSelenium cannot click 'Save As' on the browser's download dialog. Instead, you configure the browser preferences (DesiredCapabilities/Options) to automatically download files to a specific directory without asking. After clicking the download link, you use standard Java `File` methods to poll the directory and verify the file exists.",
+  "keyPoints": [
+    "Native upload only works on `<input type=\"file\">` elements.",
+    "Use absolute file paths for uploading.",
+    "Selenium cannot interact with OS-level dialogs (Save As / Open File).",
+    "Configure browser options to auto-download to a known folder."
+  ],
+  "codeExample": "// UPLOAD (Native)\nWebElement uploadInput = driver.findElement(By.id(\"file-upload\"));\nuploadInput.sendKeys(\"C:\\\\test-data\\\\resume.pdf\");\ndriver.findElement(By.id(\"submit\")).click();\n\n// CONFIGURE DOWNLOAD (Chrome)\nChromeOptions options = new ChromeOptions();\nMap<String, Object> prefs = new HashMap<>();\nprefs.put(\"download.default_directory\", \"C:\\\\downloads\");\nprefs.put(\"download.prompt_for_download\", false);\noptions.setExperimentalOption(\"prefs\", prefs);\nWebDriver driver = new ChromeDriver(options);",
+  "codeLanguage": "java",
+  "realWorldExample": "Testing an invoicing app. You click 'Export to CSV'. You configured Chrome to download to `C:\\test-downloads`. The script uses `java.io.File` in a loop to check if `invoice.csv` exists and its size is > 0, then deletes it for the next run.",
+  "commonMistakes": [
+    "Using relative paths for file uploads, which might resolve differently depending on where the CI server runs the test.",
+    "Clicking the 'Upload' button expecting to use Selenium to navigate the Windows File Explorer popup.",
+    "Not cleaning up the download directory before the test, leading to false positives if an old file is found."
+  ],
+  "bestPractices": [
+    "Store test files inside your project repository (e.g., `src/test/resources/test.pdf`) and resolve the absolute path dynamically at runtime using `System.getProperty(\"user.dir\")`.",
+    "Write a robust 'WaitForFile' utility that checks the download folder every second for a maximum of 30 seconds."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you handle a file upload if the element is NOT an `<input type=\"file\">`?",
+      "a": "You must use an external tool to interact with the OS file dialog. Options include Java's `Robot` class (simulating keystrokes), `AutoIt` (Windows only scripting), or `Sikuli` (image recognition)."
+    },
+    {
+      "q": "How do you verify a file was downloaded successfully?",
+      "a": "Configure the browser to auto-download to a specific path. Click the download link. Use Java's `File` class to loop and check if a file with the expected name exists in that directory and has finished downloading."
+    }
+  ],
+  "revisionSummary": "Upload files by sending absolute paths to <input type=\"file\"> elements. Download files by configuring the browser to auto-download, then use Java File I/O to verify the file on disk.",
+  "tags": ["selenium", "upload", "download", "robot", "autoit"]
+}

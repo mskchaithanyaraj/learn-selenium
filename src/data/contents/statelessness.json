@@ -1,0 +1,46 @@
+{
+  "id": "statelessness",
+  "moduleId": "rest-soap-wsdl",
+  "title": "Statelessness in REST",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "A deep dive into the statelessness constraint of REST, explaining how it works, its trade-offs, and why it is critical for modern cloud-native and microservices architectures.",
+  "whyItMatters": "Statelessness is arguably the most important constraint for scalability. Understanding it is crucial for SDETs when testing API authentication, session management, and load balancing behavior.",
+  "explanation": "In a RESTful architecture, **Statelessness** means that the server must not store any client-side context (session data) between requests. \n\nEvery incoming HTTP request must be completely self-contained. It must carry all the data, authentication credentials, and context required for the server to fulfill that specific request. \n\n### How it differs from Stateful systems\nIn a stateful system (like traditional monoliths using JSESSIONID), the user logs in once. The server creates a session object in memory, gives the client a cookie (Session ID), and for subsequent requests, the server looks up the user's state in its memory. \nIn a stateless system, the server forgets the client the moment the response is sent. Authentication is usually handled via tokens (like JWT - JSON Web Tokens) passed in every request header.\n\n### Benefits of Statelessness\n1. **Horizontal Scalability**: Because no server holds session state, a load balancer can route a client's request to *any* available server instance. There is no need for complex 'sticky sessions'.\n2. **Reliability/Resilience**: If a server crashes mid-session, the user isn't logged out. The next request just goes to a healthy server, which can process it immediately because the request contains all necessary state.\n3. **Visibility**: Monitoring systems can understand the nature of a request simply by looking at the request payload and headers, without needing to cross-reference server memory.\n\n### Trade-offs\n- **Network Overhead**: Because every request must carry all context (e.g., a large JWT token), the payload size of each request increases.\n- **Client Complexity**: The burden of maintaining state shifts to the client (e.g., a React frontend must store the auth token and current application state).",
+  "keyPoints": [
+    "No client context is stored on the server between requests.",
+    "Every request must be fully self-contained.",
+    "Enables seamless horizontal scaling and removes the need for sticky sessions.",
+    "Shifts state management responsibility to the client application.",
+    "JWT (JSON Web Tokens) is the most common implementation for stateless authentication."
+  ],
+  "codeExample": "// Stateless Request Example using Authorization Header\nGET /api/v1/orders HTTP/1.1\nHost: api.ecommerce.com\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI...\nAccept: application/json\n\n// The JWT token contains the user's ID, roles, and expiration.\n// The server validates the token cryptographically rather than looking up a session in a database.",
+  "codeLanguage": "http",
+  "realWorldExample": "Imagine a food delivery app during Super Bowl half-time. Traffic spikes 100x. Because the API is stateless, the DevOps team can spin up 50 new server instances. The load balancer instantly routes new requests to these instances without needing to sync session data. If a server dies, requests are just routed elsewhere with zero disruption to the user.",
+  "commonMistakes": [
+    "Implementing sticky sessions on load balancers for a REST API, indicating hidden statefulness.",
+    "Using server-side memory (like Redis session stores) to hold user context instead of passing it in the request (though sometimes necessary for token revocation, it technically violates pure statelessness).",
+    "Sending massive amounts of state in every request, causing network latency."
+  ],
+  "bestPractices": [
+    "Use stateless authentication mechanisms like JWT or OAuth2.",
+    "Keep tokens as small as possible to minimize network overhead.",
+    "Design test automation to inject state (tokens, IDs) into every request explicitly rather than relying on login sequences that assume session persistence."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the primary advantage of a stateless API?",
+      "a": "Horizontal scalability. Since the server does not store session data, any server node can handle any request independently, eliminating the need for sticky sessions and making it easy to scale out behind a load balancer."
+    },
+    {
+      "q": "If a REST API is stateless, how do we handle user authentication?",
+      "a": "Through token-based authentication, such as JWT (JSON Web Tokens). The client authenticates once, receives a token, and sends that token in the Authorization header of every subsequent request. The token contains the user's identity and is cryptographically verified by the server."
+    },
+    {
+      "q": "What is the main disadvantage of statelessness?",
+      "a": "Increased network overhead. Because the server stores no state, the client must send all necessary context (like auth tokens and transaction state) with every single request, which increases the payload size."
+    }
+  ],
+  "revisionSummary": "Statelessness means every HTTP request is independent and carries all necessary context. It enables infinite horizontal scaling and fault tolerance but increases per-request network payload.",
+  "tags": ["REST", "Statelessness", "Scalability", "JWT", "Interview-Hot"]
+}

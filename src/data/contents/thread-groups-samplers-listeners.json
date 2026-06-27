@@ -1,0 +1,41 @@
+{
+  "id": "thread-groups-samplers-listeners",
+  "moduleId": "performance-testing",
+  "title": "Thread Groups, Samplers & Listeners",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "These three components are the building blocks of any Apache JMeter test plan. Thread Groups define user load, Samplers execute the requests, and Listeners capture the results for reporting.",
+  "whyItMatters": "Understanding how to correctly configure Thread Groups, select appropriate Samplers, and use Listeners optimally is essential to building realistic and efficient performance tests without overwhelming the load generator.",
+  "explanation": "### Thread Groups\n\nThe Thread Group is the starting point of any test plan. It controls the number of threads (virtual users) JMeter will use to execute the test. Key parameters include:\n- **Number of Threads (users):** How many concurrent users to simulate.\n- **Ramp-up period (seconds):** The time it takes to reach the full number of threads. For example, 100 threads with a 50-second ramp-up means 2 threads start every second.\n- **Loop Count:** How many times each thread should execute the test plan. Can be set to 'Infinite' for duration-based testing.\n\n### Samplers\n\nSamplers tell JMeter to send requests to a server and wait for a response. They are processed in the order they appear in the tree. Common samplers include:\n- **HTTP Request:** Used to test web applications and REST/SOAP APIs.\n- **JDBC Request:** Used to test database performance via SQL queries.\n- **FTP Request, TCP Sampler, JMS Publisher/Subscriber:** For testing other protocols.\n\n### Listeners\n\nListeners let you view, save, and read the results gathered by samplers. They provide graphical and tabular data analysis.\n- **View Results Tree:** Shows detailed request and response data. Useful for debugging but should be disabled during load tests as it consumes significant memory.\n- **Summary/Aggregate Report:** Provides metrics like throughput, min/max response times, and error percentages.\n- **Backend Listener:** Sends metrics in real-time to databases like InfluxDB for dashboarding in Grafana.",
+  "keyPoints": [
+    "Thread Groups manage the virtual user simulation, including concurrency and scheduling.",
+    "Samplers perform the actual work (e.g., HTTP requests, database queries).",
+    "Listeners process and display test results.",
+    "GUI listeners should be disabled during actual load testing to save system resources."
+  ],
+  "codeExample": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<jmeterTestPlan version=\"1.2\" properties=\"5.0\" jmeter=\"5.5\">\n  <hashTree>\n    <TestPlan guiclass=\"TestPlanGui\" testclass=\"TestPlan\" testname=\"Simple Web Test\" enabled=\"true\">\n      <stringProp name=\"TestPlan.comments\"></stringProp>\n      <boolProp name=\"TestPlan.functional_mode\">false</boolProp>\n      <boolProp name=\"TestPlan.tearDown_on_shutdown\">true</boolProp>\n      <boolProp name=\"TestPlan.serialize_threadgroups\">false</boolProp>\n      <elementProp name=\"TestPlan.user_defined_variables\" elementType=\"Arguments\">\n        <collectionProp name=\"Arguments.arguments\"/>\n      </elementProp>\n      <stringProp name=\"TestPlan.user_define_classpath\"></stringProp>\n    </TestPlan>\n    <hashTree>\n      <ThreadGroup guiclass=\"ThreadGroupGui\" testclass=\"ThreadGroup\" testname=\"Thread Group\" enabled=\"true\">\n        <stringProp name=\"ThreadGroup.on_sample_error\">continue</stringProp>\n        <elementProp name=\"ThreadGroup.main_controller\" elementType=\"LoopController\">\n          <boolProp name=\"LoopController.continue_forever\">false</boolProp>\n          <stringProp name=\"LoopController.loops\">1</stringProp>\n        </elementProp>\n        <stringProp name=\"ThreadGroup.num_threads\">10</stringProp>\n        <stringProp name=\"ThreadGroup.ramp_time\">5</stringProp>\n        <boolProp name=\"ThreadGroup.scheduler\">false</boolProp>\n        <stringProp name=\"ThreadGroup.duration\"></stringProp>\n        <stringProp name=\"ThreadGroup.delay\"></stringProp>\n        <boolProp name=\"ThreadGroup.same_user_on_next_iteration\">true</boolProp>\n      </ThreadGroup>\n      <hashTree>\n        <HTTPSamplerProxy guiclass=\"HttpTestSampleGui\" testclass=\"HTTPSamplerProxy\" testname=\"HTTP Request\" enabled=\"true\">\n          <stringProp name=\"HTTPSampler.domain\">example.com</stringProp>\n          <stringProp name=\"HTTPSampler.port\"></stringProp>\n          <stringProp name=\"HTTPSampler.protocol\">https</stringProp>\n          <stringProp name=\"HTTPSampler.contentEncoding\"></stringProp>\n          <stringProp name=\"HTTPSampler.path\">/</stringProp>\n          <stringProp name=\"HTTPSampler.method\">GET</stringProp>\n          <boolProp name=\"HTTPSampler.follow_redirects\">true</boolProp>\n          <boolProp name=\"HTTPSampler.auto_redirects\">false</boolProp>\n          <boolProp name=\"HTTPSampler.use_keepalive\">true</boolProp>\n          <boolProp name=\"HTTPSampler.DO_MULTIPART_POST\">false</boolProp>\n        </HTTPSamplerProxy>\n        <hashTree/>\n      </hashTree>\n    </hashTree>\n  </hashTree>\n</jmeterTestPlan>",
+  "codeLanguage": "xml",
+  "realWorldExample": "An SDET building a load test for a Black Friday sale configures a Thread Group to simulate 10,000 users with a 5-minute ramp-up. They use HTTP Request Samplers to hit the catalog API, and use a Backend Listener streaming to Grafana instead of a View Results Tree, preventing JMeter from crashing due to memory exhaustion.",
+  "commonMistakes": [
+    "Leaving the View Results Tree listener enabled during actual large-scale load tests.",
+    "Setting a ramp-up period of 0 seconds for thousands of threads, causing an unnatural spike and potential client-side bottlenecks.",
+    "Not checking 'Same user on each iteration' when cookies and session states need to be maintained across loops."
+  ],
+  "bestPractices": [
+    "Run load tests in non-GUI mode (CLI) and output results to a JTL/CSV file.",
+    "Use appropriate ramp-up times to allow the system under test to warm up normally.",
+    "Use Backend Listeners coupled with InfluxDB/Prometheus + Grafana for live monitoring."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What happens if you run a heavy load test with GUI listeners like View Results Tree enabled?",
+      "a": "The JVM memory of the load generator will quickly fill up with response data, leading to an OutOfMemoryError and crashing JMeter."
+    },
+    {
+      "q": "If you have 100 threads and a 10-second ramp-up, how many threads start per second?",
+      "a": "10 threads per second (100 / 10 = 10)."
+    }
+  ],
+  "revisionSummary": "Thread Groups simulate users, Samplers perform the actions, and Listeners capture the metrics. Always use CLI mode for load tests.",
+  "tags": ["JMeter", "Thread Group", "Sampler", "Listener", "Performance"]
+}

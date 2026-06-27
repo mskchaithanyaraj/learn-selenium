@@ -1,0 +1,39 @@
+{
+  "id": "timeout-exception",
+  "moduleId": "selenium-webdriver",
+  "title": "TimeoutException",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Thrown when a `WebDriverWait` (Explicit Wait) exceeds its configured time limit without the expected condition being met.",
+  "whyItMatters": "A TimeoutException is often the true indicator of a test failure. It means the application didn't reach the expected state within the acceptable performance threshold.",
+  "explanation": "When you use `wait.until(...)`, Selenium polls the DOM repeatedly (by default every 500ms). If the maximum time is reached and the condition (e.g., visibility, clickability) evaluates to false, a `TimeoutException` is thrown.\n\nRoot Causes:\n- **Application is slow**: The environment or network is lagging.\n- **Application is broken**: The element never appears because of a bug.\n- **Wrong Locator**: The wait is looking for an element that doesn't exist.\n- **Wrong Condition**: Waiting for `visibilityOf` when the element is purposefully hidden.\n\nIt is highly recommended to catch or customize this exception in your framework to provide meaningful error messages to stakeholders.",
+  "keyPoints": [
+    "Triggered specifically by `WebDriverWait`.",
+    "Indicates that a specific condition was not met in time.",
+    "Often masks a `NoSuchElementException` (if the wait was for presence/visibility)."
+  ],
+  "codeExample": "try {\n    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));\n    WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(\"success-message\")));\n    System.out.println(\"Success message displayed!\");\n} catch (TimeoutException e) {\n    System.out.println(\"The success message did not appear within 10 seconds.\");\n    // Take screenshot, fail the test\n    Assert.fail(\"Transaction failed: Success message timeout\");\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "Waiting for a 'Payment Successful' banner. If the payment gateway API goes down, the banner never appears. After 30 seconds, the TimeoutException correctly fails the test.",
+  "commonMistakes": [
+    "Setting timeouts arbitrarily high (e.g., 60 seconds) to avoid flaky tests, which drastically increases the total test suite run time.",
+    "Not logging the specific condition that failed, making debugging difficult."
+  ],
+  "bestPractices": [
+    "Define standard timeout durations globally (e.g., `SHORT_WAIT = 5s`, `LONG_WAIT = 30s`) rather than hardcoding numbers.",
+    "Include the expected action in the failure message (e.g., 'Timed out waiting for login button to be clickable').",
+    "Combine with a screenshot capture mechanism."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What happens if both Implicit Wait and Explicit Wait are used, and a TimeoutException occurs?",
+      "a": "Mixing implicit and explicit waits causes unpredictable timeout durations. The explicit wait may take significantly longer than configured because every poll attempt triggers the implicit wait logic."
+    },
+    {
+      "q": "How can you change the polling frequency of an Explicit Wait?",
+      "a": "You can use FluentWait (which WebDriverWait extends) to configure the polling interval: `wait.pollingEvery(Duration.ofSeconds(1))`."
+    }
+  ],
+  "revisionSummary": "TimeoutException occurs when an Explicit Wait condition fails to evaluate to true within the allotted time. It usually signifies an application performance issue, a bug, or an incorrect locator.",
+  "tags": ["selenium", "exceptions", "waits", "timeout"]
+}

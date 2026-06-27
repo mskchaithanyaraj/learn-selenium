@@ -1,0 +1,57 @@
+{
+  "id": "page-object-model",
+  "moduleId": "selenium-webdriver",
+  "title": "Page Object Model (POM)",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Page Object Model is a design pattern that creates an object repository for web UI elements, separating test logic from page interactions.",
+  "whyItMatters": "POM is the most widely adopted Selenium design pattern. It drastically reduces code duplication, makes tests maintainable, and is asked in virtually every SDET interview.",
+  "explanation": "**Page Object Model (POM)** is a design pattern where each web page (or component) is represented as a Java class. The class contains:\n- **WebElements** (as fields)\n- **Methods** that perform actions on those elements\n\n**Without POM:**\nEvery test has findElement() calls scattered everywhere. Change one locator → update 50 tests.\n\n**With POM:**\nLocators are defined once in the page class. Tests call page methods. Change one locator → update one place.\n\n**POM Structure:**\n```\nsrc/\n├── pages/\n│   ├── LoginPage.java       ← Page class with elements + methods\n│   ├── DashboardPage.java\n│   └── CheckoutPage.java\n├── tests/\n│   ├── LoginTest.java       ← Test class using page methods\n│   └── CheckoutTest.java\n└── utils/\n    └── DriverManager.java\n```\n\n**PageFactory** is a Selenium utility that initializes WebElements lazily using @FindBy annotations, used with POM.",
+  "keyPoints": [
+    "Each page = one Java class with WebElements and action methods",
+    "Tests should NOT contain findElement() calls — only page method calls",
+    "PageFactory.initElements() initializes @FindBy annotated elements",
+    "Returns page objects from action methods for fluent method chaining",
+    "POM reduces code duplication and makes maintenance easier",
+    "Extend BasePage for shared methods (wait, scroll, screenshot)"
+  ],
+  "codeExample": "// BasePage.java\npublic class BasePage {\n    protected WebDriver driver;\n    protected WebDriverWait wait;\n    \n    public BasePage(WebDriver driver) {\n        this.driver = driver;\n        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));\n        PageFactory.initElements(driver, this);\n    }\n    \n    protected void waitAndClick(WebElement element) {\n        wait.until(ExpectedConditions.elementToBeClickable(element)).click();\n    }\n}\n\n// LoginPage.java\npublic class LoginPage extends BasePage {\n    @FindBy(id = \"username\")\n    private WebElement usernameField;\n    \n    @FindBy(id = \"password\")\n    private WebElement passwordField;\n    \n    @FindBy(css = \"button[type='submit']\")\n    private WebElement loginButton;\n    \n    @FindBy(className = \"error-message\")\n    private WebElement errorMessage;\n    \n    public LoginPage(WebDriver driver) {\n        super(driver);\n    }\n    \n    public DashboardPage login(String username, String password) {\n        usernameField.clear();\n        usernameField.sendKeys(username);\n        passwordField.sendKeys(password);\n        waitAndClick(loginButton);\n        return new DashboardPage(driver);\n    }\n    \n    public String getErrorMessage() {\n        return wait.until(ExpectedConditions.visibilityOf(errorMessage)).getText();\n    }\n}\n\n// LoginTest.java (TestNG)\npublic class LoginTest {\n    private WebDriver driver;\n    private LoginPage loginPage;\n    \n    @BeforeMethod\n    public void setUp() {\n        driver = new ChromeDriver();\n        driver.get(\"https://example.com/login\");\n        loginPage = new LoginPage(driver);\n    }\n    \n    @Test\n    public void testValidLogin() {\n        DashboardPage dashboard = loginPage.login(\"admin\", \"password123\");\n        Assert.assertTrue(dashboard.isLoaded(), \"Dashboard should load after login\");\n    }\n    \n    @Test\n    public void testInvalidLogin() {\n        loginPage.login(\"admin\", \"wrongpassword\");\n        Assert.assertEquals(loginPage.getErrorMessage(), \"Invalid credentials\");\n    }\n    \n    @AfterMethod\n    public void tearDown() {\n        if (driver != null) driver.quit();\n    }\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "A banking application has 50 test cases testing the login page. When the login button ID changes from \"btnLogin\" to \"login-submit\", with POM you update just the LoginPage class — all 50 tests automatically work. Without POM, you would need to update 50 individual test files.",
+  "commonMistakes": [
+    "Putting test assertions inside page classes — pages should only have actions, not assertions",
+    "Not using PageFactory — manually calling findElement() in page classes negates lazy initialization",
+    "Making page methods too granular (one method per click) instead of user-action-oriented",
+    "Not returning a new Page object from methods that navigate to a new page",
+    "Creating page objects as static — breaks parallel execution"
+  ],
+  "bestPractices": [
+    "Follow the Single Responsibility Principle — one page class per page/component",
+    "Return page objects from navigation methods for fluent chaining",
+    "Extend BasePage for common utilities like wait, scroll, screenshot",
+    "Use meaningful method names that describe user actions, not technical operations",
+    "Keep page objects independent of test data — pass data as parameters"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is Page Object Model and why is it used?",
+      "a": "POM is a design pattern where each web page is a Java class with WebElements and action methods. It separates test logic from page interactions, reducing duplication and making maintenance easier. When a locator changes, you update only the page class, not all tests."
+    },
+    {
+      "q": "What is PageFactory in Selenium?",
+      "a": "PageFactory is a Selenium support class that initializes WebElements annotated with @FindBy lazily (when they are first accessed, not when the page object is created). It is used with initElements() in the constructor."
+    },
+    {
+      "q": "What is the difference between @FindBy and driver.findElement()?",
+      "a": "@FindBy with PageFactory initializes elements lazily and can be reinitiated if the DOM changes. driver.findElement() finds the element immediately and throws NoSuchElementException if not found. @FindBy creates a proxy that finds the element fresh each time it is used."
+    }
+  ],
+  "revisionSummary": "POM = one class per page, WebElements + action methods. PageFactory initializes @FindBy elements lazily. Tests call page methods, never findElement(). Reduces duplication, improves maintenance.",
+  "tags": [
+    "pom",
+    "page-object-model",
+    "pagefactory",
+    "design-pattern",
+    "selenium"
+  ]
+}

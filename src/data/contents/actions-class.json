@@ -1,0 +1,39 @@
+{
+  "id": "actions-class",
+  "moduleId": "selenium-webdriver",
+  "title": "Actions Class",
+  "priority": "hot",
+  "estimatedMinutes": 45,
+  "overview": "The Actions class is used to emulate complex user gestures that standard WebElement methods cannot handle, such as hovering, drag-and-drop, and keyboard combinations.",
+  "whyItMatters": "Modern UIs rely heavily on hover states, draggable components, and keyboard shortcuts. You cannot test these features with simple `click()` and `sendKeys()`.",
+  "explanation": "To use it, instantiate `Actions action = new Actions(driver)`. \n\nKey methods:\n- **moveToElement(element)**: Hovers the mouse over an element.\n- **contextClick(element)**: Right-clicks an element.\n- **doubleClick(element)**: Double-clicks.\n- **dragAndDrop(source, target)**: Clicks, holds, moves, and releases.\n- **keyDown(Keys) / keyUp(Keys)**: Simulates holding down modifier keys (Shift, Ctrl, Alt).\n\n**Crucial**: You can chain these commands together. You must *always* conclude the chain with `.perform()` to execute the sequence.",
+  "keyPoints": [
+    "Used for complex mouse and keyboard interactions.",
+    "Commands can be chained.",
+    "Requires `.perform()` at the end of the chain to actually execute.",
+    "Essential for testing modern JavaScript-heavy interfaces."
+  ],
+  "codeExample": "Actions actions = new Actions(driver);\n\n// Hover over a menu item\nWebElement menu = driver.findElement(By.id(\"nav-menu\"));\nactions.moveToElement(menu).perform();\n\n// Drag and Drop\nWebElement source = driver.findElement(By.id(\"draggable\"));\nWebElement target = driver.findElement(By.id(\"droppable\"));\nactions.dragAndDrop(source, target).perform();\n\n// Complex sequence (Shift + Click)\nWebElement searchBox = driver.findElement(By.id(\"search\"));\nactions.keyDown(Keys.SHIFT)\n       .sendKeys(searchBox, \"hello\")\n       .keyUp(Keys.SHIFT)\n       .perform();",
+  "codeLanguage": "java",
+  "realWorldExample": "Testing an e-commerce site where the 'Sub-category' menu only appears when you hover over the 'Main Category' link. Standard `findElement` fails because the sub-category is hidden. You use `Actions.moveToElement(mainCategory).perform()` to trigger the hover, revealing the sub-category for the next click.",
+  "commonMistakes": [
+    "Forgetting to append `.perform()` at the end. (The code compiles, but nothing happens on screen).",
+    "Using Actions for a simple click, which is overkill and slightly slower than `element.click()`."
+  ],
+  "bestPractices": [
+    "Use `.build().perform()` when chaining multiple actions for better readability and structure (though `.perform()` internally calls build()).",
+    "If dragAndDrop fails (common in HTML5), you may need to use a JavascriptExecutor workaround or simulate it by chaining clickAndHold -> moveToElement -> release."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between `build()` and `perform()` in the Actions class?",
+      "a": "`build()` compiles the chained actions into a single `Action` interface object. `perform()` actually executes that action. Note that calling `perform()` automatically calls `build()` first."
+    },
+    {
+      "q": "How do you simulate hovering the mouse over an element?",
+      "a": "You instantiate the Actions class and use `actions.moveToElement(element).perform();`."
+    }
+  ],
+  "revisionSummary": "The Actions class handles complex user inputs: hover, drag-and-drop, right-click, and keyboard modifier combinations. Always remember to append .perform() to execute the sequence.",
+  "tags": ["selenium", "actions", "mouse", "keyboard", "drag-drop"]
+}

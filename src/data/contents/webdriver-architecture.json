@@ -1,0 +1,56 @@
+{
+  "id": "webdriver-architecture",
+  "moduleId": "selenium-webdriver",
+  "title": "WebDriver Architecture",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Selenium WebDriver is a browser automation framework that uses a client-server protocol (W3C WebDriver) to control browsers natively.",
+  "whyItMatters": "Understanding the architecture helps you debug flaky tests, optimize performance, and understand why certain commands behave the way they do across browsers.",
+  "explanation": "Selenium WebDriver architecture consists of three main layers:\n\n**1. Client Libraries (Language Bindings)**\nThese are the APIs in Java, Python, C#, Ruby, etc. that your test code uses. When you call driver.findElement(), you are calling a Java binding that translates to HTTP requests.\n\n**2. JSON Wire Protocol / W3C WebDriver Protocol**\nWebDriver uses HTTP REST API under the hood. Commands are serialized as JSON and sent over HTTP to the browser driver. Since Selenium 4, the W3C WebDriver standard is the only protocol used (Selenium 3 supported both).\n\n**3. Browser Drivers**\nEach browser has its own WebDriver implementation:\n- ChromeDriver — for Chrome/Chromium\n- GeckoDriver — for Firefox\n- SafariDriver — built into Safari\n- EdgeDriver — for Microsoft Edge\n\nThe browser driver receives HTTP requests, interprets them, and issues native browser commands through the browser's internal API.\n\n**Request Flow:**\nTest Code → Language Binding → HTTP Request → Browser Driver → Browser → Response → HTTP Response → Language Binding → Test Code\n\n**Selenium Grid adds a fourth layer:** A Hub distributes test requests to registered Node machines, enabling parallel execution on multiple browsers/OS combinations.",
+  "keyPoints": [
+    "WebDriver uses W3C WebDriver Protocol (HTTP REST) since Selenium 4",
+    "Each browser has its own driver: ChromeDriver, GeckoDriver, EdgeDriver, SafariDriver",
+    "Communication is JSON over HTTP between your code and the browser driver",
+    "Selenium 4 removed the Selenium RC / JSON Wire Protocol legacy support",
+    "Selenium Grid enables distributed test execution across multiple machines",
+    "The browser driver must match the installed browser version"
+  ],
+  "codeExample": "import org.openqa.selenium.WebDriver;\nimport org.openqa.selenium.chrome.ChromeDriver;\nimport org.openqa.selenium.chrome.ChromeOptions;\n\npublic class WebDriverDemo {\n    public static void main(String[] args) {\n        // Selenium 4 auto-manages ChromeDriver via Selenium Manager\n        ChromeOptions options = new ChromeOptions();\n        options.addArguments(\"--headless=new\"); // Run headless\n        options.addArguments(\"--no-sandbox\");\n        \n        WebDriver driver = new ChromeDriver(options);\n        \n        try {\n            driver.get(\"https://www.example.com\");\n            System.out.println(\"Title: \" + driver.getTitle());\n            // Internally this sends: GET /session/{id}/title\n        } finally {\n            driver.quit(); // Sends DELETE /session/{id}\n        }\n    }\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "When a test fails with \"Connection refused\", it means the browser driver process crashed or was not started. Understanding the 3-layer architecture immediately tells you to check if ChromeDriver is running on the correct port.",
+  "commonMistakes": [
+    "Using driver.close() instead of driver.quit() — close() only closes the current window, quit() terminates the entire browser session",
+    "Not matching ChromeDriver version with Chrome browser version",
+    "Not setting up PATH for browser drivers (Selenium 4 Selenium Manager handles this automatically)",
+    "Creating a new WebDriver instance in every test method without cleanup"
+  ],
+  "bestPractices": [
+    "Always call driver.quit() in an @AfterMethod or finally block",
+    "Use Selenium Manager (Selenium 4.6+) to auto-download matching browser drivers",
+    "Use headless mode for CI/CD pipelines for faster execution",
+    "Implement WebDriver as a ThreadLocal variable for parallel execution",
+    "Use WebDriverWait instead of Thread.sleep() for synchronization"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the architecture of Selenium WebDriver?",
+      "a": "Selenium WebDriver has three layers: client language bindings (Java/Python/etc.), the W3C WebDriver HTTP protocol, and browser-specific drivers (ChromeDriver, GeckoDriver). Test code sends HTTP requests to the browser driver, which translates them into native browser commands."
+    },
+    {
+      "q": "What is the difference between Selenium RC and Selenium WebDriver?",
+      "a": "Selenium RC used a server proxy that injected JavaScript into the browser. WebDriver communicates directly with the browser through native APIs, making it faster, more reliable, and support modern browser features. Selenium RC is deprecated."
+    },
+    {
+      "q": "What changed between Selenium 3 and Selenium 4 in terms of protocol?",
+      "a": "Selenium 4 fully adopts the W3C WebDriver standard, dropping legacy JSON Wire Protocol. It also introduced Selenium Grid 4 (with Docker support), BiDi Protocol support, relative locators, and built-in Selenium Manager for driver management."
+    }
+  ],
+  "revisionSummary": "WebDriver = Code → HTTP/JSON → BrowserDriver → Browser. Three layers. W3C protocol in Selenium 4. Each browser has its own driver. Always quit() after tests.",
+  "tags": [
+    "selenium",
+    "webdriver",
+    "architecture",
+    "w3c",
+    "chromedriver"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "css-vs-xpath",
+  "moduleId": "selenium-webdriver",
+  "title": "CSS Selectors vs XPath",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "A comparison between the two most powerful locator strategies in Selenium: CSS Selectors and XPath.",
+  "whyItMatters": "Knowing when to use CSS vs XPath helps you write faster, more reliable tests. While both are powerful, they have distinct advantages and limitations.",
+  "explanation": "**CSS Selectors** are generally faster because they are processed directly by the browser's native CSS engine. They are often shorter and more readable. However, they cannot traverse upwards in the DOM or match by inner text.\n\n**XPath** is slightly slower (though negligible on modern browsers) but much more flexible. It can traverse up the DOM using `parent::` or `ancestor::` and can locate elements based on their visible text (`text()`).\n\nRule of thumb: Default to CSS Selectors for performance and simplicity. Use XPath when you need to match by text or traverse up/across the DOM tree in ways CSS cannot.",
+  "keyPoints": [
+    "CSS is natively faster in modern browsers.",
+    "XPath can traverse upwards (parents/ancestors); CSS cannot.",
+    "XPath can match by text content (`text()`); CSS cannot match by text.",
+    "CSS syntax is generally cleaner for simple class/ID combinations."
+  ],
+  "codeExample": "// CSS Selector (matching by attribute and class)\nWebElement byCss = driver.findElement(By.cssSelector(\"input.primary[type='submit']\"));\n\n// Equivalent XPath\nWebElement byXpath = driver.findElement(By.xpath(\"//input[contains(@class, 'primary') and @type='submit']\"));\n\n// XPath (matching by text - IMPOSSIBLE with pure CSS)\nWebElement byText = driver.findElement(By.xpath(\"//button[text()='Login']\"));",
+  "codeLanguage": "java",
+  "realWorldExample": "You need to find a 'Logout' button. The button has no ID and shares classes with 10 other buttons. The only unique identifier is the word 'Logout'. You MUST use XPath `//button[text()='Logout']`.",
+  "commonMistakes": [
+    "Using XPath for everything out of habit, resulting in slower execution and harder-to-read code.",
+    "Thinking CSS selectors can match inner text."
+  ],
+  "bestPractices": [
+    "Establish team guidelines: e.g., 'Use CSS by default, use XPath only for text matching or upward traversal.'",
+    "Use CSS pseudo-classes like `:nth-child()` for list items if indices are stable."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "Which is faster: CSS or XPath?",
+      "a": "CSS is generally faster because it is evaluated by the browser's native rendering engine. However, on modern browsers, the difference is often negligible for single element lookups."
+    },
+    {
+      "q": "Can you find a parent element using a CSS selector?",
+      "a": "No, CSS selectors only evaluate downwards (descendants) or sideways (siblings). To find a parent, you must use XPath."
+    }
+  ],
+  "revisionSummary": "CSS is faster and cleaner but limited to downward traversal and attribute matching. XPath is slightly slower but highly flexible, supporting text matching and multi-directional DOM traversal.",
+  "tags": ["selenium", "css", "xpath", "locators", "performance"]
+}

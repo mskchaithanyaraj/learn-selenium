@@ -1,0 +1,47 @@
+{
+  "id": "rest-6-constraints",
+  "moduleId": "rest-soap-wsdl",
+  "title": "REST 6 Architectural Constraints",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "An in-depth exploration of Roy Fielding's six architectural constraints that define a RESTful system. Understanding these principles is essential for designing scalable, maintainable APIs.",
+  "whyItMatters": "While many APIs claim to be RESTful, they often only implement a subset of these constraints. A deep understanding separates senior SDETs and architects from juniors, enabling better API testing, design feedback, and system architecture comprehension.",
+  "explanation": "REST (Representational State Transfer) is not a protocol, but an architectural style. Roy Fielding defined six constraints that a system must satisfy to be considered truly RESTful:\n\n1. **Client-Server Architecture**: The client (e.g., a web frontend or mobile app) and the server (backend services) must be completely decoupled. They evolve independently as long as the interface (contract) remains consistent. This improves portability and scalability.\n\n2. **Statelessness**: Every request from the client to the server must contain all the information necessary to understand and process it. The server does not store any session context between requests. This forces horizontal scalability since any server instance can handle any request.\n\n3. **Cacheability**: Responses from the server must explicitly state whether they can be cached (e.g., using `Cache-Control` headers) and for how long. Caching eliminates redundant client-server interactions, improving performance and scalability.\n\n4. **Uniform Interface**: The most distinguishing constraint, consisting of four sub-constraints:\n   - *Resource Identification*: Resources are identified via URIs (e.g., `/users/123`).\n   - *Resource Manipulation through Representations*: Clients hold a representation (like JSON) and modify the resource via this representation.\n   - *Self-descriptive Messages*: Each message includes enough info to describe how to process it (e.g., `Content-Type: application/json`).\n   - *HATEOAS (Hypermedia As The Engine Of Application State)*: Responses include hyperlinks to related resources/actions.\n\n5. **Layered System**: The architecture can consist of multiple layers (e.g., load balancers, proxies, caching layers, database servers). The client cannot tell if it is connected directly to the end server or an intermediary, promoting security and load balancing.\n\n6. **Code on Demand (Optional)**: The server can temporarily extend client functionality by transferring executable code (e.g., JavaScript sent to a browser). This is the only optional constraint.",
+  "keyPoints": [
+    "REST is an architectural style, not a protocol or standard.",
+    "Client-Server decouples user interface concerns from data storage concerns.",
+    "Statelessness improves scalability and reliability by eliminating server-side session state.",
+    "Cacheability reduces network traffic and improves latency.",
+    "Uniform Interface simplifies the architecture and improves visibility.",
+    "Layered System enables load balancing, caching, and security enforcement at different network layers."
+  ],
+  "codeExample": "GET /api/v1/users/42 HTTP/1.1\nHost: api.example.com\nAccept: application/json\nCache-Control: no-cache\nAuthorization: Bearer jwt_token_here\n\nHTTP/1.1 200 OK\nContent-Type: application/json\nCache-Control: max-age=3600\n\n{\n  \"id\": 42,\n  \"name\": \"Alice\",\n  \"links\": [\n    { \"rel\": \"self\", \"href\": \"/api/v1/users/42\" },\n    { \"rel\": \"orders\", \"href\": \"/api/v1/users/42/orders\" }\n  ]\n}",
+  "codeLanguage": "http",
+  "realWorldExample": "Consider a large-scale e-commerce platform. The Web UI (Client) requests product data from the API (Server) using stateless JWT authentication. A CDN (Layered System) intercepts the request and serves a cached copy of the product catalog (Cacheability). The response format is uniformly JSON and includes links to 'add to cart' or 'view reviews' (Uniform Interface).",
+  "commonMistakes": [
+    "Storing user sessions (like JSESSIONID) on the server in a REST API, violating statelessness.",
+    "Treating REST as just 'HTTP + JSON' without considering constraints like HATEOAS or caching.",
+    "Leaking backend implementation details in the URIs (violating Uniform Interface)."
+  ],
+  "bestPractices": [
+    "Always use appropriate HTTP caching headers (ETag, Cache-Control) for GET requests.",
+    "Ensure your APIs can be scaled horizontally without relying on sticky sessions.",
+    "Design URLs around resources (nouns) rather than actions (verbs) to adhere to the Uniform Interface."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What does statelessness mean in the context of REST?",
+      "a": "It means the server does not store any client context between requests. Every request must contain all necessary information (like authentication tokens and parameters) for the server to process it independently. This enables high scalability."
+    },
+    {
+      "q": "Which of the six REST constraints is optional?",
+      "a": "Code on Demand. It allows servers to send executable code (like JavaScript) to the client to extend its functionality, but it is not strictly required for an API to be considered RESTful."
+    },
+    {
+      "q": "How does the Layered System constraint benefit a microservices architecture?",
+      "a": "It allows architects to insert intermediaries such as load balancers, API gateways, or caching servers (like Redis/Varnish) between the client and the backend services without the client needing to know. This improves security, scalability, and performance."
+    }
+  ],
+  "revisionSummary": "REST relies on 6 constraints: Client-Server, Statelessness, Cacheability, Uniform Interface, Layered System, and Code on Demand (optional) to build scalable and decoupled web services.",
+  "tags": ["REST", "Architecture", "API", "Constraints", "Interview-Hot"]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "data-driven-testing-poi",
+  "moduleId": "selenium-webdriver",
+  "title": "Data-Driven Testing with POI",
+  "priority": "hot",
+  "estimatedMinutes": 60,
+  "overview": "Combining Apache POI with TestNG's @DataProvider to feed data from an external Excel spreadsheet directly into your test methods.",
+  "whyItMatters": "This is the most common industry pattern for Data-Driven Testing (DDT) in Java. It separates test logic (Java) from test data (Excel), allowing non-technical team members to manage test coverage.",
+  "explanation": "The workflow:\n1. A `@DataProvider` method is invoked by TestNG.\n2. Inside the provider, Apache POI opens an Excel file.\n3. POI calculates the number of rows and columns.\n4. A 2D Java Array (`Object[][] data = new Object[rows][cols]`) is initialized.\n5. Nested `for` loops iterate through the Excel sheet, copying cell values into the 2D array.\n6. The 2D array is returned to TestNG.\n7. TestNG runs the `@Test` method once for every row in the array.\n\nUsually, you skip row 0 if it contains headers (like 'Username', 'Password').",
+  "keyPoints": [
+    "DDT separates data from code.",
+    "The DataProvider bridges Excel (POI) and the Test method (TestNG).",
+    "Requires mapping Excel columns strictly to the @Test method's arguments.",
+    "A reusable `ExcelReader` utility class is highly recommended."
+  ],
+  "codeExample": "@DataProvider(name = \"excelData\")\npublic Object[][] getData() throws IOException {\n    FileInputStream fis = new FileInputStream(\"testData.xlsx\");\n    Workbook wb = new XSSFWorkbook(fis);\n    Sheet sheet = wb.getSheet(\"Login\");\n    int rowCount = sheet.getLastRowNum();\n    int colCount = sheet.getRow(0).getLastCellNum();\n\n    Object[][] data = new Object[rowCount][colCount];\n    DataFormatter formatter = new DataFormatter();\n\n    for (int i = 0; i < rowCount; i++) {\n        Row row = sheet.getRow(i + 1); // Skip header row\n        for (int j = 0; j < colCount; j++) {\n            data[i][j] = formatter.formatCellValue(row.getCell(j));\n        }\n    }\n    wb.close();\n    return data;\n}\n\n@Test(dataProvider = \"excelData\")\npublic void loginTest(String username, String password) {\n    // Test logic using the data\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "Testing an insurance quoting engine. The business provides an Excel file with 200 rows of different driver profiles (age, car type, history). Your one test method runs 200 times, validating the quote amount for each profile.",
+  "commonMistakes": [
+    "Forgetting to subtract/skip the header row, causing the script to try and log in using the string 'Username'.",
+    "NullPointerExceptions when encountering completely blank cells in Excel; ensure you handle null cells gracefully."
+  ],
+  "bestPractices": [
+    "Use POI's `DataFormatter` to ensure all data is safely read as a String, avoiding cell type mismatch exceptions.",
+    "For massive Excel files, consider returning an `Iterator<Object[]>` instead of a massive `Object[][]` to save memory."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "How do you integrate Apache POI with TestNG?",
+      "a": "You write a TestNG @DataProvider method that uses Apache POI to parse the Excel file, copy the data into a 2-dimensional Object array, and return it. The @Test method then consumes that provider."
+    },
+    {
+      "q": "How do you skip the header row when reading from Excel?",
+      "a": "When looping through the rows, start the loop counter `i` at 1 instead of 0, or read `sheet.getRow(i + 1)` while looping from 0 to `rowCount - 1`."
+    }
+  ],
+  "revisionSummary": "Integrating Apache POI and TestNG's DataProvider creates a powerful Data-Driven Framework. It extracts test parameters from Excel and feeds them into automated test scripts dynamically.",
+  "tags": ["testng", "apache-poi", "data-driven", "excel"]
+}

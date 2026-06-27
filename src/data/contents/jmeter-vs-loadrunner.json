@@ -1,0 +1,40 @@
+{
+  "id": "jmeter-vs-loadrunner",
+  "moduleId": "performance-testing",
+  "title": "JMeter vs LoadRunner",
+  "priority": "warm",
+  "estimatedMinutes": 45,
+  "overview": "Apache JMeter and Micro Focus LoadRunner are the two dominant players in performance testing. Understanding their differences helps in selecting the right tool for specific enterprise projects.",
+  "whyItMatters": "SDETs at companies like Cognizant frequently transition between modern web/API projects (JMeter) and legacy enterprise systems like SAP or Mainframes (LoadRunner). Knowing when to use which is a key architectural skill.",
+  "explanation": "### Apache JMeter\n\n- **Type:** Open-source, Apache Foundation.\n- **Language:** Java-based. Scripting is done visually (GUI) or via JSR223 (Groovy/Java).\n- **Strengths:** Free, lightweight, massive community support, integrates easily with CI/CD (Jenkins, Maven), excellent for Web (HTTP/HTTPS) and REST/SOAP APIs.\n- **Weaknesses:** Cannot execute JavaScript in browsers (it is not a browser), limited support for legacy protocols (RDP, SAP GUI), complex to scale across massive distributed architectures without third-party tools (like BlazeMeter).\n\n### Micro Focus LoadRunner (Professional / Enterprise)\n\n- **Type:** Commercial, proprietary (formerly HP LoadRunner).\n- **Language:** VUser scripts are written in C, Java, or JavaScript via VuGen.\n- **Strengths:** Supports over 50 protocols (SAP, Oracle, Citrix, RDP, Mainframe). Exceptional out-of-the-box analysis and reporting tools. Built-in IP spoofing and network virtualization. Professional support.\n- **Weaknesses:** Very expensive licensing (per Virtual User). Steeper learning curve for C-based scripting. Heavier infrastructure requirements.",
+  "keyPoints": [
+    "JMeter is ideal for agile, API-first, web-centric projects.",
+    "LoadRunner is necessary for complex, multi-protocol enterprise systems (SAP, Citrix).",
+    "JMeter is open-source and free; LoadRunner has high licensing costs."
+  ],
+  "codeExample": "/* \n  Conceptual Scripting Difference \n*/\n\n// LoadRunner VuGen (C-based web protocol)\nAction()\n{\n    web_url(\"HomePage\",\n        \"URL=http://example.com/\",\n        \"TargetFrame=\",\n        \"Resource=0\",\n        \"RecContentType=text/html\",\n        LAST);\n    return 0;\n}\n\n<!-- JMeter (XML based, configured via GUI) -->\n<HTTPSamplerProxy testname=\"HomePage\">\n  <stringProp name=\"HTTPSampler.domain\">example.com</stringProp>\n  <stringProp name=\"HTTPSampler.path\">/</stringProp>\n  <stringProp name=\"HTTPSampler.method\">GET</stringProp>\n</HTTPSamplerProxy>",
+  "codeLanguage": "c",
+  "realWorldExample": "A banking client needs to load test a new web banking portal and the backend Mainframe processing the transactions. The SDET uses JMeter for the web portal (HTTP/API) due to CI/CD integration, but must use LoadRunner's RTE (Terminal Emulation) protocol to simulate load directly on the Mainframe.",
+  "commonMistakes": [
+    "Assuming JMeter can 'click' buttons or render JavaScript like Selenium. (Neither JMeter nor LoadRunner Web protocol executes client-side JS; they operate at the HTTP network layer).",
+    "Choosing LoadRunner for a simple REST API project, wasting budget when JMeter would suffice.",
+    "Dismissing LoadRunner as 'outdated' when it remains the only viable choice for many non-HTTP enterprise protocols."
+  ],
+  "bestPractices": [
+    "Use JMeter for Agile/DevOps environments where tests live alongside code in Git.",
+    "Use LoadRunner (or LoadRunner Enterprise) for monolithic, multi-tier enterprise applications involving Citrix or SAP.",
+    "Leverage cloud-scaling platforms like BlazeMeter if you need LoadRunner-level scale and reporting while using JMeter scripts."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "When would you choose LoadRunner over JMeter?",
+      "a": "When the application under test relies on legacy or proprietary protocols that JMeter does not support natively, such as SAP GUI, Citrix, or RDP, or when enterprise-level professional support and out-of-the-box advanced analytics are mandated by the client."
+    },
+    {
+      "q": "Can JMeter test the client-side rendering performance of a Single Page Application (React/Angular)?",
+      "a": "No. JMeter operates at the HTTP protocol layer. It downloads the HTML/JS but does not execute the JavaScript or render the DOM. To measure client-side rendering under load, tools like Selenium or Lighthouse must be used in conjunction with JMeter."
+    }
+  ],
+  "revisionSummary": "JMeter = Open Source, Java, HTTP/API focused, Agile. LoadRunner = Commercial, C-based, 50+ protocols (SAP, Citrix), Enterprise. Choose based on protocol requirements and budget.",
+  "tags": ["JMeter", "LoadRunner", "Comparison", "Protocols"]
+}

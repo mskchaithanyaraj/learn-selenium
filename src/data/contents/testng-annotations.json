@@ -1,0 +1,59 @@
+{
+  "id": "testng-annotations",
+  "moduleId": "selenium-webdriver",
+  "title": "TestNG Annotations",
+  "priority": "hot",
+  "estimatedMinutes": 55,
+  "overview": "TestNG annotations control the execution lifecycle of test methods, defining setup, teardown, and test configuration in a structured order.",
+  "whyItMatters": "TestNG is the primary test framework used with Selenium in enterprise Java projects. Mastering annotations is fundamental to writing any Selenium automation framework.",
+  "explanation": "**TestNG Annotation Execution Order:**\n\n`@BeforeSuite → @BeforeTest → @BeforeClass → @BeforeMethod → @Test → @AfterMethod → @AfterClass → @AfterTest → @AfterSuite`\n\n**Annotation Descriptions:**\n\n| Annotation | Runs | Typical Use |\n|---|---|---|\n| @BeforeSuite | Once before all tests in suite | Initialize ExtentReports |\n| @AfterSuite | Once after all tests in suite | Close reports, cleanup |\n| @BeforeTest | Before each `<test>` tag in testng.xml | Set base URL |\n| @AfterTest | After each `<test>` tag | Log test results |\n| @BeforeClass | Once before first @Test in class | Initialize common data |\n| @AfterClass | Once after last @Test in class | Cleanup class resources |\n| @BeforeMethod | Before every @Test method | Launch browser |\n| @AfterMethod | After every @Test method | Quit browser |\n| @Test | Test method | Actual test logic |\n| @DataProvider | Returns Object[][] for parameterized tests | Supply test data |\n| @Parameters | Inject values from testng.xml | Environment/browser |\n| @Listeners | Register ITestListener implementations | Reporting |\n\n**Priority:** Controls execution order within a class. Lower number = runs first. Default priority = 0.\n\n**Groups:** Categorize tests. Can include/exclude groups in testng.xml.",
+  "keyPoints": [
+    "BeforeMethod runs before EVERY test method — use for browser setup",
+    "BeforeClass runs once before first test in the class — use for class-level setup",
+    "AfterMethod runs after EVERY test — use for browser quit",
+    "@DataProvider allows parameterized testing with Object[][] data",
+    "priority attribute controls execution order (lower = earlier)",
+    "groups attribute categorizes tests for selective execution",
+    "alwaysRun = true ensures setup runs even if dependent tests fail"
+  ],
+  "codeExample": "@Listeners({TestListener.class, ExtentReportListener.class})\npublic class LoginTest extends BaseTest {\n\n    // ── LIFECYCLE ──────────────────────────────────────────────────────\n    \n    @BeforeClass(alwaysRun = true)\n    public void initClass() {\n        System.out.println(\"Setting up test class: \" + this.getClass().getName());\n        // Initialize class-level resources\n    }\n    \n    @BeforeMethod(alwaysRun = true)\n    public void setUp(Method method) {\n        // method parameter gives the current test method name\n        System.out.println(\"Starting test: \" + method.getName());\n        initDriver(); // from BaseTest\n    }\n    \n    @AfterMethod(alwaysRun = true)\n    public void tearDown(ITestResult result) {\n        if (result.getStatus() == ITestResult.FAILURE) {\n            takeScreenshot(result.getName()); // Capture on failure\n        }\n        quitDriver();\n    }\n    \n    @AfterClass(alwaysRun = true)\n    public void cleanUp() {\n        System.out.println(\"Test class complete\");\n    }\n    \n    // ── TEST METHODS ───────────────────────────────────────────────────\n    \n    @Test(priority = 1, groups = {\"smoke\", \"regression\"}, \n          description = \"Verify valid login\")\n    public void testValidLogin() {\n        LoginPage loginPage = new LoginPage(driver);\n        DashboardPage dashboard = loginPage.login(\"admin\", \"password\");\n        Assert.assertTrue(dashboard.isDisplayed());\n    }\n    \n    @Test(priority = 2, groups = {\"regression\"}, \n          dependsOnMethods = {\"testValidLogin\"})\n    public void testLogout() {\n        // Runs only if testValidLogin passes\n        DashboardPage dashboard = new DashboardPage(driver);\n        dashboard.logout();\n        Assert.assertTrue(new LoginPage(driver).isLoginFormVisible());\n    }\n    \n    // ── DATA PROVIDER ─────────────────────────────────────────────────\n    \n    @DataProvider(name = \"loginData\", parallel = true)\n    public Object[][] loginData() {\n        return new Object[][] {\n            {\"user1@test.com\", \"pass1\", true},   // valid login\n            {\"user2@test.com\", \"wrong\", false},   // invalid password\n            {\"\", \"pass1\", false},                 // empty username\n            {\"invalid\", \"pass1\", false}           // invalid username format\n        };\n    }\n    \n    @Test(dataProvider = \"loginData\", groups = {\"regression\"})\n    public void testLoginWithData(String username, String password, boolean shouldSucceed) {\n        LoginPage loginPage = new LoginPage(driver);\n        loginPage.login(username, password);\n        if (shouldSucceed) {\n            Assert.assertTrue(new DashboardPage(driver).isDisplayed());\n        } else {\n            Assert.assertNotNull(loginPage.getErrorMessage());\n        }\n    }\n    \n    // ── PARAMETERS FROM testng.xml ────────────────────────────────────\n    \n    @Test\n    @Parameters({\"browser\", \"environment\"})\n    public void testWithParameters(\n            @Optional(\"chrome\") String browser,\n            @Optional(\"staging\") String environment) {\n        System.out.println(\"Running on: \" + browser + \" | \" + environment);\n    }\n}",
+  "codeLanguage": "java",
+  "realWorldExample": "In a CI/CD pipeline, @BeforeSuite initializes the ExtentReport. @BeforeMethod launches Chrome in headless mode and navigates to the test URL. @AfterMethod takes a screenshot on failure and quits the browser. @AfterSuite finalizes and saves the report to disk.",
+  "commonMistakes": [
+    "Using @BeforeClass for browser setup — means all tests in class share one browser instance (not parallel-safe)",
+    "Forgetting alwaysRun = true in @AfterMethod — teardown skips if test throws exception",
+    "Not using ITestResult in @AfterMethod to conditionally take screenshots",
+    "Setting wrong priority order — lower number runs first, not higher",
+    "Not making DataProvider parallel when running parallel tests"
+  ],
+  "bestPractices": [
+    "Use @BeforeMethod / @AfterMethod for browser setup/teardown for test isolation",
+    "Always add alwaysRun = true to @Before/@After methods",
+    "Use ITestResult in @AfterMethod to capture screenshots only on failures",
+    "Group tests as \"smoke\", \"regression\", \"sanity\" for flexible execution",
+    "Store DataProvider test data in external sources (Excel, JSON) using Apache POI"
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the execution order of TestNG annotations?",
+      "a": "@BeforeSuite → @BeforeTest → @BeforeClass → @BeforeMethod → @Test → @AfterMethod → @AfterClass → @AfterTest → @AfterSuite"
+    },
+    {
+      "q": "What is @DataProvider in TestNG?",
+      "a": "@DataProvider returns an Object[][] that TestNG uses to run the same @Test method multiple times with different data. It supports parallel execution with parallel=true. The test method must accept the same parameters as the data provider returns."
+    },
+    {
+      "q": "What is the difference between @BeforeClass and @BeforeMethod?",
+      "a": "@BeforeClass runs once before the first test method in the class. @BeforeMethod runs before every single @Test method. For browser initialization, @BeforeMethod is preferred to ensure each test gets a fresh browser instance."
+    }
+  ],
+  "revisionSummary": "Order: BeforeSuite→BeforeTest→BeforeClass→BeforeMethod→Test→AfterMethod→AfterClass→AfterTest→AfterSuite. DataProvider supplies Object[][]. Priority: lower = runs first. Groups: smoke/regression. alwaysRun=true for setup/teardown.",
+  "tags": [
+    "testng",
+    "annotations",
+    "dataprovider",
+    "lifecycle",
+    "beforemethod",
+    "aftermethod"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "content-type-accept-headers",
+  "moduleId": "rest-assured",
+  "title": "Content-Type & Accept Headers",
+  "priority": "warm",
+  "estimatedMinutes": 30,
+  "overview": "Understand content negotiation using Content-Type and Accept headers.",
+  "whyItMatters": "APIs can support multiple data formats (JSON, XML, HTML). Content negotiation ensures the client and server understand what format is being sent and what format is expected in return.",
+  "explanation": "The `Content-Type` header tells the receiver what format the body of the message is in. For example, a POST request with `Content-Type: application/json` tells the server to parse the body as JSON. The `Accept` header tells the server what format the client wants the response to be in. If a client sends `Accept: application/xml`, the server should serialize the response to XML (or return 406 Not Acceptable if it cannot).",
+  "keyPoints": [
+    "`Content-Type` = format of the payload being sent.",
+    "`Accept` = format desired for the response payload.",
+    "Servers use these headers for media-type negotiation.",
+    "In REST Assured, use `.contentType()` and `.accept()` shortcuts."
+  ],
+  "codeExample": "given().\n    contentType(ContentType.JSON). // Tells server: I'm sending JSON\n    accept(ContentType.XML).       // Tells server: Please reply with XML\n    body(userJson).\nwhen().\n    post(\"/users\").\nthen().\n    statusCode(201).\n    contentType(ContentType.XML);  // Asserts the server replied with XML",
+  "codeLanguage": "java",
+  "realWorldExample": "An enterprise API allows external partners to download data in either JSON or CSV format. Your test suite sends two requests: one with `Accept: application/json` (asserting the response parses as JSON) and one with `Accept: text/csv` (asserting the response parses as CSV).",
+  "commonMistakes": [
+    "Setting the `Accept` header to JSON but using `XmlPath` to parse the response.",
+    "Forgetting the `Content-Type` on a POST request, causing the server to reject the payload with a 415 Unsupported Media Type error.",
+    "Confusing the two headers (e.g., trying to use `Accept` to declare the request body's format)."
+  ],
+  "bestPractices": [
+    "Always specify `Content-Type` for requests with bodies (POST, PUT, PATCH).",
+    "Always specify `Accept` to prevent the server from falling back to an unexpected default format.",
+    "Write tests that verify the server returns a 415 when an unsupported `Content-Type` is sent, and a 406 when an unsupported `Accept` is sent."
+  ],
+  "interviewQuestions": [
+    {
+      "q": "What is the difference between the Content-Type and Accept headers?",
+      "a": "Content-Type specifies the format of the data being sent in the current HTTP message body. Accept specifies the format the client expects the server to use for the response body."
+    },
+    {
+      "q": "What HTTP status code should a server return if it doesn't support the format requested in the Accept header?",
+      "a": "406 Not Acceptable."
+    }
+  ],
+  "revisionSummary": "Content-Type describes the request body format; Accept requests the response format.",
+  "tags": ["HTTP", "Headers", "Content Negotiation", "REST Assured"]
+}
