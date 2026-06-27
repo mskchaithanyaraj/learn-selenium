@@ -2,38 +2,13 @@
 
 import React, { useState } from "react";
 import {
-  Settings, Sun, Moon, Type, ZoomIn, ZoomOut,
-  Focus, Bell, BellOff, Download, Trash2,
-  RefreshCw, Eye, Keyboard, Accessibility, Check
+  Settings, Download, Trash2, Keyboard
 } from "lucide-react";
 import clsx from "clsx";
 import toast from "react-hot-toast";
 import { useProgress } from "@/components/providers/ProgressProvider";
 
-function ToggleSwitch({
-  enabled,
-  onChange,
-}: {
-  enabled: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <button
-      onClick={() => onChange(!enabled)}
-      className={clsx(
-        "relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none",
-        enabled ? "bg-blue-500" : "bg-white/[0.1]"
-      )}
-    >
-      <span
-        className={clsx(
-          "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200",
-          enabled && "translate-x-5"
-        )}
-      />
-    </button>
-  );
-}
+
 
 function SettingRow({
   icon: Icon,
@@ -73,24 +48,8 @@ function SectionCard({ title, children }: { title: string; children: React.React
 
 export default function SettingsPage() {
   const { progress } = useProgress();
-  const [settings, setSettings] = useState({
-    focusMode: false,
-    notifications: true,
-    fontSize: "medium" as "small" | "medium" | "large",
-    codeFont: true,
-    reducedMotion: false,
-    highContrast: false,
-    readingMode: false,
-    autoSave: true,
-    keyboardShortcuts: true,
-  });
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-
-  const update = (key: keyof typeof settings, value: unknown) => {
-    setSettings((s) => ({ ...s, [key]: value }));
-    toast.success("Setting updated");
-  };
 
   const exportProgress = () => {
     const data = JSON.stringify(progress, null, 2);
@@ -123,87 +82,13 @@ export default function SettingsPage() {
         <p className="text-white/40 text-sm">Customize your learning experience</p>
       </div>
 
-      {/* ── Appearance ──────────────────────────── */}
-      <SectionCard title="Appearance">
-        <SettingRow icon={Sun} label="Theme" description="Currently using dark theme">
-          <div className="flex items-center gap-1 bg-white/[0.06] border border-white/[0.1] rounded-lg p-1">
-            {["Dark", "System"].map((t) => (
-              <button
-                key={t}
-                className={clsx(
-                  "px-3 py-1.5 rounded-md text-xs font-medium transition-all",
-                  t === "Dark"
-                    ? "bg-white/[0.1] text-white"
-                    : "text-white/40 hover:text-white/70"
-                )}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </SettingRow>
 
-        <SettingRow icon={Type} label="Font Size" description="Adjust reading text size">
-          <div className="flex items-center gap-1 bg-white/[0.06] border border-white/[0.1] rounded-lg p-1">
-            {(["small", "medium", "large"] as const).map((size) => (
-              <button
-                key={size}
-                onClick={() => update("fontSize", size)}
-                className={clsx(
-                  "px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-all",
-                  settings.fontSize === size
-                    ? "bg-white/[0.1] text-white"
-                    : "text-white/40 hover:text-white/70"
-                )}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        </SettingRow>
-
-        <SettingRow icon={Eye} label="Reading Mode" description="Simplified layout for focused reading">
-          <ToggleSwitch enabled={settings.readingMode} onChange={(v) => update("readingMode", v)} />
-        </SettingRow>
-
-        <SettingRow icon={Focus} label="Focus Mode" description="Hide sidebar and distractions">
-          <ToggleSwitch enabled={settings.focusMode} onChange={(v) => update("focusMode", v)} />
-        </SettingRow>
-      </SectionCard>
-
-      {/* ── Notifications ───────────────────────── */}
-      <SectionCard title="Notifications">
-        <SettingRow icon={Bell} label="Study Reminders" description="Get reminded to study daily">
-          <ToggleSwitch enabled={settings.notifications} onChange={(v) => update("notifications", v)} />
-        </SettingRow>
-        <SettingRow icon={RefreshCw} label="Auto-save Notes" description="Automatically save your notes">
-          <ToggleSwitch enabled={settings.autoSave} onChange={(v) => update("autoSave", v)} />
-        </SettingRow>
-      </SectionCard>
-
-      {/* ── Accessibility ────────────────────────── */}
-      <SectionCard title="Accessibility">
-        <SettingRow icon={Accessibility} label="High Contrast" description="Increase text and element contrast">
-          <ToggleSwitch enabled={settings.highContrast} onChange={(v) => update("highContrast", v)} />
-        </SettingRow>
-        <SettingRow icon={ZoomIn} label="Reduced Motion" description="Minimize animations for motion sensitivity">
-          <ToggleSwitch enabled={settings.reducedMotion} onChange={(v) => update("reducedMotion", v)} />
-        </SettingRow>
-        <SettingRow icon={Keyboard} label="Keyboard Shortcuts" description="Enable ⌘K search and other shortcuts">
-          <ToggleSwitch enabled={settings.keyboardShortcuts} onChange={(v) => update("keyboardShortcuts", v)} />
-        </SettingRow>
-      </SectionCard>
 
       {/* ── Keyboard Shortcuts Reference ────────── */}
       <SectionCard title="Keyboard Shortcuts">
         <div className="space-y-2">
           {[
             { key: "⌘K", action: "Open search palette" },
-            { key: "⌘B", action: "Toggle sidebar" },
-            { key: "⌘/", action: "Toggle focus mode" },
-            { key: "→", action: "Next topic" },
-            { key: "←", action: "Previous topic" },
-            { key: "M", action: "Mark topic complete" },
             { key: "ESC", action: "Close modals/search" },
           ].map(({ key, action }) => (
             <div key={key} className="flex items-center justify-between py-2">

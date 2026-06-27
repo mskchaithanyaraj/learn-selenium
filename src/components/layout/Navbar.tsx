@@ -114,10 +114,6 @@ export function Navbar() {
             <span>{completedCount}/{totalTopics}</span>
           </div>
 
-          {/* Notification bell */}
-          <button className="p-2 rounded-lg hover:bg-white/[0.06] transition-colors text-white/40 hover:text-white">
-            <Bell className="w-4 h-4" />
-          </button>
         </div>
       </nav>
 
