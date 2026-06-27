@@ -5,6 +5,7 @@ import { interviewQuestions } from "@/data/interviewQuestions";
 import { modules } from "@/data/syllabus";
 import { Zap, Play, CheckCircle2, XCircle, RotateCcw, Target, Layers } from "lucide-react";
 import clsx from "clsx";
+import { formatAnswerText } from "@/utils/formatters";
 
 export default function PracticePage() {
   const [activeModule, setActiveModule] = useState("all");
@@ -227,7 +228,9 @@ export default function PracticePage() {
             {/* Back */}
             <div className="flashcard-back absolute w-full h-full glass-card border border-emerald-500/30 p-8 flex flex-col items-center justify-center text-center bg-emerald-500/5">
               <span className="text-xs text-emerald-400/50 uppercase tracking-widest mb-4">Answer</span>
-              <p className="text-base text-white/80 leading-relaxed overflow-y-auto line-clamp-6">{q.answer}</p>
+              <div className="text-base text-white/80 leading-relaxed overflow-y-auto w-full text-left">
+                {formatAnswerText(q.answer)}
+              </div>
             </div>
           </div>
         </div>

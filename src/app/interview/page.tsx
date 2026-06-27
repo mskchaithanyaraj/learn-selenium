@@ -7,6 +7,7 @@ import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Target, Search, ChevronDown, Check, Copy } from "lucide-react";
 import clsx from "clsx";
 import toast from "react-hot-toast";
+import { formatAnswerText } from "@/utils/formatters";
 
 const MODULES = [
   { id: "all", label: "All Modules" },
@@ -174,13 +175,8 @@ export default function InterviewPage() {
                     </div>
                   ) : null}
 
-                  <div className="prose prose-invert max-w-none text-sm text-white/70 leading-relaxed space-y-4">
-                    {q.answer.split('\n\n').map((para, i) => {
-                      if (para.startsWith('**') && para.includes('**')) {
-                        return <div key={i} dangerouslySetInnerHTML={{ __html: para.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>') }} />
-                      }
-                      return <p key={i} dangerouslySetInnerHTML={{ __html: para.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>') }} />
-                    })}
+                  <div className="text-sm text-white/70 leading-relaxed space-y-4">
+                    {formatAnswerText(q.answer)}
                   </div>
 
                   {q.codeExample && <CodeBlock code={q.codeExample} />}

@@ -33,7 +33,7 @@ const TABS = [
   { id: "all", label: "All Resources", icon: Layers },
   { id: "docs", label: "Documentation", icon: Book },
   { id: "practice", label: "Practice Sites", icon: Monitor },
-  { id: "github", label: "GitHub Repos", icon: Github },
+  { id: "github", label: "GitHub Repos", icon: GitBranch },
   { id: "books", label: "Books", icon: Bookmark },
 ];
 

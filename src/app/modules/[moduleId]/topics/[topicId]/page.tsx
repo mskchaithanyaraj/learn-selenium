@@ -470,6 +470,20 @@ export default function TopicPage({
   );
 }
 
+function formatAnswerText(text: string) {
+  return text.split('\n').map((line, i, arr) => (
+    <React.Fragment key={i}>
+      {line.split(/(\*\*.*?\*\*)/g).map((part, j) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={j} className="text-white font-semibold">{part.slice(2, -2)}</strong>;
+        }
+        return <span key={j}>{part}</span>;
+      })}
+      {i < arr.length - 1 && <br />}
+    </React.Fragment>
+  ));
+}
+
 function InterviewQA({ question, answer, index }: { question: string; answer: string; index: number }) {
   const [open, setOpen] = useState(false);
   return (
@@ -492,7 +506,7 @@ function InterviewQA({ question, answer, index }: { question: string; answer: st
             <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/15 text-emerald-400 text-xs flex items-center justify-center font-bold mt-0.5">
               A
             </span>
-            <p className="text-sm text-white/65 leading-relaxed">{answer}</p>
+            <p className="text-sm text-white/65 leading-relaxed">{formatAnswerText(answer)}</p>
           </div>
         </div>
       )}
